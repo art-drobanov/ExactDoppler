@@ -1,0 +1,204 @@
+﻿Imports System.IO
+Imports Bwl.Imaging
+Imports ExactAudio
+
+Public Class MainForm
+
+    'Константы
+    Private Const _windowSize = 32768 '32768
+    Private Const _windowStep = 1214 '1214 = Round(32768 / (3 * 3 * 3))
+    Private Const _sampleRate = 48000 '48000
+    Private Const _dopplerSize = 500 '500
+    Private Const _nBitsCapture = 16 '16
+    Private Const _nBitsPalette = 8 '8
+    Private Const _waterfallSeconds = 2 '2
+    Private Const _highFreq = 23000 '23000
+    Private Const _scale = 1.0 '1.0
+
+    'Данные
+    Private _outputDeviceIdx As Integer
+    Private _inputDeviceIdx As Integer
+    Private _blocksCounter As Long
+
+    'Объекты
+    Private _generator As SineGenerator
+    Private _capture As WaveInSource
+    Private _motionExplorer As MotionExplorer
+    Private _waterfall As RGBWaterfall
+    Private _dopplerLog As New LinkedList(Of String)
+
+    Public Sub New()
+        InitializeComponent()
+
+        _outputAudioDevicesRefreshButton_Click(Nothing, Nothing)
+        _inputAudioDevicesRefreshButton_Click(Nothing, Nothing)
+        Application.DoEvents()
+
+        _outputDeviceIdx = 0
+        _inputDeviceIdx = 0
+
+        _generator = New SineGenerator(_outputDeviceIdx, _sampleRate)
+        _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallSeconds) With {.SampleProcessor = AddressOf Me.SampleProcessor}
+        _motionExplorer = New MotionExplorer(_windowSize, _windowStep, _sampleRate, _nBitsPalette, False)
+        _waterfall = New RGBWaterfall()
+
+        _outputAudioDevicesListBox.SelectedIndex = _outputDeviceIdx
+        _inputAudioDevicesListBox.SelectedIndex = _inputDeviceIdx
+
+        _outputAudioDevicesRefreshButton.Text = _outputAudioDevicesListBox.Items(_outputDeviceIdx) + " / Refresh"
+        _inputAudioDevicesRefreshButton.Text = _inputAudioDevicesListBox.Items(_inputDeviceIdx) + " / Refresh"
+    End Sub
+
+    Private Sub SampleProcessor(samples As Single(), samplesCount As Integer)
+        Dim lowFreq As Double = 0
+        Dim highFreq As Double = 0
+        Dim deadZone As Integer = 0
+        Dim displayLeft As Boolean = False
+        Dim displayRightWithLeft As Boolean = False
+        Dim displayCenter As Boolean = False
+        Dim displayRight As Boolean = False
+
+        _blocksCounter += 1
+
+        Me.Invoke(Sub()
+                      _blocksLabel.Text = _blocksCounter.ToString()
+                      If _playCheckBox.Checked Then _generator.Play(samples, False) 'False - mono
+
+                      Dim centerFreq = Math.Max(Convert.ToDouble(_sineFreqLLabel.Text), Convert.ToDouble(_sineFreqRLabel.Text))
+                      If centerFreq = 0 Then
+                          lowFreq = 0
+                          highFreq = _highFreq
+                      Else
+                          lowFreq = centerFreq - _dopplerSize
+                          highFreq = centerFreq + _dopplerSize
+                          lowFreq = If(lowFreq < 0, 0, lowFreq)
+                          highFreq = If(highFreq > _highFreq, _highFreq, highFreq)
+                      End If
+
+                      deadZone = _deadZoneTrackBar.Value
+                      displayLeft = _displayLeftCheckBox.Checked
+                      displayRightWithLeft = _displayRightWithLeftCheckBox.Checked
+                      displayCenter = _displayCenterCheckBox.Checked
+                      displayRight = _displayRightCheckBox.Checked
+                  End Sub)
+
+        Dim motionExplorerResult = _motionExplorer.Process(samples, samplesCount, lowFreq, highFreq, deadZone, displayLeft, displayRightWithLeft, displayCenter, displayRight, True)
+
+        'DopplerLog
+        Dim nowTimeStamp = DateTime.Now
+        _dopplerLog.AddLast(String.Format("{0}, 'Low Doppler' {1} %, 'High Doppler' {2} %", nowTimeStamp.ToString("dd.MM.yyyy HH.mm.ss"),
+                                          motionExplorerResult.LowDoppler.Sum().ToString("000.00").Replace(",", "."),
+                                          motionExplorerResult.HighDoppler.Sum().ToString("000.00").Replace(",", ".")))
+
+        'Waterfall
+        Dim waterfallBlock = motionExplorerResult.RGBMatrix
+        _waterfall.Add(waterfallBlock)
+        _waterfallDisplayBitmapControl.Invoke(Sub()
+                                                  Dim disp = New Bitmap(waterfallBlock.ToBitmap(), _waterfallDisplayBitmapControl.Width, _waterfallDisplayBitmapControl.Height)
+                                                  _waterfallDisplayBitmapControl.DisplayBitmap.DrawBitmap(disp)
+                                                  _waterfallDisplayBitmapControl.Refresh()
+                                              End Sub)
+    End Sub
+
+    Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        _outputAudioDevicesRefreshButton_Click(sender, e)
+        _inputAudioDevicesRefreshButton_Click(sender, e)
+        _sineFreqLTrackBar_Scroll(sender, e)
+        _sineFreqRTrackBar_Scroll(sender, e)
+        _deadZoneTrackBar_Scroll(sender, e)
+    End Sub
+
+    Private Sub _sineGenButton_Click(sender As Object, e As EventArgs) Handles _switchOnButton.Click
+        _generator.SwitchOn(_sineFreqLLabel.Text, _sineFreqRLabel.Text, _mixCheckBox.Checked)
+        _outputGroupBox.Text = "Output [ ON AIR! ]"
+        _switchOnButton.BackColor = Me.BackColor
+    End Sub
+
+    Private Sub _switchOffButton_Click(sender As Object, e As EventArgs) Handles _switchOffButton.Click
+        _generator.SwitchOff()
+        _outputGroupBox.Text = "Output [ OFF ]"
+        _switchOnButton.BackColor = Color.MediumSpringGreen
+    End Sub
+
+    Private Sub _sineFreqLTrackBar_Scroll(sender As Object, e As EventArgs) Handles _sineFreqLTrackBar.Scroll
+        _sineFreqLLabel.Text = _sineFreqLTrackBar.Value * _dopplerSize
+        _volumeTrackBar_Scroll(sender, e)
+    End Sub
+
+    Private Sub _sineFreqRTrackBar_Scroll(sender As Object, e As EventArgs) Handles _sineFreqRTrackBar.Scroll
+        _sineFreqRLabel.Text = _sineFreqRTrackBar.Value * _dopplerSize
+        _volumeTrackBar_Scroll(sender, e)
+    End Sub
+
+    Private Sub _mixCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles _mixCheckBox.CheckedChanged
+        _sineGenButton_Click(sender, e)
+    End Sub
+
+    Private Sub _volumeTrackBar_Scroll(sender As Object, e As EventArgs) Handles _volumeTrackBar.Scroll
+        _generator.Volume = _volumeTrackBar.Value / 100.0F
+    End Sub
+
+    Private Sub _flashButton_Click(sender As Object, e As EventArgs) Handles _flashButton.Click
+        _generator.Flash(_sineFreqLLabel.Text, _sineFreqRLabel.Text, _mixCheckBox.Checked, 1000)
+    End Sub
+
+    Private Sub _outputAudioDevicesRefreshButton_Click(sender As Object, e As EventArgs) Handles _outputAudioDevicesRefreshButton.Click
+        _outputAudioDevicesListBox.Items.Clear()
+        For Each deviceName In AudioUtils.GetAudioDeviceNamesWaveOut()
+            _outputAudioDevicesListBox.Items.Add(deviceName)
+        Next
+    End Sub
+
+    Private Sub _inputAudioDevicesRefreshButton_Click(sender As Object, e As EventArgs) Handles _inputAudioDevicesRefreshButton.Click
+        _inputAudioDevicesListBox.Items.Clear()
+        For Each deviceName In AudioUtils.GetAudioDeviceNamesWaveIn()
+            _inputAudioDevicesListBox.Items.Add(deviceName)
+        Next
+    End Sub
+
+    Private Sub _outputAudioDevicesListBox_SelectedIndexChanged(sender As Object, e As EventArgs) Handles _outputAudioDevicesListBox.SelectedIndexChanged
+        _generator = New SineGenerator(_outputAudioDevicesListBox.SelectedIndex, _sampleRate)
+        _outputDeviceIdx = _outputAudioDevicesListBox.SelectedIndex
+        _outputAudioDevicesRefreshButton.Text = _outputAudioDevicesListBox.Items(_outputDeviceIdx) + " / Refresh"
+    End Sub
+
+    Private Sub _inputAudioDevicesListBox_SelectedIndexChanged(sender As Object, e As EventArgs) Handles _inputAudioDevicesListBox.SelectedIndexChanged
+        _captureOffButton_Click(sender, e)
+        _capture = New WaveInSource(_inputAudioDevicesListBox.SelectedIndex, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallSeconds) With {.SampleProcessor = AddressOf Me.SampleProcessor}
+        _inputDeviceIdx = _inputAudioDevicesListBox.SelectedIndex
+        _inputAudioDevicesRefreshButton.Text = _inputAudioDevicesListBox.Items(_inputDeviceIdx) + " / Refresh"
+    End Sub
+
+    Private Sub _captureOnButton_Click(sender As Object, e As EventArgs) Handles _captureOnButton.Click
+        _waterfall.Reset()
+        _capture.Start()
+        _inputGroupBox.Text = "Input [ ON ]"
+        _captureOnButton.BackColor = Me.BackColor
+    End Sub
+
+    Private Sub _captureOffButton_Click(sender As Object, e As EventArgs) Handles _captureOffButton.Click
+        _capture.Stop()
+
+        Dim snapshotFilename = DateTime.Now.ToString("dd.MM.yyyy__HH.mm.ss.ffff")
+
+        'LOG
+        If _dopplerLog.Any() Then
+            File.WriteAllLines("dopplerLog__" + snapshotFilename + ".txt", _dopplerLog.ToArray())
+            _dopplerLog.Clear()
+        End If
+
+        'WATERFALL
+        Dim waterfall = _waterfall.ToBitmap(_scale)
+        If waterfall IsNot Nothing Then
+            waterfall.Save("waterfall__" + snapshotFilename + ".jpg")
+        End If
+        _waterfall.Reset()
+
+        _inputGroupBox.Text = "Input [ OFF ]"
+        _captureOnButton.BackColor = Color.MediumSpringGreen
+    End Sub
+
+    Private Sub _deadZoneTrackBar_Scroll(sender As Object, e As EventArgs) Handles _deadZoneTrackBar.Scroll
+        _deadZoneLabel.Text = _deadZoneTrackBar.Value
+    End Sub
+End Class

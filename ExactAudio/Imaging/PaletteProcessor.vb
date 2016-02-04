@@ -1,0 +1,108 @@
+﻿Imports Bwl.Imaging
+Imports DrAF.DSP
+
+''' <summary>
+''' Процессор double-изображений на основе загруженной палитры
+''' </summary>
+Public Class PaletteProcessor
+    Private _red As Byte()
+    Private _green As Byte()
+    Private _blue As Byte()
+
+    Private _nBits As Integer
+    Private _minDbLevel As Integer = -100
+    Private _maxPaletteIdx As Integer
+    Private _normalizer As New Normalizer()
+
+    Public Sub SetMinDbLevel(minDbLevel As Integer)
+        _minDbLevel = minDbLevel
+    End Sub
+
+    Public Function Process(data As Double()()) As RGBMatrix
+        CheckPalette()
+
+        Dim rgbResult As New RGBMatrix(data(0).Length, data.Length)
+
+        Parallel.For(0, data.Length(), Sub(i)
+                                           Dim rgbRow = Process(data(i))
+                                           For j = 0 To rgbRow.Width - 1
+                                               Dim R = rgbRow.Red(j, 0)
+                                               Dim G = rgbRow.Green(j, 0)
+                                               Dim B = rgbRow.Blue(j, 0)
+
+                                               rgbResult.Red(j, i) = R
+                                               rgbResult.Green(j, i) = G
+                                               rgbResult.Blue(j, i) = B
+                                           Next
+                                       End Sub)
+
+        Return rgbResult
+    End Function
+
+    Public Function Process(data As Double()) As RGBMatrix
+        CheckPalette()
+
+        With _normalizer
+            .Init(_minDbLevel, 0, 0, _maxPaletteIdx)
+            .Normalize(data)
+        End With
+
+        Dim rgb = New RGBMatrix(data.Length, 1)
+        Parallel.For(0, data.Length(), Sub(i)
+                                           Dim val = If(Double.IsNaN(data(i)), 0, data(i))
+                                           If val < 0 Then val = 0
+                                           If val > _maxPaletteIdx Then val = _maxPaletteIdx
+
+                                           rgb.Red(i, 0) = _red(val)
+                                           rgb.Green(i, 0) = _green(val)
+                                           rgb.Blue(i, 0) = _blue(val)
+                                       End Sub)
+
+        Return rgb
+    End Function
+
+    Public Sub LoadPalette(path As String, name As String)
+        Dim redPath = IO.Path.Combine(path, name + "_R.raw")
+        Dim greenPath = IO.Path.Combine(path, name + "_G.raw")
+        Dim bluePath = IO.Path.Combine(path, name + "_B.raw")
+
+        If Not IO.File.Exists(redPath) Then Throw New Exception(String.Format("Red channel of {0} is not accessible!", name))
+        If Not IO.File.Exists(greenPath) Then Throw New Exception(String.Format("Green channel of {0} is not accessible!", name))
+        If Not IO.File.Exists(bluePath) Then Throw New Exception(String.Format("Blue channel of {0} is not accessible!", name))
+
+        Dim red = IO.File.ReadAllBytes(redPath)
+        Dim green = IO.File.ReadAllBytes(greenPath)
+        Dim blue = IO.File.ReadAllBytes(bluePath)
+        If red.Length <> green.Length Or red.Length <> blue.Length Or green.Length <> blue.Length Then
+            Throw New Exception(String.Format("Palette {0} is broken!", name))
+        Else
+            _red = red : _green = green : _blue = blue
+        End If
+
+        Dim bit8 = CInt(Math.Pow(2, 8))
+        Dim bit16 = CInt(Math.Pow(2, 16))
+        Dim bit24 = CInt(Math.Pow(2, 24))
+        Dim N = ExactFFT.ToLowerPowerOf2(_red.Length)
+        Select Case N
+            Case bit8
+                _nBits = 8
+            Case bit16
+                _nBits = 16
+            Case bit24
+                _nBits = 24
+            Case Else
+                Throw New Exception("Palette is broken!")
+        End Select
+
+        _maxPaletteIdx = Math.Pow(2, _nBits) - 1
+    End Sub
+
+    Private Sub CheckPalette()
+        If _red Is Nothing Or _green Is Nothing Or _blue Is Nothing Then
+            Throw New Exception("Palette is not init!")
+        End If
+        If _red.Length <> _green.Length Or _red.Length <> _blue.Length Or _green.Length <> _blue.Length Then
+            Throw New Exception("Palette is broken!")
+        End If
+    End Sub
+End Class

@@ -1,0 +1,61 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+ExactAudio
+</name>
+</assembly>
+<members>
+<member name="T:ExactAudio.MotionExplorer.MotionExplorerResult">
+ <summary>
+ Результат анализа блока
+ </summary>
+</member>
+<member name="T:ExactAudio.DTMFGenerator">
+ <summary>
+ Генератор DTMF
+ </summary>
+</member>
+<member name="T:ExactAudio.FFTExplorer">
+ <summary>
+ FFT-анализатор
+ </summary>
+</member>
+<member name="T:ExactAudio.My.Resources.Resources">
+<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member>
+<member name="P:ExactAudio.My.Resources.Resources.ResourceManager">
+<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member>
+<member name="P:ExactAudio.My.Resources.Resources.Culture">
+<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member>
+<member name="T:ExactAudio.Normalizer">
+ <summary>
+ Нормализатор набора данных double
+ </summary>
+</member>
+<member name="T:ExactAudio.PaletteProcessor">
+ <summary>
+ Процессор double-изображений на основе загруженной палитры
+ </summary>
+</member>
+<member name="T:ExactAudio.SineGenerator">
+ <summary>
+ Стерео-генератор синусоидального сигнала
+ </summary>
+</member>
+<member name="T:ExactAudio.AudioUtils">
+ <summary>
+ Аудиоутилиты
+ </summary>
+</member>
+</members>
+</doc>

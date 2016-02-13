@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports NAudio
 Imports Bwl.Imaging
 Imports ExactAudio
 
@@ -21,11 +22,13 @@ Public Class MainForm
     Private _blocksCounter As Long
 
     'Объекты
-    Private _generator As SineGenerator
+    Private _generator As Generator
+    Private _generator2 As Generator
     Private _capture As WaveInSource
     Private _motionExplorer As MotionExplorer
     Private _waterfall As RGBWaterfall
     Private _dopplerLog As New LinkedList(Of String)
+    Private _dopplerPcm As New LinkedList(Of Single())
 
     Public Sub New()
         InitializeComponent()
@@ -37,7 +40,8 @@ Public Class MainForm
         _outputDeviceIdx = 0
         _inputDeviceIdx = 0
 
-        _generator = New SineGenerator(_outputDeviceIdx, _sampleRate)
+        _generator = New Generator(_outputDeviceIdx, _sampleRate)
+        _generator2 = New Generator(0, _sampleRate)
         _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallSeconds) With {.SampleProcessor = AddressOf Me.SampleProcessor}
         _motionExplorer = New MotionExplorer(_windowSize, _windowStep, _sampleRate, _nBitsPalette, False)
         _waterfall = New RGBWaterfall()
@@ -57,12 +61,11 @@ Public Class MainForm
         Dim displayRightWithLeft As Boolean = False
         Dim displayCenter As Boolean = False
         Dim displayRight As Boolean = False
+        Dim play As Boolean = False
 
         _blocksCounter += 1
-
         Me.Invoke(Sub()
                       _blocksLabel.Text = _blocksCounter.ToString()
-                      If _playCheckBox.Checked Then _generator.Play(samples, False) 'False - mono
 
                       Dim centerFreq = Math.Max(Convert.ToDouble(_sineFreqLLabel.Text), Convert.ToDouble(_sineFreqRLabel.Text))
                       If centerFreq = 0 Then
@@ -80,6 +83,7 @@ Public Class MainForm
                       displayRightWithLeft = _displayRightWithLeftCheckBox.Checked
                       displayCenter = _displayCenterCheckBox.Checked
                       displayRight = _displayRightCheckBox.Checked
+                      play = _playCheckBox.Checked
                   End Sub)
 
         Dim motionExplorerResult = _motionExplorer.Process(samples, samplesCount, lowFreq, highFreq, deadZone, displayLeft, displayRightWithLeft, displayCenter, displayRight, True)
@@ -98,6 +102,12 @@ Public Class MainForm
                                                   _waterfallDisplayBitmapControl.DisplayBitmap.DrawBitmap(disp)
                                                   _waterfallDisplayBitmapControl.Refresh()
                                               End Sub)
+
+        'Pcm
+        _dopplerPcm.AddLast(motionExplorerResult.Pcm)
+        If play Then
+            _generator2.Play(motionExplorerResult.Pcm, False)
+        End If
     End Sub
 
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -157,7 +167,18 @@ Public Class MainForm
     End Sub
 
     Private Sub _outputAudioDevicesListBox_SelectedIndexChanged(sender As Object, e As EventArgs) Handles _outputAudioDevicesListBox.SelectedIndexChanged
-        _generator = New SineGenerator(_outputAudioDevicesListBox.SelectedIndex, _sampleRate)
+        If _outputAudioDevicesListBox.SelectedIndex = 0 Then
+            With _playCheckBox
+                .Checked = False
+                .Enabled = False
+            End With
+        Else
+            With _playCheckBox
+                .Enabled = True
+                .Checked = True
+            End With
+        End If
+        _generator = New Generator(_outputAudioDevicesListBox.SelectedIndex, _sampleRate)
         _outputDeviceIdx = _outputAudioDevicesListBox.SelectedIndex
         _outputAudioDevicesRefreshButton.Text = _outputAudioDevicesListBox.Items(_outputDeviceIdx) + " / Refresh"
     End Sub
@@ -179,6 +200,7 @@ Public Class MainForm
     Private Sub _captureOffButton_Click(sender As Object, e As EventArgs) Handles _captureOffButton.Click
         _capture.Stop()
 
+        'FileName
         Dim snapshotFilename = DateTime.Now.ToString("dd.MM.yyyy__HH.mm.ss.ffff")
 
         'LOG
@@ -190,10 +212,24 @@ Public Class MainForm
         'WATERFALL
         Dim waterfall = _waterfall.ToBitmap(_scale)
         If waterfall IsNot Nothing Then
-            waterfall.Save("waterfall__" + snapshotFilename + ".jpg")
+            waterfall.Save("waterfall___" + snapshotFilename + ".jpg")
         End If
         _waterfall.Reset()
 
+        'PCM
+        If _dopplerPcm.Any() Then
+            Dim wavFile As New Wave.WaveFileWriter("dopplerWav__" + snapshotFilename + ".wav", New Wave.WaveFormat(_sampleRate, 1))
+            For Each pcmBlock In _dopplerPcm
+                wavFile.WriteSamples(pcmBlock, 0, pcmBlock.Length)
+            Next
+            _dopplerPcm.Clear()
+            With wavFile
+                .Flush()
+                .Close()
+            End With
+        End If
+
+        'GUI
         _inputGroupBox.Text = "Input [ OFF ]"
         _captureOnButton.BackColor = Color.MediumSpringGreen
     End Sub

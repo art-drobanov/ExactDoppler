@@ -12,6 +12,7 @@ Public Class MotionExplorer
         Public Property LowDoppler As New LinkedList(Of Single)
         Public Property HighDoppler As New LinkedList(Of Single)
         Public Property Duration As Double
+        Public Property Pcm As Single()
     End Class
 
     Private Const _redChannel = 0 '0
@@ -24,17 +25,21 @@ Public Class MotionExplorer
     Private Const _noiseGuardCoeff = 1.1 '1.1
     Private Const _noiseScannerDepth = 0.1 '0.1
     Private Const _brightness = 100 '100
+    Private Const _minFreq = 200 '200
+    Private Const _playDeadZone = 12 '12
 
     Private _targetNRG As Double = 0 '0
     Private _gain As Double = 1.0 '1.0
 
     Private _paletteProcessor As PaletteProcessor
+    Private _waterfallPlayer As WaterfallPlayer
 
     Public Sub New(frameWidth As Integer, frameStep As Integer, sampleRate As Integer, nBits As Integer, stereo As Boolean)
         MyBase.New(frameWidth, frameStep, sampleRate, nBits, stereo)
         _targetNRG = Math.Pow(2, nBits - 1)
         _paletteProcessor = New PaletteProcessor()
         _paletteProcessor.LoadPalette("..\..\..\palettes.raw\Uranium", "URANIUM_PALETTE")
+        _waterfallPlayer = New WaterfallPlayer(frameWidth, frameStep, sampleRate, nBits, _minFreq)
     End Sub
 
     Public Function ProcessWithBitmap(samples As Single(), samplesCount As Integer, lowFreq As Double, highFreq As Double,
@@ -43,7 +48,7 @@ Public Class MotionExplorer
     End Function
 
     Public Function ProcessWithoutBitmap(samples As Single(), samplesCount As Integer, lowFreq As Double, highFreq As Double,
-                                        zeroDbLevel As Double, deadZone As Integer, brightness As Double) As MotionExplorerResult
+                                         zeroDbLevel As Double, deadZone As Integer, brightness As Double) As MotionExplorerResult
         Return Process(samples, samplesCount, lowFreq, highFreq, deadZone, True, False, True, True, False)
     End Function
 
@@ -52,21 +57,22 @@ Public Class MotionExplorer
                             bitmapOutput As Boolean) As MotionExplorerResult
         'FFT
         Dim mag = MyBase.Explore(samples, samplesCount, lowFreq, highFreq).MagL
+        Dim result As New MotionExplorerResult With {.Duration = mag(0).Length * MyBase.SonogramRowDuration,
+                                                     .Pcm = _waterfallPlayer.Process(mag, _playDeadZone)}
 
         'DSP
         Dim squelchInDb = MyBase.Db(AutoGain(mag, _brightness), _zeroDbLevel)
+
         MyBase.DbScale(mag, _zeroDbLevel, squelchInDb)
         DopplerFilterDb(mag, _NZeroes)
 
         'IMAGE
-        Return Detect(mag, _zeroDbLevel, deadZone, displayLeft, displayRightWithLeft, displayCenter, displayRight, bitmapOutput)
+        Return Detect(result, mag, _zeroDbLevel, deadZone, displayLeft, displayRightWithLeft, displayCenter, displayRight, bitmapOutput)
     End Function
 
-    Private Function Detect(mag As Double()(), zeroDbLevel As Double, deadZone As Integer,
+    Private Function Detect(result As MotionExplorerResult, mag As Double()(), zeroDbLevel As Double, deadZone As Integer,
                             displayLeft As Boolean, displayRightWithLeft As Boolean, displayCenter As Boolean, displayRight As Boolean,
                             bitmapOutput As Boolean) As MotionExplorerResult
-        Dim result As New MotionExplorerResult With {.Duration = mag(0).Length * MyBase.SonogramRowDuration}
-
         Dim dopplerWindowWidth = (mag(0).Length - deadZone) \ 2
         Dim lowDopplerLowHarm = 0
         Dim lowDopplerHighHarm = dopplerWindowWidth - 1

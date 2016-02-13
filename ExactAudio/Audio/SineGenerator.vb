@@ -4,8 +4,8 @@ Imports Timer = System.Timers.Timer
 ''' <summary>
 ''' Стерео-генератор синусоидального сигнала
 ''' </summary>
-Public Class SineGenerator
-    Private Class Generator
+Public Class Generator
+    Private Class SineGenerator
         Private _sineFreq As Integer
         Private _sampFreq As Integer
         Private _startPhase As Double
@@ -66,8 +66,8 @@ Public Class SineGenerator
     Private _sineFreqL As Integer
     Private _sineFreqR As Integer
 
-    Private _sineGenL As Generator
-    Private _sineGenR As Generator
+    Private _sineGenL As SineGenerator
+    Private _sineGenR As SineGenerator
 
     Private _mix As Boolean
 
@@ -114,8 +114,8 @@ Public Class SineGenerator
             Throw New Exception("Can't init at least one output device")
         End If
 
-        _sineGenL = New Generator(_sampleRate)
-        _sineGenR = New Generator(_sampleRate)
+        _sineGenL = New SineGenerator(_sampleRate)
+        _sineGenR = New SineGenerator(_sampleRate)
 
         _waveOutTimer = New Timer(_waveOutTimerInterval)
         AddHandler _waveOutTimer.Elapsed, AddressOf TimerEventProcessor
@@ -158,6 +158,7 @@ Public Class SineGenerator
     End Sub
 
     Public Sub Play(samples As Single(), stereo As Boolean)
+        If samples Is Nothing Then Return
         Dim samplesBytes = samples.Select(Function(item) CDbl(item)).ToArray().ToNBits(_bitDepth).ToByteArray24(Not stereo)
         _waveProvider.AddSamples(samplesBytes, 0, samplesBytes.Length)
         _waveOut.Play()

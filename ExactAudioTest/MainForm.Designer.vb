@@ -299,11 +299,13 @@ Partial Class MainForm
         '_playCheckBox
         '
         Me._playCheckBox.AutoSize = True
+        Me._playCheckBox.Checked = True
+        Me._playCheckBox.CheckState = System.Windows.Forms.CheckState.Checked
         Me._playCheckBox.Location = New System.Drawing.Point(6, 459)
         Me._playCheckBox.Name = "_playCheckBox"
-        Me._playCheckBox.Size = New System.Drawing.Size(45, 17)
+        Me._playCheckBox.Size = New System.Drawing.Size(160, 17)
         Me._playCheckBox.TabIndex = 16
-        Me._playCheckBox.Text = "play"
+        Me._playCheckBox.Text = "Play on default audio device"
         Me._playCheckBox.UseVisualStyleBackColor = True
         '
         '_blocksLabel
@@ -392,7 +394,7 @@ Partial Class MainForm
         Me.MaximizeBox = False
         Me.Name = "MainForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "ExactAudioTest (04.02.2016 10:08)"
+        Me.Text = "ExactAudioTest (14.02.2016 00:19)"
         CType(Me._sineFreqLTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.frequencyGroupBox.ResumeLayout(False)
         Me.frequencyGroupBox.PerformLayout()

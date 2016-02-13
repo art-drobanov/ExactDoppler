@@ -6,7 +6,7 @@
 Public Class DTMFGenerator
     Private _symbolTime As Integer
     Private _spaceTime As Integer
-    Private _generator As SineGenerator
+    Private _generator As Generator
 
     Public Structure FreqPair
         Public Sub New(lowFreq As Integer, highFreq As Integer)
@@ -21,7 +21,7 @@ Public Class DTMFGenerator
 
     Public Sub New(deviceNumber As Integer, sampleRate As Integer,
                    Optional symbolTime As Integer = 100, Optional spaceTime As Integer = 40)
-        _generator = New SineGenerator(deviceNumber, sampleRate)
+        _generator = New Generator(deviceNumber, sampleRate)
 
         _symbolTime = symbolTime
         _spaceTime = spaceTime

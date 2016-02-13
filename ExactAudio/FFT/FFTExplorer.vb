@@ -17,16 +17,15 @@ Public Class FFTExplorer
     End Property
 
     Public Sub New(frameWidth As Integer, frameStep As Integer, sampleRate As Integer, nBits As Integer, stereo As Boolean)
+        'Общие параметры
         _sampleRate = sampleRate
         _zeroDbLevel = CInt(Math.Pow(2, ExactFFT.ToLowerPowerOf2(nBits) - 1))
         _stereo = stereo
 
-        'Общие параметры
-        Dim polyDiv2 = 1
-        Dim isComplex = False
-
         'Косинусное взвешивающее окно "BLACKMAN-HARRIS" (оптимальное по совокупности характеристик)
         Dim cosTW As ExactFFT.CosTW = ExactFFT.CosTW.BLACKMAN_HARRIS_92dbPS
+        Dim polyDiv2 = 1
+        Dim isComplex = False
         _fftObj = ExactFFT.CFFT_Constructor_Cosine(frameWidth, cosTW, polyDiv2, frameStep, isComplex)
 
         'Считываем длительность одной строки сонограммы

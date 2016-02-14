@@ -87,9 +87,10 @@ Public Class WaterfallPlayer
         Dim FFT_T = New Double(_fftObj.NN - 1) {}
         Dim FFT_S = New Double(_fftObj.NN - 1) {}
         Parallel.For(1, N2, Sub(i)
-                                FFT_T((i << 1) + 0) = magRowFull(i - 1)
+                                Dim magValue = magRowFull(i - 1)
+                                FFT_T((i << 1) + 0) = magValue
                                 FFT_T((i << 1) + 1) = 0
-                                FFT_T(((_fftObj.N - i) << 1) + 0) = magRowFull(i)
+                                FFT_T(((_fftObj.N - i) << 1) + 0) = magValue
                                 FFT_T(((_fftObj.N - i) << 1) + 1) = 0
                             End Sub)
 
@@ -109,9 +110,9 @@ Public Class WaterfallPlayer
 
     Private Function GetPcm(FFT_S As Double()) As Single()
         Dim pcmOut = New Single(_fftObj.WindowStep - 1) {}
-        Dim fullPcmWidth = (FFT_S.Length / 2) - 1
+        Dim fullPcmWidth = FFT_S.Length / 2
         Dim center = CInt(Math.Round(fullPcmWidth / 2.0))
-        Dim radius = CInt(Math.Round((_fftObj.WindowStep / 2.0) - 1))
+        Dim radius = CInt(Math.Round((_fftObj.WindowStep - 1) / 2.0))
         Dim leftBound = center - radius
         Dim rightBound = leftBound + (pcmOut.Length - 1)
         Dim boundSize = (rightBound - leftBound) + 1

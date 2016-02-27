@@ -79,10 +79,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FFT\WaterfallPlayer.vb" />
-    <Compile Include="MotionExplorer.vb" />
     <Compile Include="Imaging\ImageUtils.vb" />
-    <Compile Include="Imaging\RGBWaterfall.vb" />
     <Compile Include="Audio\DTMFGenerator.vb" />
     <Compile Include="FFT\FFTExplorer.vb" />
     <Compile Include="Audio\WaveInSource.vb" />

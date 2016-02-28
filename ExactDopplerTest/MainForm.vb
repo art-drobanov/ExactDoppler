@@ -1,4 +1,5 @@
-﻿Imports NAudio
+﻿Imports System.IO
+Imports NAudio
 Imports Bwl.Imaging
 Imports ExactAudio
 Imports ExactDoppler
@@ -206,8 +207,22 @@ Public Class MainForm
         Dim snapshotFilename = DateTime.Now.ToString("dd.MM.yyyy__HH.mm.ss.ffff")
 
         'LOG
-        _dopplerLog.Write(snapshotFilename)
-        _dopplerLog.Clear()
+        If _dopplerLog.Items.Any() Then
+            Dim logFilename = "dopplerLog__" + snapshotFilename + ".txt"
+            Using logStream = File.OpenWrite(logFilename)
+                _dopplerLog.Write(logStream)
+                logStream.Flush()
+            End Using
+            _dopplerLog.Clear()
+            Using logStreamR = File.OpenRead(logFilename)
+                Dim dopplerLogTest As New DopplerLog()
+                dopplerLogTest.Read(logStreamR)
+                Using logStreamW = File.OpenWrite(logFilename.Replace(".txt", ".copy.txt"))
+                    dopplerLogTest.Write(logStreamW)
+                    logStreamW.Flush()
+                End Using
+            End Using
+        End If
 
         'WATERFALL
         Dim waterfall = _waterfall.ToBitmap(_scale)

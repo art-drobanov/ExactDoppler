@@ -1,0 +1,36 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+ExactDoppler
+</name>
+</assembly>
+<members>
+<member name="T:ExactAudio.ExactDoppler">
+ <summary>
+ Доплеровский акустический детектор
+ </summary>
+</member>
+<member name="T:ExactAudio.MotionExplorer.MotionExplorerResult">
+ <summary>
+ Результат анализа блока
+ </summary>
+</member>
+<member name="T:ExactAudio.My.Resources.Resources">
+<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member>
+<member name="P:ExactAudio.My.Resources.Resources.ResourceManager">
+<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member>
+<member name="P:ExactAudio.My.Resources.Resources.Culture">
+<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member>
+</members>
+</doc>

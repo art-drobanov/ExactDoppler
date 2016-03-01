@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{94CA58FE-F34B-4784-8C2D-68177A610A65}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>ExactDoppler</RootNamespace>
+    <RootNamespace>ExactAudio</RootNamespace>
     <AssemblyName>ExactDoppler</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
@@ -49,6 +49,9 @@
     <Reference Include="ExactFFT">
       <HintPath>..\refs\ExactFFT.dll</HintPath>
     </Reference>
+    <Reference Include="NAudio">
+      <HintPath>..\refs\NAudio.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -70,6 +73,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExactDoppler.vb" />
     <Compile Include="Log\DopplerLog.vb" />
     <Compile Include="Motion\MotionExplorer.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

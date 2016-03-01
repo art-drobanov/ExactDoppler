@@ -33,7 +33,6 @@ Partial Class MainForm
         Me._sineFreqRTrackBar = New System.Windows.Forms.TrackBar()
         Me._labelL = New System.Windows.Forms.Label()
         Me._volumeTrackBar = New System.Windows.Forms.TrackBar()
-        Me._flashButton = New System.Windows.Forms.Button()
         Me._outputGroupBox = New System.Windows.Forms.GroupBox()
         Me._outputAudioDevicesRefreshButton = New System.Windows.Forms.Button()
         Me._outputAudioDevicesListBox = New System.Windows.Forms.ListBox()
@@ -45,7 +44,6 @@ Partial Class MainForm
         Me._inputAudioDevicesListBox = New System.Windows.Forms.ListBox()
         Me._blocksLabel_ = New System.Windows.Forms.Label()
         Me._captureOffButton = New System.Windows.Forms.Button()
-        Me._playCheckBox = New System.Windows.Forms.CheckBox()
         Me._blocksLabel = New System.Windows.Forms.Label()
         Me._captureOnButton = New System.Windows.Forms.Button()
         Me._waterfallDisplayBitmapControl = New Bwl.Imaging.DisplayBitmapControl()
@@ -173,20 +171,10 @@ Partial Class MainForm
         Me._volumeTrackBar.TickStyle = System.Windows.Forms.TickStyle.None
         Me._volumeTrackBar.Value = 100
         '
-        '_flashButton
-        '
-        Me._flashButton.Location = New System.Drawing.Point(7, 455)
-        Me._flashButton.Name = "_flashButton"
-        Me._flashButton.Size = New System.Drawing.Size(213, 23)
-        Me._flashButton.TabIndex = 9
-        Me._flashButton.Text = "Flash"
-        Me._flashButton.UseVisualStyleBackColor = True
-        '
         '_outputGroupBox
         '
         Me._outputGroupBox.Controls.Add(Me._outputAudioDevicesRefreshButton)
         Me._outputGroupBox.Controls.Add(Me._switchOnButton)
-        Me._outputGroupBox.Controls.Add(Me._flashButton)
         Me._outputGroupBox.Controls.Add(Me._outputAudioDevicesListBox)
         Me._outputGroupBox.Controls.Add(Me._switchOffButton)
         Me._outputGroupBox.Controls.Add(Me.frequencyGroupBox)
@@ -223,13 +211,12 @@ Partial Class MainForm
         Me._inputGroupBox.Controls.Add(Me._inputAudioDevicesListBox)
         Me._inputGroupBox.Controls.Add(Me._blocksLabel_)
         Me._inputGroupBox.Controls.Add(Me._captureOffButton)
-        Me._inputGroupBox.Controls.Add(Me._playCheckBox)
         Me._inputGroupBox.Controls.Add(Me._blocksLabel)
         Me._inputGroupBox.Controls.Add(Me._captureOnButton)
         Me._inputGroupBox.Location = New System.Drawing.Point(287, 12)
         Me._inputGroupBox.Name = "_inputGroupBox"
         Me._inputGroupBox.Size = New System.Drawing.Size(267, 486)
-        Me._inputGroupBox.TabIndex = 10
+        Me._inputGroupBox.TabIndex = 9
         Me._inputGroupBox.TabStop = False
         Me._inputGroupBox.Text = "Input [ OFF ]"
         '
@@ -258,7 +245,7 @@ Partial Class MainForm
         Me._deadZoneTrackBar.Minimum = 1
         Me._deadZoneTrackBar.Name = "_deadZoneTrackBar"
         Me._deadZoneTrackBar.Size = New System.Drawing.Size(255, 45)
-        Me._deadZoneTrackBar.TabIndex = 13
+        Me._deadZoneTrackBar.TabIndex = 12
         Me._deadZoneTrackBar.Value = 70
         '
         '_inputAudioDevicesRefreshButton
@@ -266,7 +253,7 @@ Partial Class MainForm
         Me._inputAudioDevicesRefreshButton.Location = New System.Drawing.Point(6, 250)
         Me._inputAudioDevicesRefreshButton.Name = "_inputAudioDevicesRefreshButton"
         Me._inputAudioDevicesRefreshButton.Size = New System.Drawing.Size(256, 23)
-        Me._inputAudioDevicesRefreshButton.TabIndex = 12
+        Me._inputAudioDevicesRefreshButton.TabIndex = 11
         Me._inputAudioDevicesRefreshButton.UseVisualStyleBackColor = True
         '
         '_inputAudioDevicesListBox
@@ -275,7 +262,7 @@ Partial Class MainForm
         Me._inputAudioDevicesListBox.Location = New System.Drawing.Point(6, 19)
         Me._inputAudioDevicesListBox.Name = "_inputAudioDevicesListBox"
         Me._inputAudioDevicesListBox.Size = New System.Drawing.Size(256, 225)
-        Me._inputAudioDevicesListBox.TabIndex = 11
+        Me._inputAudioDevicesListBox.TabIndex = 10
         '
         '_blocksLabel_
         '
@@ -292,21 +279,9 @@ Partial Class MainForm
         Me._captureOffButton.Location = New System.Drawing.Point(214, 426)
         Me._captureOffButton.Name = "_captureOffButton"
         Me._captureOffButton.Size = New System.Drawing.Size(47, 23)
-        Me._captureOffButton.TabIndex = 15
+        Me._captureOffButton.TabIndex = 14
         Me._captureOffButton.Text = "Off"
         Me._captureOffButton.UseVisualStyleBackColor = False
-        '
-        '_playCheckBox
-        '
-        Me._playCheckBox.AutoSize = True
-        Me._playCheckBox.Checked = True
-        Me._playCheckBox.CheckState = System.Windows.Forms.CheckState.Checked
-        Me._playCheckBox.Location = New System.Drawing.Point(6, 459)
-        Me._playCheckBox.Name = "_playCheckBox"
-        Me._playCheckBox.Size = New System.Drawing.Size(160, 17)
-        Me._playCheckBox.TabIndex = 16
-        Me._playCheckBox.Text = "Play on default audio device"
-        Me._playCheckBox.UseVisualStyleBackColor = True
         '
         '_blocksLabel
         '
@@ -323,7 +298,7 @@ Partial Class MainForm
         Me._captureOnButton.Location = New System.Drawing.Point(6, 426)
         Me._captureOnButton.Name = "_captureOnButton"
         Me._captureOnButton.Size = New System.Drawing.Size(202, 23)
-        Me._captureOnButton.TabIndex = 14
+        Me._captureOnButton.TabIndex = 13
         Me._captureOnButton.Text = "Capture On"
         Me._captureOnButton.UseVisualStyleBackColor = False
         '
@@ -334,7 +309,7 @@ Partial Class MainForm
         Me._waterfallDisplayBitmapControl.Location = New System.Drawing.Point(12, 504)
         Me._waterfallDisplayBitmapControl.Name = "_waterfallDisplayBitmapControl"
         Me._waterfallDisplayBitmapControl.Size = New System.Drawing.Size(542, 148)
-        Me._waterfallDisplayBitmapControl.TabIndex = 17
+        Me._waterfallDisplayBitmapControl.TabIndex = 15
         '
         '_displayLeftCheckBox
         '
@@ -344,7 +319,7 @@ Partial Class MainForm
         Me._displayLeftCheckBox.Location = New System.Drawing.Point(12, 658)
         Me._displayLeftCheckBox.Name = "_displayLeftCheckBox"
         Me._displayLeftCheckBox.Size = New System.Drawing.Size(15, 14)
-        Me._displayLeftCheckBox.TabIndex = 41
+        Me._displayLeftCheckBox.TabIndex = 16
         Me._displayLeftCheckBox.UseVisualStyleBackColor = True
         '
         '_displayRightCheckBox
@@ -355,7 +330,7 @@ Partial Class MainForm
         Me._displayRightCheckBox.Location = New System.Drawing.Point(539, 658)
         Me._displayRightCheckBox.Name = "_displayRightCheckBox"
         Me._displayRightCheckBox.Size = New System.Drawing.Size(15, 14)
-        Me._displayRightCheckBox.TabIndex = 44
+        Me._displayRightCheckBox.TabIndex = 19
         Me._displayRightCheckBox.UseVisualStyleBackColor = True
         '
         '_displayRightWithLeftCheckBox
@@ -364,7 +339,7 @@ Partial Class MainForm
         Me._displayRightWithLeftCheckBox.Location = New System.Drawing.Point(30, 658)
         Me._displayRightWithLeftCheckBox.Name = "_displayRightWithLeftCheckBox"
         Me._displayRightWithLeftCheckBox.Size = New System.Drawing.Size(15, 14)
-        Me._displayRightWithLeftCheckBox.TabIndex = 42
+        Me._displayRightWithLeftCheckBox.TabIndex = 17
         Me._displayRightWithLeftCheckBox.UseVisualStyleBackColor = True
         '
         '_displayCenterCheckBox
@@ -375,7 +350,7 @@ Partial Class MainForm
         Me._displayCenterCheckBox.Location = New System.Drawing.Point(278, 658)
         Me._displayCenterCheckBox.Name = "_displayCenterCheckBox"
         Me._displayCenterCheckBox.Size = New System.Drawing.Size(15, 14)
-        Me._displayCenterCheckBox.TabIndex = 43
+        Me._displayCenterCheckBox.TabIndex = 18
         Me._displayCenterCheckBox.UseVisualStyleBackColor = True
         '
         'MainForm
@@ -394,7 +369,7 @@ Partial Class MainForm
         Me.MaximizeBox = False
         Me.Name = "MainForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "ExactDopplerTest (28.02.2016 04:41)"
+        Me.Text = "ExactDopplerTest (01.03.2016 12:58)"
         CType(Me._sineFreqLTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.frequencyGroupBox.ResumeLayout(False)
         Me.frequencyGroupBox.PerformLayout()
@@ -419,16 +394,13 @@ Partial Class MainForm
     Friend WithEvents _labelR As Label
     Friend WithEvents _sineFreqRLabel As Label
     Friend WithEvents _sineFreqLLabel As Label
-    Friend WithEvents _mixCheckBox As CheckBox
     Friend WithEvents _volumeTrackBar As TrackBar
-    Friend WithEvents _flashButton As Button
     Friend WithEvents _outputGroupBox As GroupBox
     Friend WithEvents _outputAudioDevicesRefreshButton As Button
     Friend WithEvents _outputAudioDevicesListBox As ListBox
     Friend WithEvents _inputGroupBox As GroupBox
     Friend WithEvents _inputAudioDevicesListBox As ListBox
     Friend WithEvents _inputAudioDevicesRefreshButton As Button
-    Friend WithEvents _playCheckBox As CheckBox
     Friend WithEvents _captureOffButton As Button
     Friend WithEvents _blocksLabel As Label
     Friend WithEvents _blocksLabel_ As Label
@@ -441,4 +413,5 @@ Partial Class MainForm
     Friend WithEvents _displayRightCheckBox As CheckBox
     Friend WithEvents _displayRightWithLeftCheckBox As CheckBox
     Friend WithEvents _displayCenterCheckBox As CheckBox
+    Friend WithEvents _mixCheckBox As CheckBox
 End Class

@@ -4,6 +4,29 @@
 ''' Доплеровский акустический детектор
 ''' </summary>
 Public Class ExactDoppler
+    Public Class ExactDopplerConfig
+        Public ReadOnly Property CenterFreq As Double
+        Public ReadOnly Property DeadZone As Integer
+        Public ReadOnly Property DisplayLeft As Boolean
+        Public ReadOnly Property DisplayRightWithLeft As Boolean
+        Public ReadOnly Property DisplayCenter As Boolean
+        Public ReadOnly Property DisplayRight As Boolean
+        Public ReadOnly Property PcmOutput As Boolean
+        Public ReadOnly Property ImageOutput As Boolean
+
+        Public Sub New(centerFreq As Double, deadZone As Integer, displayLeft As Boolean,
+                       displayRightWithLeft As Boolean, displayCenter As Boolean, displayRight As Boolean,
+                       pcmOutput As Boolean, imageOutput As Boolean)
+            Me.CenterFreq = centerFreq
+            Me.DeadZone = deadZone
+            Me.DisplayLeft = displayLeft
+            Me.DisplayRightWithLeft = displayRightWithLeft
+            Me.DisplayCenter = displayCenter
+            Me.DisplayRight = displayRight
+            Me.PcmOutput = pcmOutput
+            Me.ImageOutput = imageOutput
+        End Sub
+    End Class
 
     'Константы
     Private Const _windowSize = 32768 '32768
@@ -50,7 +73,7 @@ Public Class ExactDoppler
         Set(value As Integer)
             SyncLock Me
                 _inputDeviceIdx = value
-                _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallSeconds) With {.SampleProcessor = Me.SampleProcessor}
+                _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallSeconds) With {.SampleProcessor = AddressOf SampleProcessor}
             End SyncLock
         End Set
     End Property
@@ -84,46 +107,56 @@ Public Class ExactDoppler
         End Set
     End Property
 
-    Public Property SampleProcessor As SampleProcessorDelegate
+    Private _config As ExactDopplerConfig
+    Public Property Config As ExactDopplerConfig
         Get
-            Return _capture.SampleProcessor
-        End Get
-        Set(value As SampleProcessorDelegate)
             SyncLock Me
-                _capture.SampleProcessor = value
+                Return _config
             End SyncLock
+        End Get
+        Set(value As ExactDopplerConfig)
+            _config = value
         End Set
     End Property
 
+    Public Event SamplesProcessed(motionExplorerResult As MotionExplorerResult)
+
     Public Sub New()
+        Me.New(Nothing)
+    End Sub
+
+    Public Sub New(config As ExactDopplerConfig)
+        If config IsNot Nothing Then
+            _config = config
+        End If
         _generator = New Generator(_outputDeviceIdx, _sampleRate)
         _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallSeconds)
         _motionExplorer = New MotionExplorer(_windowSize, _windowStep, _sampleRate, _nBitsPalette, False)
     End Sub
 
-    Public Function Process(samples As Single(), samplesCount As Integer, centerFreq As Double, deadZone As Integer,
-                            displayLeft As Boolean, displayRightWithLeft As Boolean, displayCenter As Boolean, displayRight As Boolean,
-                            pcmOutput As Boolean, imageOutput As Boolean) As MotionExplorerResult
+    Public Function Process(samples As Single(), samplesCount As Integer) As MotionExplorerResult
         SyncLock Me
+            'Параметры
             Dim lowFreq As Double = 0
             Dim highFreq As Double = 0
             Dim play As Boolean = False
 
-            If centerFreq = 0 Then
+            If _config.CenterFreq = 0 Then
                 lowFreq = 0
                 highFreq = _topFreq
             Else
-                lowFreq = centerFreq - _dopplerSize
-                highFreq = centerFreq + _dopplerSize
+                lowFreq = _config.CenterFreq - _dopplerSize
+                highFreq = _config.CenterFreq + _dopplerSize
                 lowFreq = If(lowFreq < 0, 0, lowFreq)
                 highFreq = If(highFreq > _topFreq, _topFreq, highFreq)
             End If
 
-            'Processing
-            Dim motionExplorerResult = _motionExplorer.Process(samples, samplesCount, lowFreq, HighFreq, deadZone, displayLeft,
-                                                               displayRightWithLeft, displayCenter, displayRight, pcmOutput, imageOutput)
+            'Обработка
+            Dim motionExplorerResult = _motionExplorer.Process(samples, samplesCount, lowFreq, highFreq, _config.DeadZone, _config.DisplayLeft,
+                                                               _config.DisplayRightWithLeft, _config.DisplayCenter, _config.DisplayRight,
+                                                               _config.PcmOutput, _config.ImageOutput)
 
-            'DopplerLog
+            'Допплер-лог
             Dim nowTimeStamp = DateTime.Now
             Dim lowDopplerSum = motionExplorerResult.LowDoppler.Sum()
             Dim highDopplerSum = motionExplorerResult.HighDoppler.Sum()
@@ -134,6 +167,11 @@ Public Class ExactDoppler
             Return motionExplorerResult
         End SyncLock
     End Function
+
+    Private Sub SampleProcessor(samples As Single(), samplesCount As Integer)
+        Dim motionExplorerResult = Process(samples, samplesCount)
+        RaiseEvent SamplesProcessed(motionExplorerResult)
+    End Sub
 
     Public Sub SwitchOnGen(sineFreqL As Integer, sineFreqR As Integer, mix As Boolean)
         SyncLock Me
@@ -150,7 +188,7 @@ Public Class ExactDoppler
     Public Sub Start()
         SyncLock Me
             With _capture
-                .SampleProcessor = Me.SampleProcessor
+                .SampleProcessor = AddressOf SampleProcessor
                 .Start()
             End With
         End SyncLock

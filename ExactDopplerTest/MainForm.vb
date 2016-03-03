@@ -2,13 +2,14 @@
 Imports NAudio
 Imports Bwl.Imaging
 Imports ExactAudio
+Imports ExactAudio.MotionExplorer
 
 Public Class MainForm
     Private _waterfall As New RGBWaterfall
     Private _dopplerPcm As New LinkedList(Of Single())
 
     Private _blocksCounter As Long = 0
-    Private _exactDoppler As New ExactDoppler() With {.SampleProcessor = AddressOf SampleProcessor}
+    Private WithEvents _exactDoppler As New ExactDoppler()
 
     Public Sub New()
         InitializeComponent()
@@ -23,28 +24,7 @@ Public Class MainForm
         _inputAudioDevicesRefreshButton.Text = _inputAudioDevicesListBox.Items(_exactDoppler.InputDeviceIdx) + " / Refresh"
     End Sub
 
-    Private Sub SampleProcessor(samples As Single(), samplesCount As Integer)
-        Dim centerFreq As Double
-        Dim deadZone As Integer = 0
-        Dim displayLeft As Boolean = False
-        Dim displayRightWithLeft As Boolean = False
-        Dim displayCenter As Boolean = False
-        Dim displayRight As Boolean = False
-
-        _blocksCounter += 1
-        Me.Invoke(Sub()
-                      _blocksLabel.Text = _blocksCounter.ToString()
-                      centerFreq = Math.Max(Convert.ToDouble(_sineFreqLLabel.Text), Convert.ToDouble(_sineFreqRLabel.Text))
-                      deadZone = _deadZoneTrackBar.Value
-                      displayLeft = _displayLeftCheckBox.Checked
-                      displayRightWithLeft = _displayRightWithLeftCheckBox.Checked
-                      displayCenter = _displayCenterCheckBox.Checked
-                      displayRight = _displayRightCheckBox.Checked
-                  End Sub)
-
-        'Processing
-        Dim motionExplorerResult = _exactDoppler.Process(samples, samplesCount, centerFreq, deadZone, displayLeft, displayRightWithLeft, displayCenter, displayRight, True, True)
-
+    Private Sub SamplesProcessedHandler(motionExplorerResult As MotionExplorerResult) Handles _exactDoppler.SamplesProcessed
         'Waterfall
         Dim waterfallBlock = motionExplorerResult.Image
         _waterfall.Add(waterfallBlock)
@@ -65,6 +45,32 @@ Public Class MainForm
         _deadZoneTrackBar_Scroll(sender, e)
     End Sub
 
+    Private Sub UpdateExactDopplerConfig()
+        If Not Me.Visible Then Return
+
+        Dim centerFreq As Double
+        Dim deadZone As Integer
+        Dim displayLeft As Boolean
+        Dim displayRightWithLeft As Boolean
+        Dim displayCenter As Boolean
+        Dim displayRight As Boolean
+
+        _blocksCounter += 1
+        Me.Invoke(Sub()
+                      _blocksLabel.Text = _blocksCounter.ToString()
+                      centerFreq = Math.Max(Convert.ToDouble(_sineFreqLLabel.Text), Convert.ToDouble(_sineFreqRLabel.Text))
+                      deadZone = _deadZoneTrackBar.Value
+                      displayLeft = _displayLeftCheckBox.Checked
+                      displayRightWithLeft = _displayRightWithLeftCheckBox.Checked
+                      displayCenter = _displayCenterCheckBox.Checked
+                      displayRight = _displayRightCheckBox.Checked
+                  End Sub)
+
+        Dim pcmOutput = True
+        Dim imageOutput = True
+        _exactDoppler.Config = New ExactDoppler.ExactDopplerConfig(centerFreq, deadZone, displayLeft, displayRightWithLeft, displayCenter, displayRight, pcmOutput, imageOutput)
+    End Sub
+
     Private Sub _sineGenButton_Click(sender As Object, e As EventArgs) Handles _switchOnButton.Click
         _exactDoppler.SwitchOnGen(_sineFreqLLabel.Text, _sineFreqRLabel.Text, _mixCheckBox.Checked)
         _outputGroupBox.Text = "Output [ ON AIR! ]"
@@ -80,11 +86,13 @@ Public Class MainForm
     Private Sub _sineFreqLTrackBar_Scroll(sender As Object, e As EventArgs) Handles _sineFreqLTrackBar.Scroll
         _sineFreqLLabel.Text = _sineFreqLTrackBar.Value * _exactDoppler.DopplerSize
         _volumeTrackBar_Scroll(sender, e)
+        UpdateExactDopplerConfig()
     End Sub
 
     Private Sub _sineFreqRTrackBar_Scroll(sender As Object, e As EventArgs) Handles _sineFreqRTrackBar.Scroll
         _sineFreqRLabel.Text = _sineFreqRTrackBar.Value * _exactDoppler.DopplerSize
         _volumeTrackBar_Scroll(sender, e)
+        UpdateExactDopplerConfig()
     End Sub
 
     Private Sub _mixCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles _mixCheckBox.CheckedChanged
@@ -118,6 +126,27 @@ Public Class MainForm
         _captureOffButton_Click(sender, e)
         _exactDoppler.InputDeviceIdx = _inputAudioDevicesListBox.SelectedIndex
         _inputAudioDevicesRefreshButton.Text = _inputAudioDevicesListBox.Items(_exactDoppler.InputDeviceIdx) + " / Refresh"
+    End Sub
+
+    Private Sub _deadZoneTrackBar_Scroll(sender As Object, e As EventArgs) Handles _deadZoneTrackBar.Scroll
+        _deadZoneLabel.Text = _deadZoneTrackBar.Value
+        UpdateExactDopplerConfig()
+    End Sub
+
+    Private Sub _displayLeftCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles _displayLeftCheckBox.CheckedChanged
+        UpdateExactDopplerConfig()
+    End Sub
+
+    Private Sub _displayRightWithLeftCheckBox_CheckStateChanged(sender As Object, e As EventArgs) Handles _displayRightWithLeftCheckBox.CheckStateChanged
+        UpdateExactDopplerConfig()
+    End Sub
+
+    Private Sub _displayCenterCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles _displayCenterCheckBox.CheckedChanged
+        UpdateExactDopplerConfig()
+    End Sub
+
+    Private Sub _displayRightCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles _displayRightCheckBox.CheckedChanged
+        UpdateExactDopplerConfig()
     End Sub
 
     Private Sub _captureOnButton_Click(sender As Object, e As EventArgs) Handles _captureOnButton.Click
@@ -174,9 +203,5 @@ Public Class MainForm
         'GUI
         _inputGroupBox.Text = "Input [ OFF ]"
         _captureOnButton.BackColor = Color.MediumSpringGreen
-    End Sub
-
-    Private Sub _deadZoneTrackBar_Scroll(sender As Object, e As EventArgs) Handles _deadZoneTrackBar.Scroll
-        _deadZoneLabel.Text = _deadZoneTrackBar.Value
     End Sub
 End Class

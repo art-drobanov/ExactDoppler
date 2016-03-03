@@ -166,7 +166,7 @@ Partial Class MainForm
         Me._volumeTrackBar.Maximum = 100
         Me._volumeTrackBar.Name = "_volumeTrackBar"
         Me._volumeTrackBar.Orientation = System.Windows.Forms.Orientation.Vertical
-        Me._volumeTrackBar.Size = New System.Drawing.Size(45, 199)
+        Me._volumeTrackBar.Size = New System.Drawing.Size(45, 170)
         Me._volumeTrackBar.TabIndex = 27
         Me._volumeTrackBar.TickStyle = System.Windows.Forms.TickStyle.None
         Me._volumeTrackBar.Value = 100
@@ -181,7 +181,7 @@ Partial Class MainForm
         Me._outputGroupBox.Controls.Add(Me._volumeTrackBar)
         Me._outputGroupBox.Location = New System.Drawing.Point(12, 12)
         Me._outputGroupBox.Name = "_outputGroupBox"
-        Me._outputGroupBox.Size = New System.Drawing.Size(269, 486)
+        Me._outputGroupBox.Size = New System.Drawing.Size(269, 457)
         Me._outputGroupBox.TabIndex = 0
         Me._outputGroupBox.TabStop = False
         Me._outputGroupBox.Text = "Output [ OFF ]"
@@ -215,7 +215,7 @@ Partial Class MainForm
         Me._inputGroupBox.Controls.Add(Me._captureOnButton)
         Me._inputGroupBox.Location = New System.Drawing.Point(287, 12)
         Me._inputGroupBox.Name = "_inputGroupBox"
-        Me._inputGroupBox.Size = New System.Drawing.Size(267, 486)
+        Me._inputGroupBox.Size = New System.Drawing.Size(267, 457)
         Me._inputGroupBox.TabIndex = 9
         Me._inputGroupBox.TabStop = False
         Me._inputGroupBox.Text = "Input [ OFF ]"
@@ -306,9 +306,9 @@ Partial Class MainForm
         '
         Me._waterfallDisplayBitmapControl.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me._waterfallDisplayBitmapControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me._waterfallDisplayBitmapControl.Location = New System.Drawing.Point(12, 504)
+        Me._waterfallDisplayBitmapControl.Location = New System.Drawing.Point(12, 475)
         Me._waterfallDisplayBitmapControl.Name = "_waterfallDisplayBitmapControl"
-        Me._waterfallDisplayBitmapControl.Size = New System.Drawing.Size(542, 148)
+        Me._waterfallDisplayBitmapControl.Size = New System.Drawing.Size(542, 177)
         Me._waterfallDisplayBitmapControl.TabIndex = 15
         '
         '_displayLeftCheckBox
@@ -369,7 +369,7 @@ Partial Class MainForm
         Me.MaximizeBox = False
         Me.Name = "MainForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "ExactDopplerTest (03.03.2016 14:01)"
+        Me.Text = "ExactDopplerTest (03.03.2016 23:44)"
         CType(Me._sineFreqLTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.frequencyGroupBox.ResumeLayout(False)
         Me.frequencyGroupBox.PerformLayout()

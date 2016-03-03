@@ -3,9 +3,9 @@ Imports System.Globalization
 
 Public Class DopplerLog
     Public Class Item
-        Public ReadOnly Property Time As DateTime
-        Public ReadOnly Property LowDoppler As Single
-        Public ReadOnly Property HighDoppler As Single
+        Public Property Time As DateTime
+        Public Property LowDoppler As Single
+        Public Property HighDoppler As Single
 
         Public Sub New(T As DateTime, L As Single, H As Single)
             Me.Time = T

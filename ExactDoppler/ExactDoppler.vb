@@ -5,14 +5,14 @@
 ''' </summary>
 Public Class ExactDoppler
     Public Class ExactDopplerConfig
-        Public ReadOnly Property CenterFreq As Double
-        Public ReadOnly Property DeadZone As Integer
-        Public ReadOnly Property DisplayLeft As Boolean
-        Public ReadOnly Property DisplayRightWithLeft As Boolean
-        Public ReadOnly Property DisplayCenter As Boolean
-        Public ReadOnly Property DisplayRight As Boolean
-        Public ReadOnly Property PcmOutput As Boolean
-        Public ReadOnly Property ImageOutput As Boolean
+        Public ReadOnly CenterFreq As Double
+        Public ReadOnly DeadZone As Integer
+        Public ReadOnly DisplayLeft As Boolean
+        Public ReadOnly DisplayRightWithLeft As Boolean
+        Public ReadOnly DisplayCenter As Boolean
+        Public ReadOnly DisplayRight As Boolean
+        Public ReadOnly PcmOutput As Boolean
+        Public ReadOnly ImageOutput As Boolean
 
         Public Sub New(centerFreq As Double, deadZone As Integer, displayLeft As Boolean,
                        displayRightWithLeft As Boolean, displayCenter As Boolean, displayRight As Boolean,

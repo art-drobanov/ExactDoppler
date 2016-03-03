@@ -21,11 +21,11 @@ Public Class Generator
             _startPhase = 0
         End Sub
 
-        Public Function Generate24Bits(sineFreq As Integer, n As Integer) As Integer()
+        Public Function Generate24BitsN(sineFreq As Integer, n As Integer) As Integer()
             Return ToNBits(Process(sineFreq, n), 24)
         End Function
 
-        Public Function Generate24Bits(sineFreq As Integer, ms As Double) As Integer()
+        Public Function Generate24BitsMs(sineFreq As Integer, ms As Double) As Integer()
             Dim s As Double = ms / 1000.0
             Dim n = CInt(Math.Floor(_sampFreq * s))
             Return ToNBits(Process(sineFreq, n), 24)
@@ -131,6 +131,7 @@ Public Class Generator
         AddWaveSamples()
         If _waveOut.PlaybackState <> PlaybackState.Playing Then
             _waveOutTimer.Start()
+            AddWaveSamples(2000)
             _waveOut.Play()
         End If
     End Sub
@@ -164,7 +165,7 @@ Public Class Generator
         _waveOut.Play()
     End Sub
 
-    Private Sub AddWaveSamples(sineTimeToGenerate As Integer)
+    Private Sub AddWaveSamples(sineTimeToGenerate As Double)
         Dim savedSineTimeToGenerate = _sineTimeToGenerate
         _sineTimeToGenerate = sineTimeToGenerate
         AddWaveSamples()
@@ -179,8 +180,8 @@ Public Class Generator
             Dim sineL As Byte()
             Dim sineR As Byte()
 
-            sineIntsL = _sineGenL.Generate24Bits(_sineFreqL, _sineTimeToGenerate)
-            sineIntsR = _sineGenR.Generate24Bits(_sineFreqR, _sineTimeToGenerate)
+            sineIntsL = _sineGenL.Generate24BitsMs(_sineFreqL, _sineTimeToGenerate)
+            sineIntsR = _sineGenR.Generate24BitsMs(_sineFreqR, _sineTimeToGenerate)
             If _mix Then sineIntsL.MixWith(sineIntsR)
             sineL = sineIntsL.ToByteArray24(False)
             sineR = sineIntsR.ToByteArray24(False)

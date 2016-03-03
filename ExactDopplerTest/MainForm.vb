@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports System.Threading
 Imports NAudio
 Imports Bwl.Imaging
 Imports ExactAudio
@@ -30,11 +31,72 @@ Public Class MainForm
         _waterfall.Add(waterfallBlock)
         _waterfallDisplayBitmapControl.Invoke(Sub()
                                                   Dim disp = New Bitmap(waterfallBlock.ToBitmap(), _waterfallDisplayBitmapControl.Width, _waterfallDisplayBitmapControl.Height)
-                                                  _waterfallDisplayBitmapControl.DisplayBitmap.DrawBitmap(disp)
-                                                  _waterfallDisplayBitmapControl.Refresh()
+                                                  With _waterfallDisplayBitmapControl
+                                                      .DisplayBitmap.DrawBitmap(disp)
+                                                      .Refresh()
+                                                  End With
                                               End Sub)
+
         'Pcm
         _dopplerPcm.AddLast(motionExplorerResult.Pcm)
+
+        'Gui
+        _blocksCounter += 1
+        _blocksLabel.Invoke(Sub()
+                                _blocksLabel.Text = _blocksCounter.ToString()
+                            End Sub)
+    End Sub
+
+    Private Sub _captureOffButton_Click(sender As Object, e As EventArgs) Handles _captureOffButton.Click
+        _exactDoppler.Stop()
+
+        'FileName
+        Dim snapshotFilename = DateTime.Now.ToString("dd.MM.yyyy__HH.mm.ss.ffff")
+
+        'DopplerLog
+        If _exactDoppler.DopplerLog.Items.Any() Then
+            'Log
+            Dim logFilename = "dopplerLog__" + snapshotFilename + ".txt"
+            Using logStream = File.OpenWrite(logFilename)
+                _exactDoppler.DopplerLog.Write(logStream)
+                logStream.Flush()
+            End Using
+            _exactDoppler.DopplerLog.Clear()
+
+            ''Exact Doppler Log Write/Read Test
+            'Using logStreamR = File.OpenRead(logFilename)
+            '    Dim dopplerLogTest As New DopplerLog()
+            '    dopplerLogTest.Read(logStreamR)
+            '    Using logStreamW = File.OpenWrite(logFilename.Replace(".txt", ".copy.txt"))
+            '        dopplerLogTest.Write(logStreamW)
+            '        logStreamW.Flush()
+            '    End Using
+            'End Using
+        End If
+
+        'WaterFall
+        Dim waterfall = _waterfall.ToBitmap()
+        If waterfall IsNot Nothing Then
+            waterfall.Save("waterfall___" + snapshotFilename + ".jpg")
+        End If
+        _waterfall.Reset()
+
+        'PCM
+        If _dopplerPcm.Any() Then
+            Dim wavFile As New Wave.WaveFileWriter("dopplerWav__" + snapshotFilename + ".wav", New Wave.WaveFormat(_exactDoppler.SampleRate, 1))
+            For Each pcmBlock In _dopplerPcm
+                wavFile.WriteSamples(pcmBlock, 0, pcmBlock.Length)
+            Next
+            _dopplerPcm.Clear()
+            With wavFile
+                .Flush()
+                .Close()
+            End With
+        End If
+
+        'GUI
+        _inputGroupBox.Text = "Input [ OFF ]"
+        _captureOnButton.BackColor = Color.MediumSpringGreen
     End Sub
 
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -55,9 +117,7 @@ Public Class MainForm
         Dim displayCenter As Boolean
         Dim displayRight As Boolean
 
-        _blocksCounter += 1
         Me.Invoke(Sub()
-                      _blocksLabel.Text = _blocksCounter.ToString()
                       centerFreq = Math.Max(Convert.ToDouble(_sineFreqLLabel.Text), Convert.ToDouble(_sineFreqRLabel.Text))
                       deadZone = _deadZoneTrackBar.Value
                       displayLeft = _displayLeftCheckBox.Checked
@@ -81,6 +141,13 @@ Public Class MainForm
         _exactDoppler.SwitchOffGen()
         _outputGroupBox.Text = "Output [ OFF ]"
         _switchOnButton.BackColor = Color.MediumSpringGreen
+    End Sub
+
+    Private Sub _captureOnButton_Click(sender As Object, e As EventArgs) Handles _captureOnButton.Click
+        _waterfall.Reset()
+        _exactDoppler.Start()
+        _inputGroupBox.Text = "Input [ ON ]"
+        _captureOnButton.BackColor = Me.BackColor
     End Sub
 
     Private Sub _sineFreqLTrackBar_Scroll(sender As Object, e As EventArgs) Handles _sineFreqLTrackBar.Scroll
@@ -147,61 +214,5 @@ Public Class MainForm
 
     Private Sub _displayRightCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles _displayRightCheckBox.CheckedChanged
         UpdateExactDopplerConfig()
-    End Sub
-
-    Private Sub _captureOnButton_Click(sender As Object, e As EventArgs) Handles _captureOnButton.Click
-        _waterfall.Reset()
-        _exactDoppler.Start()
-        _inputGroupBox.Text = "Input [ ON ]"
-        _captureOnButton.BackColor = Me.BackColor
-    End Sub
-
-    Private Sub _captureOffButton_Click(sender As Object, e As EventArgs) Handles _captureOffButton.Click
-        _exactDoppler.Stop()
-
-        'FileName
-        Dim snapshotFilename = DateTime.Now.ToString("dd.MM.yyyy__HH.mm.ss.ffff")
-
-        'DopplerLog
-        If _exactDoppler.DopplerLog.Items.Any() Then
-            Dim logFilename = "dopplerLog__" + snapshotFilename + ".txt"
-            Using logStream = File.OpenWrite(logFilename)
-                _exactDoppler.DopplerLog.Write(logStream)
-                logStream.Flush()
-            End Using
-            _exactDoppler.DopplerLog.Clear()
-            Using logStreamR = File.OpenRead(logFilename)
-                Dim dopplerLogTest As New DopplerLog()
-                dopplerLogTest.Read(logStreamR)
-                Using logStreamW = File.OpenWrite(logFilename.Replace(".txt", ".copy.txt"))
-                    dopplerLogTest.Write(logStreamW)
-                    logStreamW.Flush()
-                End Using
-            End Using
-        End If
-
-        'WaterFall
-        Dim waterfall = _waterfall.ToBitmap()
-        If waterfall IsNot Nothing Then
-            waterfall.Save("waterfall___" + snapshotFilename + ".jpg")
-        End If
-        _waterfall.Reset()
-
-        'PCM
-        If _dopplerPcm.Any() Then
-            Dim wavFile As New Wave.WaveFileWriter("dopplerWav__" + snapshotFilename + ".wav", New Wave.WaveFormat(_exactDoppler.SampleRate, 1))
-            For Each pcmBlock In _dopplerPcm
-                wavFile.WriteSamples(pcmBlock, 0, pcmBlock.Length)
-            Next
-            _dopplerPcm.Clear()
-            With wavFile
-                .Flush()
-                .Close()
-            End With
-        End If
-
-        'GUI
-        _inputGroupBox.Text = "Input [ OFF ]"
-        _captureOnButton.BackColor = Color.MediumSpringGreen
     End Sub
 End Class

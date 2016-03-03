@@ -12,14 +12,7 @@
 	@cd ..
 )
 
-@for /D %%i in (*Release) do @(
-	@rmdir /Q /S %%i
-)
-
 @for /D %%i in (*Debug) do @(
 	@rmdir /Q /S %%i
 )
 
-@for /D %%i in (*-out) do @(
-	@rmdir /Q /S %%i
-)

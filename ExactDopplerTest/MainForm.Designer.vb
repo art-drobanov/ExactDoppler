@@ -146,10 +146,11 @@ Partial Class MainForm
         '_sineFreqRTrackBar
         '
         Me._sineFreqRTrackBar.Location = New System.Drawing.Point(6, 52)
-        Me._sineFreqRTrackBar.Maximum = 40
+        Me._sineFreqRTrackBar.Maximum = 48
         Me._sineFreqRTrackBar.Name = "_sineFreqRTrackBar"
         Me._sineFreqRTrackBar.Size = New System.Drawing.Size(202, 45)
         Me._sineFreqRTrackBar.TabIndex = 6
+        Me._sineFreqRTrackBar.Value = 42
         '
         '_labelL
         '
@@ -327,7 +328,7 @@ Partial Class MainForm
         Me._displayRightCheckBox.AutoSize = True
         Me._displayRightCheckBox.Checked = True
         Me._displayRightCheckBox.CheckState = System.Windows.Forms.CheckState.Checked
-        Me._displayRightCheckBox.Location = New System.Drawing.Point(539, 658)
+        Me._displayRightCheckBox.Location = New System.Drawing.Point(540, 658)
         Me._displayRightCheckBox.Name = "_displayRightCheckBox"
         Me._displayRightCheckBox.Size = New System.Drawing.Size(15, 14)
         Me._displayRightCheckBox.TabIndex = 19
@@ -369,7 +370,7 @@ Partial Class MainForm
         Me.MaximizeBox = False
         Me.Name = "MainForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "ExactDopplerTest (03.03.2016 23:44)"
+        Me.Text = "ExactDopplerTest (07.03.2016 17:11)"
         CType(Me._sineFreqLTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.frequencyGroupBox.ResumeLayout(False)
         Me.frequencyGroupBox.PerformLayout()

@@ -75,6 +75,7 @@
   <ItemGroup>
     <Compile Include="ExactDoppler.vb" />
     <Compile Include="Log\DopplerLog.vb" />
+    <Compile Include="Log\PcmLog.vb" />
     <Compile Include="Motion\MotionExplorer.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

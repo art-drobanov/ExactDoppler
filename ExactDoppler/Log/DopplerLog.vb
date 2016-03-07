@@ -94,6 +94,19 @@ Public Class DopplerLog
         End If
     End Sub
 
+    Public Sub Write(filename As String)
+        Using logStream = File.OpenWrite(filename)
+            Write(logStream)
+            logStream.Flush()
+        End Using
+    End Sub
+
+    Public Sub Read(filename As String)
+        Using logStream = File.OpenRead(filename)
+            Read(logStream)
+        End Using
+    End Sub
+
     Public Sub Clear()
         SyncLock Me
             _items.Clear()

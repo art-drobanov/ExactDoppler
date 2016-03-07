@@ -1,16 +1,12 @@
-﻿Imports System.IO
-Imports System.Threading
-Imports NAudio
-Imports Bwl.Imaging
+﻿Imports Bwl.Imaging
 Imports ExactAudio
 Imports ExactAudio.MotionExplorer
 
 Public Class MainForm
-    Private _waterfall As New RGBWaterfall
-    Private _dopplerPcm As New LinkedList(Of Single())
-
-    Private _blocksCounter As Long = 0
     Private WithEvents _exactDoppler As New ExactDoppler()
+    Private _pcmLog As New PcmLog(_exactDoppler.SampleRate)
+    Private _waterfall As New RGBWaterfall
+    Private _blocksCounter As Long = 0
 
     Public Sub New()
         InitializeComponent()
@@ -36,11 +32,10 @@ Public Class MainForm
                                                       .Refresh()
                                                   End With
                                               End Sub)
-
         'Pcm
-        _dopplerPcm.AddLast(motionExplorerResult.Pcm)
+        _pcmLog.Add(motionExplorerResult.Pcm)
 
-        'Gui
+        'GUI
         _blocksCounter += 1
         _blocksLabel.Invoke(Sub()
                                 _blocksLabel.Text = _blocksCounter.ToString()
@@ -57,21 +52,16 @@ Public Class MainForm
         If _exactDoppler.DopplerLog.Items.Any() Then
             'Log
             Dim logFilename = "dopplerLog__" + snapshotFilename + ".txt"
-            Using logStream = File.OpenWrite(logFilename)
-                _exactDoppler.DopplerLog.Write(logStream)
-                logStream.Flush()
-            End Using
-            _exactDoppler.DopplerLog.Clear()
-
-            ''Exact Doppler Log Write/Read Test
-            'Using logStreamR = File.OpenRead(logFilename)
-            '    Dim dopplerLogTest As New DopplerLog()
-            '    dopplerLogTest.Read(logStreamR)
-            '    Using logStreamW = File.OpenWrite(logFilename.Replace(".txt", ".copy.txt"))
-            '        dopplerLogTest.Write(logStreamW)
-            '        logStreamW.Flush()
-            '    End Using
-            'End Using
+            With _exactDoppler.DopplerLog
+                .Write(logFilename)
+                .Clear()
+            End With
+            'Exact Doppler Log Write/Read Test
+            Dim dopplerLogTest As New DopplerLog()
+            With dopplerLogTest
+                .Read(logFilename)
+                .Write(logFilename.Replace(".txt", ".copy.txt"))
+            End With
         End If
 
         'WaterFall
@@ -82,16 +72,10 @@ Public Class MainForm
         _waterfall.Reset()
 
         'PCM
-        If _dopplerPcm.Any() Then
-            Dim wavFile As New Wave.WaveFileWriter("dopplerWav__" + snapshotFilename + ".wav", New Wave.WaveFormat(_exactDoppler.SampleRate, 1))
-            For Each pcmBlock In _dopplerPcm
-                wavFile.WriteSamples(pcmBlock, 0, pcmBlock.Length)
-            Next
-            _dopplerPcm.Clear()
-            With wavFile
-                .Flush()
-                .Close()
-            End With
+        If _pcmLog.Items.Any() Then
+            Dim wavFilename = "dopplerWav__" + snapshotFilename + ".wav"
+            _pcmLog.Write(wavFilename)
+            _pcmLog.Clear()
         End If
 
         'GUI

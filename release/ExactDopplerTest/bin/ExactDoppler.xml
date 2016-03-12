@@ -44,7 +44,7 @@ ExactDoppler
 	<param name="pcmSamplesCount">Количество семплов (для учета режима моно/стерео).</param>
 	<param name="lowFreq">Нижняя частота области интереса.</param>
 	<param name="highFreq">Верхняя частота области интереса.</param>
-	<param name="deadZone">"Мертвая зона" для подавления несущей частоты.</param>
+	<param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
 	<param name="displayLeft">Отображать разметку слева?</param>
 	<param name="displayRightWithLeft">Отображать "правую" разметку вместе с разметкой слева?</param>
 	<param name="displayCenter">Отображать центральную область разметки?</param>
@@ -59,7 +59,7 @@ ExactDoppler
 	<param name="result">Объект "Результат анализа движения" (под заполнение).</param>
 	<param name="mag">Магнитудная сонограмма ("водопад").</param>
 	<param name="zeroDbLevel">"Нулевой" уровень логарифмической шкалы.</param>
-	<param name="deadZone">"Мертвая зона" для подавления несущей частоты.</param>
+	<param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
 	<param name="displayLeft">Отображать разметку слева?</param>
 	<param name="displayRightWithLeft">Отображать "правую" разметку вместе с разметкой слева?</param>
 	<param name="displayCenter">Отображать центральную область разметки?</param>
@@ -79,6 +79,10 @@ ExactDoppler
 	<param name="mag">Магнитудная сонограмма ("водопад").</param>
 	<param name="brightness">"Яркость".</param>
 	<returns>Порог отсечки (для разделения сигнал/шум).</returns>
+</member><member name="P:ExactAudio.ExactDoppler.OutputAudioDevices">
+	<summary>Список аудиоустройств вывода.</summary>
+</member><member name="P:ExactAudio.ExactDoppler.InputAudioDevices">
+	<summary>Список аудиоустройств ввода.</summary>
 </member><member name="P:ExactAudio.ExactDoppler.SampleRate">
 	<summary>Частота семлирования.</summary>
 </member><member name="P:ExactAudio.ExactDoppler.TopFreq">

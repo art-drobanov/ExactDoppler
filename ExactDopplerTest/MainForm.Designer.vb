@@ -25,7 +25,7 @@ Partial Class MainForm
         Me._switchOnButton = New System.Windows.Forms.Button()
         Me._switchOffButton = New System.Windows.Forms.Button()
         Me._sineFreqLTrackBar = New System.Windows.Forms.TrackBar()
-        Me.frequencyGroupBox = New System.Windows.Forms.GroupBox()
+        Me._frequencyGroupBox = New System.Windows.Forms.GroupBox()
         Me._mixCheckBox = New System.Windows.Forms.CheckBox()
         Me._sineFreqRLabel = New System.Windows.Forms.Label()
         Me._sineFreqLLabel = New System.Windows.Forms.Label()
@@ -37,9 +37,9 @@ Partial Class MainForm
         Me._outputAudioDevicesRefreshButton = New System.Windows.Forms.Button()
         Me._outputAudioDevicesListBox = New System.Windows.Forms.ListBox()
         Me._inputGroupBox = New System.Windows.Forms.GroupBox()
-        Me._deadZoneLabel = New System.Windows.Forms.Label()
+        Me._blindZoneLabel = New System.Windows.Forms.Label()
         Me._sineHarmWidthLabel_ = New System.Windows.Forms.Label()
-        Me._deadZoneTrackBar = New System.Windows.Forms.TrackBar()
+        Me._blindZoneTrackBar = New System.Windows.Forms.TrackBar()
         Me._inputAudioDevicesRefreshButton = New System.Windows.Forms.Button()
         Me._inputAudioDevicesListBox = New System.Windows.Forms.ListBox()
         Me._blocksLabel_ = New System.Windows.Forms.Label()
@@ -52,12 +52,12 @@ Partial Class MainForm
         Me._displayRightWithLeftCheckBox = New System.Windows.Forms.CheckBox()
         Me._displayCenterCheckBox = New System.Windows.Forms.CheckBox()
         CType(Me._sineFreqLTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.frequencyGroupBox.SuspendLayout()
+        Me._frequencyGroupBox.SuspendLayout()
         CType(Me._sineFreqRTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me._volumeTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me._outputGroupBox.SuspendLayout()
         Me._inputGroupBox.SuspendLayout()
-        CType(Me._deadZoneTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me._blindZoneTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         '_switchOnButton
@@ -90,30 +90,30 @@ Partial Class MainForm
         Me._sineFreqLTrackBar.TickStyle = System.Windows.Forms.TickStyle.TopLeft
         Me._sineFreqLTrackBar.Value = 42
         '
-        'frequencyGroupBox
+        '_frequencyGroupBox
         '
-        Me.frequencyGroupBox.Controls.Add(Me._mixCheckBox)
-        Me.frequencyGroupBox.Controls.Add(Me._sineFreqRLabel)
-        Me.frequencyGroupBox.Controls.Add(Me._sineFreqLLabel)
-        Me.frequencyGroupBox.Controls.Add(Me._labelR)
-        Me.frequencyGroupBox.Controls.Add(Me._sineFreqRTrackBar)
-        Me.frequencyGroupBox.Controls.Add(Me._sineFreqLTrackBar)
-        Me.frequencyGroupBox.Controls.Add(Me._labelL)
-        Me.frequencyGroupBox.Location = New System.Drawing.Point(6, 279)
-        Me.frequencyGroupBox.Name = "frequencyGroupBox"
-        Me.frequencyGroupBox.Size = New System.Drawing.Size(214, 141)
-        Me.frequencyGroupBox.TabIndex = 3
-        Me.frequencyGroupBox.TabStop = False
-        Me.frequencyGroupBox.Text = "Frequency"
+        Me._frequencyGroupBox.Controls.Add(Me._mixCheckBox)
+        Me._frequencyGroupBox.Controls.Add(Me._sineFreqRLabel)
+        Me._frequencyGroupBox.Controls.Add(Me._sineFreqLLabel)
+        Me._frequencyGroupBox.Controls.Add(Me._labelR)
+        Me._frequencyGroupBox.Controls.Add(Me._sineFreqRTrackBar)
+        Me._frequencyGroupBox.Controls.Add(Me._sineFreqLTrackBar)
+        Me._frequencyGroupBox.Controls.Add(Me._labelL)
+        Me._frequencyGroupBox.Location = New System.Drawing.Point(6, 279)
+        Me._frequencyGroupBox.Name = "_frequencyGroupBox"
+        Me._frequencyGroupBox.Size = New System.Drawing.Size(214, 141)
+        Me._frequencyGroupBox.TabIndex = 3
+        Me._frequencyGroupBox.TabStop = False
+        Me._frequencyGroupBox.Text = "Frequency"
         '
         '_mixCheckBox
         '
         Me._mixCheckBox.AutoSize = True
         Me._mixCheckBox.Location = New System.Drawing.Point(167, 0)
         Me._mixCheckBox.Name = "_mixCheckBox"
-        Me._mixCheckBox.Size = New System.Drawing.Size(41, 17)
+        Me._mixCheckBox.Size = New System.Drawing.Size(42, 17)
         Me._mixCheckBox.TabIndex = 4
-        Me._mixCheckBox.Text = "mix"
+        Me._mixCheckBox.Text = "Mix"
         Me._mixCheckBox.UseVisualStyleBackColor = True
         '
         '_sineFreqRLabel
@@ -178,7 +178,7 @@ Partial Class MainForm
         Me._outputGroupBox.Controls.Add(Me._switchOnButton)
         Me._outputGroupBox.Controls.Add(Me._outputAudioDevicesListBox)
         Me._outputGroupBox.Controls.Add(Me._switchOffButton)
-        Me._outputGroupBox.Controls.Add(Me.frequencyGroupBox)
+        Me._outputGroupBox.Controls.Add(Me._frequencyGroupBox)
         Me._outputGroupBox.Controls.Add(Me._volumeTrackBar)
         Me._outputGroupBox.Location = New System.Drawing.Point(12, 12)
         Me._outputGroupBox.Name = "_outputGroupBox"
@@ -205,9 +205,9 @@ Partial Class MainForm
         '
         '_inputGroupBox
         '
-        Me._inputGroupBox.Controls.Add(Me._deadZoneLabel)
+        Me._inputGroupBox.Controls.Add(Me._blindZoneLabel)
         Me._inputGroupBox.Controls.Add(Me._sineHarmWidthLabel_)
-        Me._inputGroupBox.Controls.Add(Me._deadZoneTrackBar)
+        Me._inputGroupBox.Controls.Add(Me._blindZoneTrackBar)
         Me._inputGroupBox.Controls.Add(Me._inputAudioDevicesRefreshButton)
         Me._inputGroupBox.Controls.Add(Me._inputAudioDevicesListBox)
         Me._inputGroupBox.Controls.Add(Me._blocksLabel_)
@@ -221,33 +221,33 @@ Partial Class MainForm
         Me._inputGroupBox.TabStop = False
         Me._inputGroupBox.Text = "Input [ OFF ]"
         '
-        '_deadZoneLabel
+        '_blindZoneLabel
         '
-        Me._deadZoneLabel.AutoSize = True
-        Me._deadZoneLabel.Location = New System.Drawing.Point(6, 315)
-        Me._deadZoneLabel.Name = "_deadZoneLabel"
-        Me._deadZoneLabel.Size = New System.Drawing.Size(13, 13)
-        Me._deadZoneLabel.TabIndex = 38
-        Me._deadZoneLabel.Text = "0"
+        Me._blindZoneLabel.AutoSize = True
+        Me._blindZoneLabel.Location = New System.Drawing.Point(6, 315)
+        Me._blindZoneLabel.Name = "_blindZoneLabel"
+        Me._blindZoneLabel.Size = New System.Drawing.Size(13, 13)
+        Me._blindZoneLabel.TabIndex = 38
+        Me._blindZoneLabel.Text = "0"
         '
         '_sineHarmWidthLabel_
         '
         Me._sineHarmWidthLabel_.AutoSize = True
         Me._sineHarmWidthLabel_.Location = New System.Drawing.Point(6, 294)
         Me._sineHarmWidthLabel_.Name = "_sineHarmWidthLabel_"
-        Me._sineHarmWidthLabel_.Size = New System.Drawing.Size(61, 13)
+        Me._sineHarmWidthLabel_.Size = New System.Drawing.Size(104, 13)
         Me._sineHarmWidthLabel_.TabIndex = 37
-        Me._sineHarmWidthLabel_.Text = "Dead Zone"
+        Me._sineHarmWidthLabel_.Text = "Central ""Blind Zone"""
         '
-        '_deadZoneTrackBar
+        '_blindZoneTrackBar
         '
-        Me._deadZoneTrackBar.Location = New System.Drawing.Point(6, 331)
-        Me._deadZoneTrackBar.Maximum = 100
-        Me._deadZoneTrackBar.Minimum = 1
-        Me._deadZoneTrackBar.Name = "_deadZoneTrackBar"
-        Me._deadZoneTrackBar.Size = New System.Drawing.Size(255, 45)
-        Me._deadZoneTrackBar.TabIndex = 12
-        Me._deadZoneTrackBar.Value = 70
+        Me._blindZoneTrackBar.Location = New System.Drawing.Point(6, 331)
+        Me._blindZoneTrackBar.Maximum = 100
+        Me._blindZoneTrackBar.Minimum = 1
+        Me._blindZoneTrackBar.Name = "_blindZoneTrackBar"
+        Me._blindZoneTrackBar.Size = New System.Drawing.Size(255, 45)
+        Me._blindZoneTrackBar.TabIndex = 12
+        Me._blindZoneTrackBar.Value = 70
         '
         '_inputAudioDevicesRefreshButton
         '
@@ -370,17 +370,17 @@ Partial Class MainForm
         Me.MaximizeBox = False
         Me.Name = "MainForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "ExactDopplerTest (12.03.2016 13:53)"
+        Me.Text = "ExactDopplerTest (13.03.2016 00:36)"
         CType(Me._sineFreqLTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.frequencyGroupBox.ResumeLayout(False)
-        Me.frequencyGroupBox.PerformLayout()
+        Me._frequencyGroupBox.ResumeLayout(False)
+        Me._frequencyGroupBox.PerformLayout()
         CType(Me._sineFreqRTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me._volumeTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me._outputGroupBox.ResumeLayout(False)
         Me._outputGroupBox.PerformLayout()
         Me._inputGroupBox.ResumeLayout(False)
         Me._inputGroupBox.PerformLayout()
-        CType(Me._deadZoneTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me._blindZoneTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -389,7 +389,7 @@ Partial Class MainForm
     Friend WithEvents _switchOnButton As Button
     Friend WithEvents _switchOffButton As Button
     Friend WithEvents _sineFreqLTrackBar As TrackBar
-    Friend WithEvents frequencyGroupBox As GroupBox
+    Friend WithEvents _frequencyGroupBox As GroupBox
     Friend WithEvents _sineFreqRTrackBar As TrackBar
     Friend WithEvents _labelL As Label
     Friend WithEvents _labelR As Label
@@ -407,9 +407,9 @@ Partial Class MainForm
     Friend WithEvents _blocksLabel_ As Label
     Friend WithEvents _captureOnButton As Button
     Friend WithEvents _waterfallDisplayBitmapControl As Bwl.Imaging.DisplayBitmapControl
-    Friend WithEvents _deadZoneLabel As Label
+    Friend WithEvents _blindZoneLabel As Label
     Friend WithEvents _sineHarmWidthLabel_ As Label
-    Friend WithEvents _deadZoneTrackBar As TrackBar
+    Friend WithEvents _blindZoneTrackBar As TrackBar
     Friend WithEvents _displayLeftCheckBox As CheckBox
     Friend WithEvents _displayRightCheckBox As CheckBox
     Friend WithEvents _displayRightWithLeftCheckBox As CheckBox

@@ -6,7 +6,7 @@
 Public Class ExactDoppler
     Public Class ExactDopplerConfig
         Public ReadOnly CenterFreq As Double
-        Public ReadOnly DeadZone As Integer
+        Public ReadOnly BlindZone As Integer
         Public ReadOnly DisplayLeft As Boolean
         Public ReadOnly DisplayRightWithLeft As Boolean
         Public ReadOnly DisplayCenter As Boolean
@@ -14,11 +14,11 @@ Public Class ExactDoppler
         Public ReadOnly PcmOutput As Boolean
         Public ReadOnly ImageOutput As Boolean
 
-        Public Sub New(centerFreq As Double, deadZone As Integer, displayLeft As Boolean,
+        Public Sub New(centerFreq As Double, blindZone As Integer, displayLeft As Boolean,
                        displayRightWithLeft As Boolean, displayCenter As Boolean, displayRight As Boolean,
                        pcmOutput As Boolean, imageOutput As Boolean)
             Me.CenterFreq = centerFreq
-            Me.DeadZone = deadZone
+            Me.BlindZone = blindZone
             Me.DisplayLeft = displayLeft
             Me.DisplayRightWithLeft = displayRightWithLeft
             Me.DisplayCenter = displayCenter
@@ -49,6 +49,20 @@ Public Class ExactDoppler
     Private _motionExplorer As MotionExplorer
 
     Public ReadOnly SyncRoot As New Object
+
+    ''' <summary>Список аудиоустройств вывода.</summary>
+    Public ReadOnly Property OutputAudioDevices As String()
+        Get
+            Return AudioUtils.GetAudioDeviceNamesWaveOut()
+        End Get
+    End Property
+
+    ''' <summary>Список аудиоустройств ввода.</summary>
+    Public ReadOnly Property InputAudioDevices As String()
+        Get
+            Return AudioUtils.GetAudioDeviceNamesWaveIn()
+        End Get
+    End Property
 
     ''' <summary>Частота семлирования.</summary>
     Public ReadOnly Property SampleRate As Integer
@@ -176,7 +190,7 @@ Public Class ExactDoppler
             End If
 
             'Обработка
-            Dim motionExplorerResult = _motionExplorer.Process(pcmSamples, pcmSamplesCount, lowFreq, highFreq, _config.DeadZone, _config.DisplayLeft,
+            Dim motionExplorerResult = _motionExplorer.Process(pcmSamples, pcmSamplesCount, lowFreq, highFreq, _config.BlindZone, _config.DisplayLeft,
                                                                _config.DisplayRightWithLeft, _config.DisplayCenter, _config.DisplayRight,
                                                                _config.PcmOutput, _config.ImageOutput)
 

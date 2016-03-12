@@ -26,7 +26,7 @@ Public Class MotionExplorer
     Private Const _noiseScannerDepth = 0.1 '0.1
     Private Const _brightness = 100 '100
     Private Const _minFreq = 200 '200
-    Private Const _playDeadZone = 12 '12
+    Private Const _blindZone = 12 '12
 
     Private _targetNRG As Double = 0 '0
     Private _gain As Double = 1.0 '1.0
@@ -57,7 +57,7 @@ Public Class MotionExplorer
     ''' <param name="pcmSamplesCount">Количество семплов (для учета режима моно/стерео).</param>
     ''' <param name="lowFreq">Нижняя частота области интереса.</param>
     ''' <param name="highFreq">Верхняя частота области интереса.</param>
-    ''' <param name="deadZone">"Мертвая зона" для подавления несущей частоты.</param>
+    ''' <param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
     ''' <param name="displayLeft">Отображать разметку слева?</param>
     ''' <param name="displayRightWithLeft">Отображать "правую" разметку вместе с разметкой слева?</param>
     ''' <param name="displayCenter">Отображать центральную область разметки?</param>
@@ -65,13 +65,13 @@ Public Class MotionExplorer
     ''' <param name="pcmOutput">Осуществлять вывод Pcm?</param>
     ''' <param name="imageOutput">Выводить изображение?</param>
     ''' <returns>"Результат анализа движения".</returns>
-    Public Function Process(pcmSamples As Single(), pcmSamplesCount As Integer, lowFreq As Double, highFreq As Double, deadZone As Integer,
+    Public Function Process(pcmSamples As Single(), pcmSamplesCount As Integer, lowFreq As Double, highFreq As Double, blindZone As Integer,
                             displayLeft As Boolean, displayRightWithLeft As Boolean, displayCenter As Boolean, displayRight As Boolean,
                             pcmOutput As Boolean, imageOutput As Boolean) As MotionExplorerResult
         'FFT
         Dim mag = MyBase.Explore(pcmSamples, pcmSamplesCount, lowFreq, highFreq).MagL
         Dim result As New MotionExplorerResult With {.Duration = mag(0).Length * MyBase.SonogramRowDuration,
-                                                     .Pcm = If(pcmOutput, _waterfallPlayer.Process(mag, _playDeadZone), Nothing)}
+                                                     .Pcm = If(pcmOutput, _waterfallPlayer.Process(mag, _blindZone), Nothing)}
 
         'DSP
         Dim squelchInDb = MyBase.Db(AutoGainAndGetSquelch(mag, _brightness), _zeroDbLevel)
@@ -79,7 +79,7 @@ Public Class MotionExplorer
         DopplerFilterDb(mag, _NZeroes)
 
         'Detection
-        Return DetectOnImage(result, mag, _zeroDbLevel, deadZone, displayLeft, displayRightWithLeft, displayCenter, displayRight, imageOutput)
+        Return DetectOnImage(result, mag, _zeroDbLevel, blindZone, displayLeft, displayRightWithLeft, displayCenter, displayRight, imageOutput)
     End Function
 
     ''' <summary>
@@ -88,17 +88,17 @@ Public Class MotionExplorer
     ''' <param name="result">Объект "Результат анализа движения" (под заполнение).</param>
     ''' <param name="mag">Магнитудная сонограмма ("водопад").</param>
     ''' <param name="zeroDbLevel">"Нулевой" уровень логарифмической шкалы.</param>
-    ''' <param name="deadZone">"Мертвая зона" для подавления несущей частоты.</param>
+    ''' <param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
     ''' <param name="displayLeft">Отображать разметку слева?</param>
     ''' <param name="displayRightWithLeft">Отображать "правую" разметку вместе с разметкой слева?</param>
     ''' <param name="displayCenter">Отображать центральную область разметки?</param>
     ''' <param name="displayRight">Отображать разметку справа?</param>
     ''' <param name="imageOutput">Выводить изображение?</param>
     ''' <returns>"Результат анализа движения".</returns>
-    Private Function DetectOnImage(result As MotionExplorerResult, mag As Double()(), zeroDbLevel As Double, deadZone As Integer,
+    Private Function DetectOnImage(result As MotionExplorerResult, mag As Double()(), zeroDbLevel As Double, blindZone As Integer,
                                    displayLeft As Boolean, displayRightWithLeft As Boolean, displayCenter As Boolean, displayRight As Boolean,
                                    imageOutput As Boolean) As MotionExplorerResult
-        Dim dopplerWindowWidth = (mag(0).Length - deadZone) \ 2
+        Dim dopplerWindowWidth = (mag(0).Length - blindZone) \ 2
         Dim lowDopplerLowHarm = 0
         Dim lowDopplerHighHarm = dopplerWindowWidth - 1
         Dim highDopplerLowHarm = mag(0).Length - dopplerWindowWidth

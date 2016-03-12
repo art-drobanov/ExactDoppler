@@ -31,11 +31,11 @@ Public Class WaterfallPlayer
         _timeSliceDuration = timeSliceDuration
     End Sub
 
-    Public Function Process(mag As Double()(), deadZone As Integer) As Single()
+    Public Function Process(mag As Double()(), blindZone As Integer) As Single()
         Dim pcm As New Queue(Of Single)
 
         For Each magRow In mag
-            Dim rowPcm = ProcessMagRow(magRow, deadZone)
+            Dim rowPcm = ProcessMagRow(magRow, blindZone)
             For Each sample In rowPcm
                 pcm.Enqueue(sample)
             Next
@@ -44,7 +44,7 @@ Public Class WaterfallPlayer
         Return pcm.ToArray()
     End Function
 
-    Private Function ProcessMagRow(magRow As Double(), deadZone As Integer) As Single()
+    Private Function ProcessMagRow(magRow As Double(), blindZone As Integer) As Single()
 
         'Требуется определить, в какой части спектра будет располагаться сонограмма.
         'Если ширина блока больше ширины, установленной в конструкторе - исключение!
@@ -65,9 +65,9 @@ Public Class WaterfallPlayer
         'Зануление центра
         magRow = magRow.Clone()
         Dim center = magRow.Length / 2
-        Dim blankRadius = deadZone / 2
+        Dim blankRadius = blindZone / 2
         Dim left = center - blankRadius
-        Dim right = left + deadZone
+        Dim right = left + blindZone
         For i = left To right
             magRow(i) = 0
         Next

@@ -88,14 +88,14 @@ Public Class MainForm
         _inputAudioDevicesRefreshButton_Click(sender, e)
         _sineFreqLTrackBar_Scroll(sender, e)
         _sineFreqRTrackBar_Scroll(sender, e)
-        _deadZoneTrackBar_Scroll(sender, e)
+        _blindZoneTrackBar_Scroll(sender, e)
     End Sub
 
     Private Sub UpdateExactDopplerConfig()
         If Not Me.Visible Then Return
 
         Dim centerFreq As Double
-        Dim deadZone As Integer
+        Dim blindZone As Integer
         Dim displayLeft As Boolean
         Dim displayRightWithLeft As Boolean
         Dim displayCenter As Boolean
@@ -103,7 +103,7 @@ Public Class MainForm
 
         Me.Invoke(Sub()
                       centerFreq = Math.Max(Convert.ToDouble(_sineFreqLLabel.Text), Convert.ToDouble(_sineFreqRLabel.Text))
-                      deadZone = _deadZoneTrackBar.Value
+                      blindZone = _blindZoneTrackBar.Value
                       displayLeft = _displayLeftCheckBox.Checked
                       displayRightWithLeft = _displayRightWithLeftCheckBox.Checked
                       displayCenter = _displayCenterCheckBox.Checked
@@ -112,7 +112,7 @@ Public Class MainForm
 
         Dim pcmOutput = True
         Dim imageOutput = True
-        _exactDoppler.Config = New ExactDoppler.ExactDopplerConfig(centerFreq, deadZone, displayLeft, displayRightWithLeft, displayCenter, displayRight, pcmOutput, imageOutput)
+        _exactDoppler.Config = New ExactDoppler.ExactDopplerConfig(centerFreq, blindZone, displayLeft, displayRightWithLeft, displayCenter, displayRight, pcmOutput, imageOutput)
     End Sub
 
     Private Sub _sineGenButton_Click(sender As Object, e As EventArgs) Handles _switchOnButton.Click
@@ -156,14 +156,14 @@ Public Class MainForm
 
     Private Sub _outputAudioDevicesRefreshButton_Click(sender As Object, e As EventArgs) Handles _outputAudioDevicesRefreshButton.Click
         _outputAudioDevicesListBox.Items.Clear()
-        For Each deviceName In AudioUtils.GetAudioDeviceNamesWaveOut()
+        For Each deviceName In _exactDoppler.OutputAudioDevices
             _outputAudioDevicesListBox.Items.Add(deviceName)
         Next
     End Sub
 
     Private Sub _inputAudioDevicesRefreshButton_Click(sender As Object, e As EventArgs) Handles _inputAudioDevicesRefreshButton.Click
         _inputAudioDevicesListBox.Items.Clear()
-        For Each deviceName In AudioUtils.GetAudioDeviceNamesWaveIn()
+        For Each deviceName In _exactDoppler.InputAudioDevices
             _inputAudioDevicesListBox.Items.Add(deviceName)
         Next
     End Sub
@@ -179,8 +179,8 @@ Public Class MainForm
         _inputAudioDevicesRefreshButton.Text = _inputAudioDevicesListBox.Items(_exactDoppler.InputDeviceIdx) + " / Refresh"
     End Sub
 
-    Private Sub _deadZoneTrackBar_Scroll(sender As Object, e As EventArgs) Handles _deadZoneTrackBar.Scroll
-        _deadZoneLabel.Text = _deadZoneTrackBar.Value
+    Private Sub _blindZoneTrackBar_Scroll(sender As Object, e As EventArgs) Handles _blindZoneTrackBar.Scroll
+        _blindZoneLabel.Text = _blindZoneTrackBar.Value
         UpdateExactDopplerConfig()
     End Sub
 

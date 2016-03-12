@@ -56,7 +56,7 @@ Public Class Generator
     End Class
 
     Private Const _bufferLengthInMs As Double = 2000 '2000
-    Private _sineTimeToGenerateInMs As Double = _bufferLengthInMs \ 2 '2
+    Private Const _sineTimeToGenerateInMs As Double = _bufferLengthInMs \ 2 '2
     Private Const _minRemainToPlayInMs As Double = _bufferLengthInMs \ 2 '2
     Private Const _waveOutTimerIntervalInMs As Double = _minRemainToPlayInMs \ 10 '10
 

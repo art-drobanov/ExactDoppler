@@ -2,17 +2,22 @@
 Imports Bwl.Imaging
 Imports ExactAudio
 
+''' <summary>
+''' "Водопад" в формате RGB
+''' </summary>
 Public Class RGBWaterfall
     Private _waterfallRowBlocks As New Queue(Of RGBMatrix)
 
+    Public ReadOnly SyncRoot As New Object
+
     Public Sub Reset()
-        SyncLock Me
+        SyncLock SyncRoot
             _waterfallRowBlocks.Clear()
         End SyncLock
     End Sub
 
     Public Sub Add(waterfallRowBlock As RGBMatrix)
-        SyncLock Me
+        SyncLock SyncRoot
             If _waterfallRowBlocks.Any() Then
                 If _waterfallRowBlocks.Peek().Width <> waterfallRowBlock.Width Then
                     Throw New Exception("_waterfallBlocks.Peek().Width <> waterfallBlock.Width")
@@ -23,7 +28,7 @@ Public Class RGBWaterfall
     End Sub
 
     Public Function [Get]() As RGBMatrix
-        SyncLock Me
+        SyncLock SyncRoot
             If Not _waterfallRowBlocks.Any() Then Return Nothing
             Dim rowsCounter = _waterfallRowBlocks.Sum(Function(item) item.Height)
             Dim waterfall = New RGBMatrix(_waterfallRowBlocks.Peek.Width, rowsCounter)

@@ -10,6 +10,10 @@ ExactAudio
 	<summary>
  Аудиоутилиты
  </summary>
+</member><member name="T:ExactAudio.Generator.SineGenerator">
+	<summary>
+ "Математический" генератор синусоидального сигнала
+ </summary>
 </member><member name="T:ExactAudio.Generator">
 	<summary>
  Стерео-генератор синусоидального сигнала

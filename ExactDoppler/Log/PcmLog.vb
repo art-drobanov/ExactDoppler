@@ -2,11 +2,15 @@
 
 Public Class PcmLog
     Private _sampleRate As Integer
-    Private _items As New LinkedList(Of Single())
 
-    Public ReadOnly Property Items As LinkedList(Of Single())
+    Private _items As New LinkedList(Of Single())
+    Public ReadOnly SyncRoot As New Object
+
+    Public ReadOnly Property Items As Single()()
         Get
-            Return _items
+            SyncLock SyncRoot
+                Return _items.ToArray()
+            End SyncLock
         End Get
     End Property
 
@@ -15,13 +19,13 @@ Public Class PcmLog
     End Sub
 
     Public Sub Add(pcm As Single())
-        SyncLock Me
+        SyncLock SyncRoot
             _items.AddLast(pcm)
         End SyncLock
     End Sub
 
     Public Sub Write(filename As String)
-        SyncLock Me
+        SyncLock SyncRoot
             Dim wavFile As New Wave.WaveFileWriter(filename, New Wave.WaveFormat(_sampleRate, 1))
             For Each pcmBlock In _items
                 wavFile.WriteSamples(pcmBlock, 0, pcmBlock.Length)
@@ -34,7 +38,7 @@ Public Class PcmLog
     End Sub
 
     Public Sub Clear()
-        SyncLock Me
+        SyncLock SyncRoot
             _items.Clear()
         End SyncLock
     End Sub

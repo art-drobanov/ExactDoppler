@@ -34,7 +34,7 @@ Public Class FFTExplorer
         _timeSliceDuration = timeSliceDuration
     End Sub
 
-    Public Function Explore(samples As Single(), samplesCount As Integer, lowFreq As Double, highFreq As Double) As ExactPlotter.CFFT_ExploreResult
+    Public Function Explore(pcmSamples As Single(), pcmSamplesCount As Integer, lowFreq As Double, highFreq As Double) As ExactPlotter.CFFT_ExploreResult
         'Конфигурация: прямой проход FFT с нормализацией и использованием взвешивающего окна...
         Dim useTaperWindow As Boolean = True
         Dim recoverAfterTaperWindow As Boolean = False
@@ -44,7 +44,7 @@ Public Class FFTExplorer
         Dim isMirror As Boolean = True
 
         'Обеспечиваем L+R
-        Dim samplesLR = If(_stereo, samples, samples.RealToComplex(0)) 'Если на входе "моно" - нагружаем им только левый канал!
+        Dim samplesLR = If(_stereo, pcmSamples, pcmSamples.RealToComplex(0)) 'Если на входе "моно" - нагружаем им только левый канал!
 
         'Добавляем семплы в обработку (бесшовное соединение блоков samples)...
         ExactFFT.AddSamplesToProcessing(samplesLR, _zeroDbLevel, _fftObj)

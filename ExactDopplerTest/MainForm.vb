@@ -21,7 +21,7 @@ Public Class MainForm
         _inputAudioDevicesRefreshButton.Text = _inputAudioDevicesListBox.Items(_exactDoppler.InputDeviceIdx) + " / Refresh"
     End Sub
 
-    Private Sub SamplesProcessedHandler(motionExplorerResult As MotionExplorerResult) Handles _exactDoppler.SamplesProcessed
+    Private Sub SamplesProcessedHandler(motionExplorerResult As MotionExplorerResult) Handles _exactDoppler.PcmSamplesProcessed
         'Waterfall
         Dim waterfallBlock = motionExplorerResult.Image
         _waterfall.Add(waterfallBlock)

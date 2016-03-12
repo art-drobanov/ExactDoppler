@@ -25,6 +25,8 @@ Public Class DopplerLog
 
     Private _items As New LinkedList(Of Item)
 
+    Public ReadOnly SyncRoot As New Object
+
     Public ReadOnly Property Items As LinkedList(Of Item)
         Get
             Return _items
@@ -32,13 +34,13 @@ Public Class DopplerLog
     End Property
 
     Public Sub Add(T As DateTime, L As Single, H As Single)
-        SyncLock Me
+        SyncLock SyncRoot
             _items.AddLast(New Item(T, L, H))
         End SyncLock
     End Sub
 
     Public Sub Write(stream As Stream)
-        SyncLock Me
+        SyncLock SyncRoot
             If _items.Any() Then
                 Dim sw = New StreamWriter(stream, Text.Encoding.UTF8)
                 For Each logItem In _items.Select(Function(item) item.ToString())
@@ -83,7 +85,7 @@ Public Class DopplerLog
         sr.Close()
 
         If newLog.Items.Any() Then
-            SyncLock Me
+            SyncLock SyncRoot
                 Clear()
                 For Each li In newLog.Items
                     _items.AddLast(li)
@@ -92,6 +94,12 @@ Public Class DopplerLog
                 newLog = Nothing
             End SyncLock
         End If
+    End Sub
+
+    Public Sub Clear()
+        SyncLock SyncRoot
+            _items.Clear()
+        End SyncLock
     End Sub
 
     Public Sub Write(filename As String)
@@ -105,11 +113,5 @@ Public Class DopplerLog
         Using logStream = File.OpenRead(filename)
             Read(logStream)
         End Using
-    End Sub
-
-    Public Sub Clear()
-        SyncLock Me
-            _items.Clear()
-        End SyncLock
     End Sub
 End Class

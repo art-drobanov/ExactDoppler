@@ -6,7 +6,42 @@ ExactDoppler
 </name>
 </assembly>
 <members>
-<member name="T:ExactAudio.RGBWaterfall">
+<member name="P:ExactAudio.WaterfallPlayer.SonogramRowDuration">
+	<summary>Длительность одной строки "водопада".</summary>
+</member><member name="M:ExactAudio.WaterfallPlayer.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,System.Double)">
+	<summary>
+ Конструктор
+ </summary>
+	<param name="frameWidth">Размер окна при построении "водопада".</param>
+	<param name="frameStep">Шаг окна при построении "водопада".</param>
+	<param name="sampleRate">Частота семплирования.</param>
+	<param name="nBits">Разрядность.</param>
+	<param name="minFreq">Минимальная частота (для привязки полосы).</param>
+</member><member name="M:ExactAudio.WaterfallPlayer.Process(System.Double[][],System.Int32)">
+	<summary>
+ Основной метод обработки
+ </summary>
+	<param name="mag">Фрагмент "водопада".</param>
+	<param name="blindZone">"Слепая" зона в центре фрагмента.</param>
+	<returns>PCM-фрагмент (результат воспроизведения).</returns>
+</member><member name="M:ExactAudio.WaterfallPlayer.ProcessMagRow(System.Double[],System.Int32)">
+	<summary>
+ Обработка одной строки "водопада"
+ </summary>
+	<param name="magRow">Строка водопада.</param>
+	<param name="blindZone">"Слепая" зона в центре фрагмента.</param>
+	<returns>PCM-фрагмент, относящийся к одной строке "водопада".</returns>
+</member><member name="M:ExactAudio.WaterfallPlayer.GetPcm(System.Double[])">
+	<summary>
+ Получение PCM-данных из результатов обратного преобразования FFT
+ </summary>
+	<param name="FFT_S">Результат обратного преобразования FFT.</param>
+	<returns>PCM-данные.</returns>
+</member><member name="T:ExactAudio.WaterfallPlayer">
+	<summary>
+ "Аудиопроигрыватель" водопада
+ </summary>
+</member><member name="T:ExactAudio.RGBWaterfall">
 	<summary>
  "Водопад" в формате RGB
  </summary>
@@ -52,9 +87,9 @@ ExactDoppler
 	<param name="pcmOutput">Осуществлять вывод Pcm?</param>
 	<param name="imageOutput">Выводить изображение?</param>
 	<returns>"Результат анализа движения".</returns>
-</member><member name="M:ExactAudio.MotionExplorer.DetectOnImage(ExactAudio.MotionExplorer.MotionExplorerResult,System.Double[][],System.Double,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+</member><member name="M:ExactAudio.MotionExplorer.WaterfallDetector(ExactAudio.MotionExplorer.MotionExplorerResult,System.Double[][],System.Double,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
 	<summary>
- Детектирование всплесков по изображению
+ Детектирование всплесков на "водопаде"
  </summary>
 	<param name="result">Объект "Результат анализа движения" (под заполнение).</param>
 	<param name="mag">Магнитудная сонограмма ("водопад").</param>

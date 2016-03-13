@@ -113,7 +113,7 @@ Public Class FFTExplorer
 
     Public Sub DbScale(data As Double(), zeroDbLevel As Double, squelchInDb As Double)
         Parallel.For(0, data.Length, Sub(i)
-                                         Dim val = 10.0 * Math.Log(data(i) / zeroDbLevel) 'log
+                                         Dim val = 10.0 * Math.Log(data(i) / zeroDbLevel)  'log
                                          val = If(val < squelchInDb, Double.MinValue, val) 'squelch
                                          data(i) = val
                                      End Sub)

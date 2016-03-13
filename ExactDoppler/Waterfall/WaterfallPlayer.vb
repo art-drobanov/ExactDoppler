@@ -1,5 +1,8 @@
 ﻿Imports DrAF.DSP
 
+''' <summary>
+''' "Аудиопроигрыватель" водопада
+''' </summary>
 Public Class WaterfallPlayer
     Private _sampleRate As Integer
     Private _zeroDbLevel As Integer
@@ -8,12 +11,21 @@ Public Class WaterfallPlayer
 
     Private _fftObj As ExactFFT.CFFT_Object
 
+    ''' <summary>Длительность одной строки "водопада".</summary>
     Public ReadOnly Property SonogramRowDuration As Double
         Get
             Return _timeSliceDuration
         End Get
     End Property
 
+    ''' <summary>
+    ''' Конструктор
+    ''' </summary>
+    ''' <param name="frameWidth">Размер окна при построении "водопада".</param>
+    ''' <param name="frameStep">Шаг окна при построении "водопада".</param>
+    ''' <param name="sampleRate">Частота семплирования.</param>
+    ''' <param name="nBits">Разрядность.</param>
+    ''' <param name="minFreq">Минимальная частота (для привязки полосы).</param>
     Public Sub New(frameWidth As Integer, frameStep As Integer, sampleRate As Integer, nBits As Integer, minFreq As Double)
         _sampleRate = sampleRate
         _zeroDbLevel = CInt(Math.Pow(2, ExactFFT.ToLowerPowerOf2(nBits) - 1))
@@ -31,6 +43,12 @@ Public Class WaterfallPlayer
         _timeSliceDuration = timeSliceDuration
     End Sub
 
+    ''' <summary>
+    ''' Основной метод обработки
+    ''' </summary>
+    ''' <param name="mag">Фрагмент "водопада".</param>
+    ''' <param name="blindZone">"Слепая" зона в центре фрагмента.</param>
+    ''' <returns>PCM-фрагмент (результат воспроизведения).</returns>
     Public Function Process(mag As Double()(), blindZone As Integer) As Single()
         Dim pcm As New Queue(Of Single)
 
@@ -44,6 +62,12 @@ Public Class WaterfallPlayer
         Return pcm.ToArray()
     End Function
 
+    ''' <summary>
+    ''' Обработка одной строки "водопада"
+    ''' </summary>
+    ''' <param name="magRow">Строка водопада.</param>
+    ''' <param name="blindZone">"Слепая" зона в центре фрагмента.</param>
+    ''' <returns>PCM-фрагмент, относящийся к одной строке "водопада".</returns>
     Private Function ProcessMagRow(magRow As Double(), blindZone As Integer) As Single()
 
         'Требуется определить, в какой части спектра будет располагаться сонограмма.
@@ -108,6 +132,11 @@ Public Class WaterfallPlayer
         Return rowPcm
     End Function
 
+    ''' <summary>
+    ''' Получение PCM-данных из результатов обратного преобразования FFT
+    ''' </summary>
+    ''' <param name="FFT_S">Результат обратного преобразования FFT.</param>
+    ''' <returns>PCM-данные.</returns>
     Private Function GetPcm(FFT_S As Double()) As Single()
         Dim pcmOut = New Single(_fftObj.WindowStep - 1) {}
         Dim fullPcmWidth = FFT_S.Length / 2

@@ -67,7 +67,7 @@ Public Class MainForm
         'WaterFall
         Dim waterfall = _waterfall.ToBitmap()
         If waterfall IsNot Nothing Then
-            waterfall.Save("waterfall___" + snapshotFilename + ".jpg")
+            waterfall.Save("waterfall___" + snapshotFilename + ".png")
         End If
         _waterfall.Reset()
 

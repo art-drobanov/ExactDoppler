@@ -46,6 +46,7 @@ Public Class RGBWaterfall
                                    End Sub)
                 globalRowOffset += rowBlock.Height
             Next
+
             Return waterfall
         End SyncLock
     End Function

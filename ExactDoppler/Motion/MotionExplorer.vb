@@ -79,11 +79,11 @@ Public Class MotionExplorer
         DopplerFilterDb(mag, _NZeroes)
 
         'Detection
-        Return DetectOnImage(result, mag, _zeroDbLevel, blindZone, displayLeft, displayRightWithLeft, displayCenter, displayRight, imageOutput)
+        Return WaterfallDetector(result, mag, _zeroDbLevel, blindZone, displayLeft, displayRightWithLeft, displayCenter, displayRight, imageOutput)
     End Function
 
     ''' <summary>
-    ''' Детектирование всплесков по изображению
+    ''' Детектирование всплесков на "водопаде"
     ''' </summary>
     ''' <param name="result">Объект "Результат анализа движения" (под заполнение).</param>
     ''' <param name="mag">Магнитудная сонограмма ("водопад").</param>
@@ -95,9 +95,9 @@ Public Class MotionExplorer
     ''' <param name="displayRight">Отображать разметку справа?</param>
     ''' <param name="imageOutput">Выводить изображение?</param>
     ''' <returns>"Результат анализа движения".</returns>
-    Private Function DetectOnImage(result As MotionExplorerResult, mag As Double()(), zeroDbLevel As Double, blindZone As Integer,
-                                   displayLeft As Boolean, displayRightWithLeft As Boolean, displayCenter As Boolean, displayRight As Boolean,
-                                   imageOutput As Boolean) As MotionExplorerResult
+    Private Function WaterfallDetector(result As MotionExplorerResult, mag As Double()(), zeroDbLevel As Double, blindZone As Integer,
+                                       displayLeft As Boolean, displayRightWithLeft As Boolean, displayCenter As Boolean, displayRight As Boolean,
+                                       imageOutput As Boolean) As MotionExplorerResult
         Dim dopplerWindowWidth = (mag(0).Length - blindZone) \ 2
         Dim lowDopplerLowHarm = 0
         Dim lowDopplerHighHarm = dopplerWindowWidth - 1
@@ -116,13 +116,13 @@ Public Class MotionExplorer
 
         'Наполнение векторов данными о доплеровских всплесках
         For i = 0 To magRGB.Height - 1
-            Dim isLowMotion = If(Math.Max(Math.Max(sideL.Red(0, i), sideL.Green(0, i)), sideL.Blue(0, i)) <> 0, 1, 0)
-            Dim isHighMotion = If(Math.Max(Math.Max(sideR.Red(0, i), sideR.Green(0, i)), sideR.Blue(0, i)) <> 0, 1, 0)
-            Dim lowDopplerMotion = isLowMotion * (100 / CSng(magRGB.Height))
-            Dim highDopplerMotion = isHighMotion * (100 / CSng(magRGB.Height))
+            Dim isLowDopplerMotion = If(Math.Max(Math.Max(sideL.Red(0, i), sideL.Green(0, i)), sideL.Blue(0, i)) <> 0, 1, 0)
+            Dim isHighDopplerMotion = If(Math.Max(Math.Max(sideR.Red(0, i), sideR.Green(0, i)), sideR.Blue(0, i)) <> 0, 1, 0)
+            Dim lowDopplerMotionVal = isLowDopplerMotion * (100 / CSng(magRGB.Height))
+            Dim highDopplerMotionVal = isHighDopplerMotion * (100 / CSng(magRGB.Height))
             With result
-                .LowDoppler.AddLast(lowDopplerMotion)
-                .HighDoppler.AddLast(highDopplerMotion)
+                .LowDoppler.AddLast(lowDopplerMotionVal)
+                .HighDoppler.AddLast(highDopplerMotionVal)
             End With
         Next
 
@@ -297,7 +297,7 @@ Public Class MotionExplorer
                                         'Максимальная энергия по границам слева и справа - её нужно отсечь!
                                         'Локатор сканирует боковые полосы - выбирая минимальный максимум из двух полос -
                                         'так обеспечивается невозможность "захвата" помехи в качестве уровня фонового шума.
-                                        For k = 0 To Math.Round(mag(0).Length * _noiseScannerDepth)
+                                        For k = 0 To Math.Round(mag(0).Length * _noiseScannerDepth) - 1
                                             noiseMaxNRG = Math.Min(If(row(k) > noiseMaxNRG, row(k), noiseMaxNRG),
                                                                    If(row(row.Length - k - 1) > noiseMaxNRG, row(row.Length - k - 1), noiseMaxNRG))
                                         Next

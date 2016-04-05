@@ -14,7 +14,7 @@ Public Class DopplerLog
         End Sub
 
         Public Overrides Function ToString() As String
-            Return String.Format("DMY:{0}, L:{1}, H:{2};",
+            Return String.Format("DMY:{0}, L:{1}%, H:{2}%;",
                                  Time.ToString(DateTimeFormat),
                                  LowDoppler.ToString("00.00").Replace(",", "."),
                                  HighDoppler.ToString("00.00").Replace(",", "."))
@@ -68,12 +68,14 @@ Public Class DopplerLog
                 Throw New Exception(String.Format("Can't parse 'DMY:{0}' from log", logItemStrings(0)))
             End If
 
+            logItemStrings(1) = logItemStrings(1).Replace("%", String.Empty)
             If Not Single.TryParse(logItemStrings(1).Replace(".", ","), L) Then
                 If Not Single.TryParse(logItemStrings(1).Replace(",", "."), L) Then
                     Throw New Exception(String.Format("Can't parse 'L:{0}' from log", logItemStrings(1)))
                 End If
             End If
 
+            logItemStrings(2) = logItemStrings(2).Replace("%", String.Empty)
             If Not Single.TryParse(logItemStrings(2).Replace(".", ","), H) Then
                 If Not Single.TryParse(logItemStrings(2).Replace(",", "."), H) Then
                     Throw New Exception(String.Format("Can't parse 'H:{0}' from log", logItemStrings(2)))

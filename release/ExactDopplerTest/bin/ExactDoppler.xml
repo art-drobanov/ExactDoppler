@@ -151,6 +151,10 @@ ExactDoppler
 	<param name="pcmSamples">Pcm-семплы.</param>
 	<param name="pcmSamplesCount">Количество семплов (для учета режима моно/стерео).</param>
 	<returns>"Результат анализа движения".</returns>
+</member><member name="M:ExactAudio.ExactDoppler.SwitchOnGen">
+	<summary>
+ Включение генератора
+ </summary>
 </member><member name="M:ExactAudio.ExactDoppler.SwitchOnGen(System.Int32,System.Int32,System.Boolean)">
 	<summary>
  Включение генератора

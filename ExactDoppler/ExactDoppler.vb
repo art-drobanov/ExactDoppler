@@ -14,6 +14,10 @@ Public Class ExactDoppler
         Public ReadOnly PcmOutput As Boolean
         Public ReadOnly ImageOutput As Boolean
 
+        Public Sub New()
+            Me.New(21000, 70, False, False, False, False, False, False)
+        End Sub
+
         Public Sub New(centerFreq As Double, blindZone As Integer, displayLeft As Boolean,
                        displayRightWithLeft As Boolean, displayCenter As Boolean, displayRight As Boolean,
                        pcmOutput As Boolean, imageOutput As Boolean)
@@ -150,7 +154,7 @@ Public Class ExactDoppler
     Public Event PcmSamplesProcessed(motionExplorerResult As MotionExplorerResult)
 
     Public Sub New()
-        Me.New(Nothing)
+        Me.New(New ExactDopplerConfig())
     End Sub
 
     ''' <summary>
@@ -164,6 +168,9 @@ Public Class ExactDoppler
         _generator = New Generator(_outputDeviceIdx, _sampleRate)
         _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallSeconds)
         _motionExplorer = New MotionExplorer(_windowSize, _windowStep, _sampleRate, _nBitsPalette, False)
+        InputDeviceIdx = 0
+        OutputDeviceIdx = 0
+        Volume = 1.0
     End Sub
 
     ''' <summary>
@@ -205,6 +212,13 @@ Public Class ExactDoppler
             Return motionExplorerResult
         End SyncLock
     End Function
+
+    ''' <summary>
+    ''' Включение генератора
+    ''' </summary>
+    Public Sub SwitchOnGen()
+        SwitchOnGen(Config.CenterFreq, Config.CenterFreq, False)
+    End Sub
 
     ''' <summary>
     ''' Включение генератора

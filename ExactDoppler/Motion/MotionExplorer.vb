@@ -115,11 +115,11 @@ Public Class MotionExplorer
         Dim sideR = _paletteProcessor.Process(highDopplerImage)
 
         'Наполнение векторов данными о доплеровских всплесках
-        For i = 0 To magRGB.Height - 1
+        For i = 0 To mag.GetLength(0) - 1
             Dim isLowDopplerMotion = If(Math.Max(Math.Max(sideL.Red(0, i), sideL.Green(0, i)), sideL.Blue(0, i)) <> 0, 1, 0)
             Dim isHighDopplerMotion = If(Math.Max(Math.Max(sideR.Red(0, i), sideR.Green(0, i)), sideR.Blue(0, i)) <> 0, 1, 0)
-            Dim lowDopplerMotionVal = isLowDopplerMotion * (100 / CSng(magRGB.Height))
-            Dim highDopplerMotionVal = isHighDopplerMotion * (100 / CSng(magRGB.Height))
+            Dim lowDopplerMotionVal = isLowDopplerMotion * (100 / CSng(mag.GetLength(0))) 'Атомарный вклад очередной строки (left-side)
+            Dim highDopplerMotionVal = isHighDopplerMotion * (100 / CSng(mag.GetLength(0))) 'Атомарный вклад очередной строки (right-side)
             With result
                 .LowDoppler.AddLast(lowDopplerMotionVal)
                 .HighDoppler.AddLast(highDopplerMotionVal)

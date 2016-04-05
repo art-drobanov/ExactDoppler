@@ -1,0 +1,189 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+ExactDoppler
+</name>
+</assembly>
+<members>
+<member name="P:ExactAudio.WaterfallPlayer.SonogramRowDuration">
+	<summary>Длительность одной строки "водопада".</summary>
+</member><member name="M:ExactAudio.WaterfallPlayer.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,System.Double)">
+	<summary>
+ Конструктор
+ </summary>
+	<param name="frameWidth">Размер окна при построении "водопада".</param>
+	<param name="frameStep">Шаг окна при построении "водопада".</param>
+	<param name="sampleRate">Частота семплирования.</param>
+	<param name="nBits">Разрядность.</param>
+	<param name="minFreq">Минимальная частота (для привязки полосы).</param>
+</member><member name="M:ExactAudio.WaterfallPlayer.Process(System.Double[][],System.Int32)">
+	<summary>
+ Основной метод обработки
+ </summary>
+	<param name="mag">Фрагмент "водопада".</param>
+	<param name="blindZone">"Слепая" зона в центре фрагмента.</param>
+	<returns>PCM-фрагмент (результат воспроизведения).</returns>
+</member><member name="M:ExactAudio.WaterfallPlayer.ProcessMagRow(System.Double[],System.Int32)">
+	<summary>
+ Обработка одной строки "водопада"
+ </summary>
+	<param name="magRow">Строка водопада.</param>
+	<param name="blindZone">"Слепая" зона в центре фрагмента.</param>
+	<returns>PCM-фрагмент, относящийся к одной строке "водопада".</returns>
+</member><member name="M:ExactAudio.WaterfallPlayer.GetPcm(System.Double[])">
+	<summary>
+ Получение PCM-данных из результатов обратного преобразования FFT
+ </summary>
+	<param name="FFT_S">Результат обратного преобразования FFT.</param>
+	<returns>PCM-данные.</returns>
+</member><member name="T:ExactAudio.WaterfallPlayer">
+	<summary>
+ "Аудиопроигрыватель" водопада
+ </summary>
+</member><member name="T:ExactAudio.RGBWaterfall">
+	<summary>
+ "Водопад" в формате RGB
+ </summary>
+</member><member name="P:ExactAudio.My.Resources.Resources.ResourceManager">
+	<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member><member name="P:ExactAudio.My.Resources.Resources.Culture">
+	<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member><member name="T:ExactAudio.My.Resources.Resources">
+	<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member><member name="T:ExactAudio.MotionExplorer.MotionExplorerResult">
+	<summary>
+ Результат анализа блока PCM
+ </summary>
+</member><member name="M:ExactAudio.MotionExplorer.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean)">
+	<summary>
+ Конструктор.
+ </summary>
+	<param name="frameWidth">Размер кадра.</param>
+	<param name="frameStep">Шаг окна БПФ.</param>
+	<param name="sampleRate">Частота семплирования.</param>
+	<param name="nBits">Разрядность.</param>
+	<param name="stereo">Стереорежим?</param>
+</member><member name="M:ExactAudio.MotionExplorer.Process(System.Single[],System.Int32,System.Double,System.Double,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+	<summary>
+ Основной метод обработки.
+ </summary>
+	<param name="pcmSamples">Pcm-семплы.</param>
+	<param name="pcmSamplesCount">Количество семплов (для учета режима моно/стерео).</param>
+	<param name="lowFreq">Нижняя частота области интереса.</param>
+	<param name="highFreq">Верхняя частота области интереса.</param>
+	<param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
+	<param name="displayLeft">Отображать разметку слева?</param>
+	<param name="displayRightWithLeft">Отображать "правую" разметку вместе с разметкой слева?</param>
+	<param name="displayCenter">Отображать центральную область разметки?</param>
+	<param name="displayRight">Отображать разметку справа?</param>
+	<param name="pcmOutput">Осуществлять вывод Pcm?</param>
+	<param name="imageOutput">Выводить изображение?</param>
+	<returns>"Результат анализа движения".</returns>
+</member><member name="M:ExactAudio.MotionExplorer.WaterfallDetector(ExactAudio.MotionExplorer.MotionExplorerResult,System.Double[][],System.Double,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+	<summary>
+ Детектирование всплесков на "водопаде"
+ </summary>
+	<param name="result">Объект "Результат анализа движения" (под заполнение).</param>
+	<param name="mag">Магнитудная сонограмма ("водопад").</param>
+	<param name="zeroDbLevel">"Нулевой" уровень логарифмической шкалы.</param>
+	<param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
+	<param name="displayLeft">Отображать разметку слева?</param>
+	<param name="displayRightWithLeft">Отображать "правую" разметку вместе с разметкой слева?</param>
+	<param name="displayCenter">Отображать центральную область разметки?</param>
+	<param name="displayRight">Отображать разметку справа?</param>
+	<param name="imageOutput">Выводить изображение?</param>
+	<returns>"Результат анализа движения".</returns>
+</member><member name="M:ExactAudio.MotionExplorer.DopplerFilterDb(System.Double[][],System.Int32)">
+	<summary>
+ Фильтр доплеровских всплесков
+ </summary>
+	<param name="mag">Магнитудная сонограмма ("водопад").</param>
+	<param name="NZeroes">Допустимое количество "нулевых" уровней.</param>
+</member><member name="M:ExactAudio.MotionExplorer.AutoGainAndGetSquelch(System.Double[][],System.Double)">
+	<summary>
+ Применение автоусиления и вычисление порога отсечки (для разделения сигнал/шум)
+ </summary>
+	<param name="mag">Магнитудная сонограмма ("водопад").</param>
+	<param name="brightness">"Яркость".</param>
+	<returns>Порог отсечки (для разделения сигнал/шум).</returns>
+</member><member name="P:ExactAudio.ExactDoppler.OutputAudioDevices">
+	<summary>Список аудиоустройств вывода.</summary>
+</member><member name="P:ExactAudio.ExactDoppler.InputAudioDevices">
+	<summary>Список аудиоустройств ввода.</summary>
+</member><member name="P:ExactAudio.ExactDoppler.SampleRate">
+	<summary>Частота семлирования.</summary>
+</member><member name="P:ExactAudio.ExactDoppler.TopFreq">
+	<summary>Верхняя частота области интереса.</summary>
+</member><member name="P:ExactAudio.ExactDoppler.DopplerSize">
+	<summary>Размер доплеровской области интереса.</summary>
+</member><member name="P:ExactAudio.ExactDoppler.InputDeviceIdx">
+	<summary>Индекс устройства захвата аудио.</summary>
+</member><member name="P:ExactAudio.ExactDoppler.OutputDeviceIdx">
+	<summary>Индекс устройства вывода аудио.</summary>
+</member><member name="P:ExactAudio.ExactDoppler.DopplerLog">
+	<summary>Доплеровский лог.</summary>
+</member><member name="P:ExactAudio.ExactDoppler.Volume">
+	<summary>Громкость.</summary>
+</member><member name="P:ExactAudio.ExactDoppler.Config">
+	<summary>Конфигурация доплеровского анализатора.</summary>
+</member><member name="E:ExactAudio.ExactDoppler.PcmSamplesProcessed">
+	<summary>
+ Событие "Pcm-семплы обработаны"
+ </summary>
+	<param name="motionExplorerResult">"Результат анализа движения".</param>
+</member><member name="M:ExactAudio.ExactDoppler.#ctor(ExactAudio.ExactDoppler.ExactDopplerConfig)">
+	<summary>
+ Конструктор
+ </summary>
+	<param name="config">Конфигурация доплеровского анализатора.</param>
+</member><member name="M:ExactAudio.ExactDoppler.Process(System.Single[],System.Int32)">
+	<summary>
+ Основной метод обработки
+ </summary>
+	<param name="pcmSamples">Pcm-семплы.</param>
+	<param name="pcmSamplesCount">Количество семплов (для учета режима моно/стерео).</param>
+	<returns>"Результат анализа движения".</returns>
+</member><member name="M:ExactAudio.ExactDoppler.SwitchOnGen">
+	<summary>
+ Включение генератора
+ </summary>
+</member><member name="M:ExactAudio.ExactDoppler.SwitchOnGen(System.Int32,System.Int32,System.Boolean)">
+	<summary>
+ Включение генератора
+ </summary>
+	<param name="sineFreqL">Частота левого канала.</param>
+	<param name="sineFreqR">Частота правого канала.</param>
+	<param name="mix">Смешивать каналы?</param>
+</member><member name="M:ExactAudio.ExactDoppler.SwitchOffGen">
+	<summary>
+ Выключение генератора
+ </summary>
+</member><member name="M:ExactAudio.ExactDoppler.Start">
+	<summary>
+ Запуск
+ </summary>
+</member><member name="M:ExactAudio.ExactDoppler.Stop">
+	<summary>
+ Останов
+ </summary>
+</member><member name="M:ExactAudio.ExactDoppler.SampleProcessor(System.Single[],System.Int32)">
+	<summary>
+ Обработчик Pcm-семплов
+ </summary>
+	<param name="pcmSamples">Pcm-семплы.</param>
+	<param name="pcmSamplesCount">Количество семплов (для учета режима моно/стерео).</param>
+</member><member name="T:ExactAudio.ExactDoppler">
+	<summary>
+ Доплеровский акустический детектор
+ </summary>
+</member>
+</members>
+</doc>

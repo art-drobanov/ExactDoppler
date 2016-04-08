@@ -20,20 +20,24 @@ Public Class PcmLog
 
     Public Sub Add(pcm As Single())
         SyncLock SyncRoot
-            _items.AddLast(pcm)
+            If pcm IsNot Nothing Then
+                _items.AddLast(pcm)
+            End If
         End SyncLock
     End Sub
 
     Public Sub Write(filename As String)
         SyncLock SyncRoot
-            Dim wavFile As New Wave.WaveFileWriter(filename, New Wave.WaveFormat(_sampleRate, 1))
-            For Each pcmBlock In _items
-                wavFile.WriteSamples(pcmBlock, 0, pcmBlock.Length)
-            Next
-            With wavFile
-                .Flush()
-                .Close()
-            End With
+            If _items.Any() Then
+                Dim wavFile As New Wave.WaveFileWriter(filename, New Wave.WaveFormat(_sampleRate, 1))
+                For Each pcmBlock In _items
+                    wavFile.WriteSamples(pcmBlock, 0, pcmBlock.Length)
+                Next
+                With wavFile
+                    .Flush()
+                    .Close()
+                End With
+            End If
         End SyncLock
     End Sub
 

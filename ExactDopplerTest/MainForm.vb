@@ -69,7 +69,7 @@ Public Class MainForm
         If waterfall IsNot Nothing Then
             waterfall.Save("waterfall___" + snapshotFilename + ".png")
         End If
-        _waterfall.Reset()
+        _waterfall.Clear()
 
         'PCM
         If _pcmLog.Items.Any() Then
@@ -112,7 +112,7 @@ Public Class MainForm
 
         Dim pcmOutput = True
         Dim imageOutput = True
-        _exactDoppler.Config = New ExactDoppler.ExactDopplerConfig(centerFreq, blindZone, displayLeft, displayRightWithLeft, displayCenter, displayRight, pcmOutput, imageOutput)
+        _exactDoppler.Config = New ExactDopplerConfig(centerFreq, blindZone, displayLeft, displayRightWithLeft, displayCenter, displayRight, pcmOutput, imageOutput)
     End Sub
 
     Private Sub _sineGenButton_Click(sender As Object, e As EventArgs) Handles _switchOnButton.Click
@@ -128,7 +128,7 @@ Public Class MainForm
     End Sub
 
     Private Sub _captureOnButton_Click(sender As Object, e As EventArgs) Handles _captureOnButton.Click
-        _waterfall.Reset()
+        _waterfall.Clear()
         _exactDoppler.Start()
         _inputGroupBox.Text = "Input [ ON ]"
         _captureOnButton.BackColor = Me.BackColor

@@ -139,7 +139,7 @@ ExactDoppler
  Событие "Pcm-семплы обработаны"
  </summary>
 	<param name="motionExplorerResult">"Результат анализа движения".</param>
-</member><member name="M:ExactAudio.ExactDoppler.#ctor(ExactAudio.ExactDoppler.ExactDopplerConfig)">
+</member><member name="M:ExactAudio.ExactDoppler.#ctor(ExactAudio.ExactDopplerConfig)">
 	<summary>
  Конструктор
  </summary>

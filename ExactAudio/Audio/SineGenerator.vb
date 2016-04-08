@@ -55,10 +55,12 @@ Public Class Generator
         End Function
     End Class
 
-    Private Const _bufferLengthInMs As Double = 2000 '2000
-    Private Const _sineTimeToGenerateInMs As Double = _bufferLengthInMs \ 2 '2
-    Private Const _minRemainToPlayInMs As Double = _bufferLengthInMs \ 2 '2
-    Private Const _waveOutTimerIntervalInMs As Double = _minRemainToPlayInMs \ 10 '10
+    Private Const _bufferDurationInMs As Double = 2000 '2000
+    Private Const _sineTimeToGenerateInMs As Double = 1000 '1000
+    Private Const _minRemainToPlayInMs As Double = 500 '500
+    Private Const _waveOutTimerIntervalInMs As Double = 100 '100
+
+    Public ReadOnly SyncRoot As New Object
 
     Private _waveOut As WaveOut
     Private _waveFormat As WaveFormat
@@ -69,13 +71,10 @@ Public Class Generator
     Private _sampleRate As Integer
     Private _sineFreqL As Integer
     Private _sineFreqR As Integer
+    Private _mix As Boolean
 
     Private _sineGenL As SineGenerator
     Private _sineGenR As SineGenerator
-
-    Private _mix As Boolean
-
-    Public ReadOnly SyncRoot As New Object
 
     Public Property Volume As Single
         Get
@@ -92,8 +91,8 @@ Public Class Generator
         _sampleRate = sampleRate
         _waveFormat = New WaveFormat(_sampleRate, SineGenerator.BitDepth, 2)
         _waveProvider = New BufferedWaveProvider(_waveFormat) With {
-                                                                        .DiscardOnBufferOverflow = True,
-                                                                        .BufferDuration = TimeSpan.FromMilliseconds(_bufferLengthInMs)
+                                                                        .BufferDuration = TimeSpan.FromMilliseconds(_bufferDurationInMs),
+                                                                        .DiscardOnBufferOverflow = True
                                                                    }
 
         Try
@@ -154,7 +153,7 @@ Public Class Generator
 
     Public Sub Flash(sineFreqL As Integer, sineFreqR As Integer, mix As Boolean, milliseconds As Integer)
         SyncLock SyncRoot
-            If milliseconds > _bufferLengthInMs Then
+            If milliseconds > _bufferDurationInMs Then
                 Throw New Exception("milliseconds > _bufferLengthInMs")
             End If
             _waveOutTimer.Stop()
@@ -179,34 +178,36 @@ Public Class Generator
     End Sub
 
     Private Sub AddWaveSamples(sineTimeToGenerateInMs As Double)
-        Dim remainToPlayInMs = (_waveProvider.BufferedDuration.TotalMilliseconds)
-        If remainToPlayInMs < _minRemainToPlayInMs Then
-            Dim sineIntsL As Integer()
-            Dim sineIntsR As Integer()
-            Dim sineL As Byte()
-            Dim sineR As Byte()
+        SyncLock SyncRoot
+            Dim remainToPlayInMs = (_waveProvider.BufferedDuration.TotalMilliseconds)
+            If remainToPlayInMs < _minRemainToPlayInMs Then
+                Dim sineIntsL As Integer()
+                Dim sineIntsR As Integer()
+                Dim sineL As Byte()
+                Dim sineR As Byte()
 
-            sineIntsL = _sineGenL.Generate24BitsMs(_sineFreqL, sineTimeToGenerateInMs)
-            sineIntsR = _sineGenR.Generate24BitsMs(_sineFreqR, sineTimeToGenerateInMs)
-            If _mix Then sineIntsL.MixWith(sineIntsR)
-            sineL = sineIntsL.ToByteArray24(False)
-            sineR = sineIntsR.ToByteArray24(False)
+                sineIntsL = _sineGenL.Generate24BitsMs(_sineFreqL, sineTimeToGenerateInMs)
+                sineIntsR = _sineGenR.Generate24BitsMs(_sineFreqR, sineTimeToGenerateInMs)
+                If _mix Then sineIntsL.MixWith(sineIntsR)
+                sineL = sineIntsL.ToByteArray24(False)
+                sineR = sineIntsR.ToByteArray24(False)
 
-            Dim bytesPerSample As Integer = SineGenerator.BitDepth \ 8
-            Dim sineSamplesCountL As Integer = sineL.Length \ bytesPerSample
-            Dim sineSamplesCountR As Integer = sineR.Length \ bytesPerSample
-            If sineSamplesCountL <> sineSamplesCountR Then Throw New Exception("sineSamplesCountL <> sineSamplesCountR")
-            Dim sineSamplesCount = sineSamplesCountL
+                Dim bytesPerSample As Integer = SineGenerator.BitDepth \ 8
+                Dim sineSamplesCountL As Integer = sineL.Length \ bytesPerSample
+                Dim sineSamplesCountR As Integer = sineR.Length \ bytesPerSample
+                If sineSamplesCountL <> sineSamplesCountR Then Throw New Exception("sineSamplesCountL <> sineSamplesCountR")
+                Dim sineSamplesCount = sineSamplesCountL
 
-            Dim sineLR = New Byte((sineSamplesCount * bytesPerSample * 2) - 1) {}
-            For sineSampleIdx = 0 To sineSamplesCount - 1
-                Dim sineSourceOffset = sineSampleIdx * bytesPerSample
-                Array.Copy(sineL, sineSourceOffset, sineLR, (sineSourceOffset * 2) + (0 * bytesPerSample), bytesPerSample)
-                Array.Copy(sineR, sineSourceOffset, sineLR, (sineSourceOffset * 2) + (1 * bytesPerSample), bytesPerSample)
-            Next sineSampleIdx
+                Dim sineLR = New Byte((sineSamplesCount * bytesPerSample * 2) - 1) {}
+                For sineSampleIdx = 0 To sineSamplesCount - 1
+                    Dim sineSourceOffset = sineSampleIdx * bytesPerSample
+                    Array.Copy(sineL, sineSourceOffset, sineLR, (sineSourceOffset * 2) + (0 * bytesPerSample), bytesPerSample)
+                    Array.Copy(sineR, sineSourceOffset, sineLR, (sineSourceOffset * 2) + (1 * bytesPerSample), bytesPerSample)
+                Next sineSampleIdx
 
-            _waveProvider.AddSamples(sineLR, 0, sineLR.Length)
-        End If
+                _waveProvider.AddSamples(sineLR, 0, sineLR.Length)
+            End If
+        End SyncLock
     End Sub
 
     Private Sub AddWaveSamples(ByVal myObject As Object, ByVal myEventArgs As EventArgs)

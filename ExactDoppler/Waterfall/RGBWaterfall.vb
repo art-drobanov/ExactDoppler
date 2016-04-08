@@ -10,7 +10,7 @@ Public Class RGBWaterfall
 
     Public ReadOnly SyncRoot As New Object
 
-    Public Sub Reset()
+    Public Sub Clear()
         SyncLock SyncRoot
             _waterfallRowBlocks.Clear()
         End SyncLock
@@ -18,12 +18,14 @@ Public Class RGBWaterfall
 
     Public Sub Add(waterfallRowBlock As RGBMatrix)
         SyncLock SyncRoot
-            If _waterfallRowBlocks.Any() Then
-                If _waterfallRowBlocks.Peek().Width <> waterfallRowBlock.Width Then
-                    Throw New Exception("_waterfallBlocks.Peek().Width <> waterfallBlock.Width")
+            If waterfallRowBlock IsNot Nothing Then
+                If _waterfallRowBlocks.Any() Then
+                    If _waterfallRowBlocks.Peek().Width <> waterfallRowBlock.Width Then
+                        Throw New Exception("_waterfallBlocks.Peek().Width <> waterfallBlock.Width")
+                    End If
                 End If
+                _waterfallRowBlocks.Enqueue(waterfallRowBlock)
             End If
-            _waterfallRowBlocks.Enqueue(waterfallRowBlock)
         End SyncLock
     End Sub
 
@@ -52,11 +54,22 @@ Public Class RGBWaterfall
     End Function
 
     Public Function ToBitmap(Optional scale As Single = 1.0) As Bitmap
-        Dim waterfall = [Get]()
-        If waterfall IsNot Nothing Then
-            Return waterfall.ToBitmap(scale)
-        Else
-            Return Nothing
-        End If
+        SyncLock SyncRoot
+            Dim waterfall = [Get]()
+            If waterfall IsNot Nothing Then
+                Return waterfall.ToBitmap(scale)
+            Else
+                Return Nothing
+            End If
+        End SyncLock
     End Function
+
+    Public Sub Write(filaName As String)
+        SyncLock SyncRoot
+            Dim bmp = ToBitmap()
+            If bmp IsNot Nothing Then
+                bmp.Save(filaName)
+            End If
+        End SyncLock
+    End Sub
 End Class

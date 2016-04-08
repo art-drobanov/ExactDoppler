@@ -26,30 +26,28 @@ Public Module AudioUtils
 
     <Extension>
     Public Function ToByteArray24(ints32 As Integer(), monoToStereo As Boolean) As Byte()
-        Dim ms = New MemoryStream()
-        For Each elem In ints32
-            Dim int24b = BitConverter.GetBytes(elem)
-            If monoToStereo Then
-                ms.Write(int24b, 0, 3)
-                ms.Write(int24b, 0, 3)
-            Else
-                ms.Write(int24b, 0, 3)
-            End If
-        Next
-        ms.Flush()
-        ms.Seek(0, SeekOrigin.Begin)
-        Dim result = New Byte(ms.Length - 1) {}
-        Array.Copy(ms.GetBuffer(), result, ms.Length)
-        ms.Close()
-        Return result
+        Using ms = New MemoryStream()
+            For Each elem In ints32
+                Dim int24b = BitConverter.GetBytes(elem)
+                If monoToStereo Then
+                    ms.Write(int24b, 0, 3)
+                    ms.Write(int24b, 0, 3)
+                Else
+                    ms.Write(int24b, 0, 3)
+                End If
+            Next
+            ms.Flush()
+            ms.Seek(0, SeekOrigin.Begin)
+            Return ms.ToArray()
+        End Using
     End Function
 
     <Extension>
-    Public Function ToNBits(samples As Double(), N As Integer) As Integer()
-        Dim bits As Integer = CInt(Math.Floor(Math.Pow(2, (N - 1)))) - 1
+    Public Function ToNBits(samples As Double(), NBits As Integer) As Integer()
+        Dim bitAmp As Integer = CInt(Math.Floor(Math.Pow(2, (NBits - 1)))) - 1
         Dim result = New Integer(samples.Length - 1) {}
-        For i As Integer = 0 To samples.Length - 1
-            result(i) = CInt(Math.Floor(samples(i) * bits))
+        For i = 0 To samples.Length - 1
+            result(i) = CInt(Math.Floor(samples(i) * bitAmp))
         Next i
         Return result
     End Function
@@ -58,7 +56,7 @@ Public Module AudioUtils
     Public Sub MixWith(int32A As Integer(), int32B As Integer())
         If int32A.Length <> int32B.Length Then Throw New Exception("int32A.Length <> int32B.Length")
         For i = 0 To int32A.Length - 1
-            Dim result = CInt(Math.Floor(int32A(i) / 2.0 + int32B(i) / 2.0))
+            Dim result = CInt(Math.Floor((int32A(i) * 0.5) + (int32B(i) * 0.5)))
             int32A(i) = result
             int32B(i) = result
         Next

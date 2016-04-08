@@ -47,6 +47,9 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bwl.Framework">
+      <HintPath>..\refs\Bwl.Framework.dll</HintPath>
+    </Reference>
     <Reference Include="Bwl.Imaging">
       <HintPath>..\refs\Bwl.Imaging.dll</HintPath>
     </Reference>
@@ -77,6 +80,8 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cfg\ExactDopplerConfig.vb" />
+    <Compile Include="Cfg\ExactDopplerConfigFromStorage.vb" />
     <Compile Include="ExactDoppler.vb" />
     <Compile Include="Log\DopplerLog.vb" />
     <Compile Include="Log\PcmLog.vb" />

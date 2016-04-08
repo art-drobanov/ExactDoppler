@@ -4,34 +4,6 @@
 ''' Доплеровский акустический детектор
 ''' </summary>
 Public Class ExactDoppler
-    Public Class ExactDopplerConfig
-        Public ReadOnly CenterFreq As Double
-        Public ReadOnly BlindZone As Integer
-        Public ReadOnly DisplayLeft As Boolean
-        Public ReadOnly DisplayRightWithLeft As Boolean
-        Public ReadOnly DisplayCenter As Boolean
-        Public ReadOnly DisplayRight As Boolean
-        Public ReadOnly PcmOutput As Boolean
-        Public ReadOnly ImageOutput As Boolean
-
-        Public Sub New()
-            Me.New(21000, 70, False, False, False, False, False, False)
-        End Sub
-
-        Public Sub New(centerFreq As Double, blindZone As Integer, displayLeft As Boolean,
-                       displayRightWithLeft As Boolean, displayCenter As Boolean, displayRight As Boolean,
-                       pcmOutput As Boolean, imageOutput As Boolean)
-            Me.CenterFreq = centerFreq
-            Me.BlindZone = blindZone
-            Me.DisplayLeft = displayLeft
-            Me.DisplayRightWithLeft = displayRightWithLeft
-            Me.DisplayCenter = displayCenter
-            Me.DisplayRight = displayRight
-            Me.PcmOutput = pcmOutput
-            Me.ImageOutput = imageOutput
-        End Sub
-    End Class
-
     'Константы
     Private Const _windowSize = 32768 '32768
     Private Const _windowStep = 1214 '1214 = Round(32768 / (3 * 3 * 3))

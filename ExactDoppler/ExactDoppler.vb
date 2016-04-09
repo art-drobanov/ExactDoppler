@@ -140,9 +140,9 @@ Public Class ExactDoppler
         _generator = New Generator(_outputDeviceIdx, _sampleRate)
         _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallSeconds)
         _motionExplorer = New MotionExplorer(_windowSize, _windowStep, _sampleRate, _nBitsPalette, False)
-        InputDeviceIdx = 0
-        OutputDeviceIdx = 0
-        Volume = 1.0
+        InputDeviceIdx = _config.InputDeviceIdx
+        OutputDeviceIdx = _config.OutputDeviceIdx
+        Volume = _config.Volume
     End Sub
 
     ''' <summary>

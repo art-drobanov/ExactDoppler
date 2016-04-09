@@ -3,9 +3,17 @@ Imports System.Globalization
 
 Public Class DopplerLog
     Public Class Item
+        Private Const _diffThr = 15
         Public Property Time As DateTime
         Public Property LowDoppler As Single
         Public Property HighDoppler As Single
+        Public ReadOnly Property Type As String
+            Get
+                If (HighDoppler - LowDoppler) > _diffThr Then Return "Incoming motion"
+                If (LowDoppler - HighDoppler) > _diffThr Then Return "Outcoming motion"
+                Return "Motion"
+            End Get
+        End Property
 
         Public Sub New(T As DateTime, L As Single, H As Single)
             Me.Time = T
@@ -14,10 +22,11 @@ Public Class DopplerLog
         End Sub
 
         Public Overrides Function ToString() As String
-            Return String.Format("DMY:{0}, L:{1}%, H:{2}%;",
+            Return String.Format("DMY:{0}, L:{1}%, H:{2}%; Type:{3}",
                                  Time.ToString(DateTimeFormat),
                                  LowDoppler.ToString("00.00").Replace(",", "."),
-                                 HighDoppler.ToString("00.00").Replace(",", "."))
+                                 HighDoppler.ToString("00.00").Replace(",", "."),
+                                 Type)
         End Function
     End Class
 

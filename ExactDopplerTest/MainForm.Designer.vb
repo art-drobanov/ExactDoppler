@@ -170,7 +170,7 @@ Partial Class MainForm
         Me._volumeTrackBar.Size = New System.Drawing.Size(45, 170)
         Me._volumeTrackBar.TabIndex = 9
         Me._volumeTrackBar.TickStyle = System.Windows.Forms.TickStyle.None
-        Me._volumeTrackBar.Value = 100
+        Me._volumeTrackBar.Value = 50
         '
         '_outputGroupBox
         '
@@ -370,7 +370,7 @@ Partial Class MainForm
         Me.MaximizeBox = False
         Me.Name = "MainForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "ExactDopplerTest (13.03.2016 16:23)"
+        Me.Text = "ExactDopplerTest (09.04.2016 08:51)"
         CType(Me._sineFreqLTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me._frequencyGroupBox.ResumeLayout(False)
         Me._frequencyGroupBox.PerformLayout()

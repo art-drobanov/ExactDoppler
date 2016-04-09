@@ -43,9 +43,9 @@ Module App
                 _pcmLog.Add(motionExplorerResult.Pcm)
                 _waterfall.Add(motionExplorerResult.Image)
 
-                File.WriteAllText(Path.Combine(_consoleAppBase.DataFolder, logData.Time.ToString("yyyy.MM.dd_HH..mm..ss") & ".txt"), logString)
-                _pcmLog.Write(Path.Combine(_consoleAppBase.DataFolder, logData.Time.ToString("yyyy.MM.dd_HH..mm..ss") & ".wav"))
-                _waterfall.Write(Path.Combine(_consoleAppBase.DataFolder, logData.Time.ToString("yyyy.MM.dd_HH..mm..ss") & ".png"))
+                File.WriteAllText(Path.Combine(_consoleAppBase.DataFolder, logData.Time.ToString("yyyy.MM.dd__HH..mm..ss") & ".txt"), logString)
+                _pcmLog.Write(Path.Combine(_consoleAppBase.DataFolder, logData.Time.ToString("yyyy.MM.dd__HH..mm..ss") & ".wav"))
+                _waterfall.Write(Path.Combine(_consoleAppBase.DataFolder, logData.Time.ToString("yyyy.MM.dd__HH..mm..ss") & ".png"))
 
                 _exactDoppler.DopplerLog.Clear()
                 _pcmLog.Clear()

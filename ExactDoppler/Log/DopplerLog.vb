@@ -67,7 +67,9 @@ Public Class DopplerLog
         While True
             Dim logItemString = sr.ReadLine()
             If logItemString Is Nothing Then Exit While
-            Dim logItemStrings = logItemString.ToUpper().Replace("DMY:", String.Empty).Replace("L:", String.Empty).Replace("H:", String.Empty).Replace(";", String.Empty).Split(",")
+            Dim logItemStrings = logItemString.ToUpper().Replace("DMY:", String.Empty).Replace("L:", String.Empty).Replace("H:", String.Empty) _
+                                                        .Replace("TYPE:", String.Empty).Replace("INCOMING", String.Empty).Replace("OUTCOMING", String.Empty) _
+                                                        .Replace("MOTION", String.Empty).Replace(";", String.Empty).Split(",")
 
             Dim T As DateTime
             Dim L As Single

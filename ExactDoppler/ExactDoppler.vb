@@ -11,7 +11,7 @@ Public Class ExactDoppler
     Private Const _dopplerSize = 500 '500
     Private Const _nBitsCapture = 16 '16
     Private Const _nBitsPalette = 8 '8
-    Private Const _waterfallSeconds = 2 '2
+    Private Const _waterfallSeconds = _windowSize / _sampleRate '0.6827
     Private Const _topFreq = 23000 '23000
 
     'Данные

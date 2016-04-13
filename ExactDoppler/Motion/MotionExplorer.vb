@@ -58,15 +58,10 @@ Public Class MotionExplorer
     ''' <param name="lowFreq">Нижняя частота области интереса.</param>
     ''' <param name="highFreq">Верхняя частота области интереса.</param>
     ''' <param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
-    ''' <param name="displayLeft">Отображать разметку слева?</param>
-    ''' <param name="displayRightWithLeft">Отображать "правую" разметку вместе с разметкой слева?</param>
-    ''' <param name="displayCenter">Отображать центральную область разметки?</param>
-    ''' <param name="displayRight">Отображать разметку справа?</param>
     ''' <param name="pcmOutput">Осуществлять вывод Pcm?</param>
     ''' <param name="imageOutput">Выводить изображение?</param>
     ''' <returns>"Результат анализа движения".</returns>
     Public Function Process(pcmSamples As Single(), pcmSamplesCount As Integer, lowFreq As Double, highFreq As Double, blindZone As Integer,
-                            displayLeft As Boolean, displayRightWithLeft As Boolean, displayCenter As Boolean, displayRight As Boolean,
                             pcmOutput As Boolean, imageOutput As Boolean) As MotionExplorerResult
         'FFT
         Dim mag = MyBase.Explore(pcmSamples, pcmSamplesCount, lowFreq, highFreq).MagL
@@ -79,7 +74,7 @@ Public Class MotionExplorer
         DopplerFilterDb(mag, _NZeroes)
 
         'Detection
-        Return WaterfallDetector(result, mag, _zeroDbLevel, blindZone, displayLeft, displayRightWithLeft, displayCenter, displayRight, imageOutput)
+        Return WaterfallDetector(result, mag, _zeroDbLevel, blindZone, imageOutput)
     End Function
 
     ''' <summary>
@@ -89,14 +84,9 @@ Public Class MotionExplorer
     ''' <param name="mag">Магнитудная сонограмма ("водопад").</param>
     ''' <param name="zeroDbLevel">"Нулевой" уровень логарифмической шкалы.</param>
     ''' <param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
-    ''' <param name="displayLeft">Отображать разметку слева?</param>
-    ''' <param name="displayRightWithLeft">Отображать "правую" разметку вместе с разметкой слева?</param>
-    ''' <param name="displayCenter">Отображать центральную область разметки?</param>
-    ''' <param name="displayRight">Отображать разметку справа?</param>
     ''' <param name="imageOutput">Выводить изображение?</param>
     ''' <returns>"Результат анализа движения".</returns>
     Private Function WaterfallDetector(result As MotionExplorerResult, mag As Double()(), zeroDbLevel As Double, blindZone As Integer,
-                                       displayLeft As Boolean, displayRightWithLeft As Boolean, displayCenter As Boolean, displayRight As Boolean,
                                        imageOutput As Boolean) As MotionExplorerResult
         Dim dopplerWindowWidth = (mag(0).Length - blindZone) \ 2
         Dim lowDopplerLowHarm = 0
@@ -107,19 +97,19 @@ Public Class MotionExplorer
         Dim lowDoppler = ExactPlotter.SubBand(mag, lowDopplerLowHarm, lowDopplerHighHarm)
         Dim highDoppler = ExactPlotter.SubBand(mag, highDopplerLowHarm, highDopplerHighHarm)
         Dim sideWidth = mag(0).Length \ _sideFormDivider
-        Dim lowDopplerImage = MyBase.HarmSlicesSumImageDb(lowDoppler, sideWidth)
-        Dim highDopplerImage = MyBase.HarmSlicesSumImageDb(highDoppler, sideWidth)
+        Dim lowDopplerImage = MyBase.HarmSlicesSumImageInDb(lowDoppler, 1)
+        Dim highDopplerImage = MyBase.HarmSlicesSumImageInDb(highDoppler, 1)
 
         Dim magRGB = If(imageOutput, _paletteProcessor.Process(mag), Nothing)
         Dim sideL = _paletteProcessor.Process(lowDopplerImage)
         Dim sideR = _paletteProcessor.Process(highDopplerImage)
 
         'Наполнение векторов данными о доплеровских всплесках
-        For i = 0 To mag.GetLength(0) - 1
-            Dim isLowDopplerMotion = If(Math.Max(Math.Max(sideL.Red(0, i), sideL.Green(0, i)), sideL.Blue(0, i)) <> 0, 1, 0)
-            Dim isHighDopplerMotion = If(Math.Max(Math.Max(sideR.Red(0, i), sideR.Green(0, i)), sideR.Blue(0, i)) <> 0, 1, 0)
-            Dim lowDopplerMotionVal = isLowDopplerMotion * (100 / CSng(mag.GetLength(0))) 'Атомарный вклад очередной строки (left-side)
-            Dim highDopplerMotionVal = isHighDopplerMotion * (100 / CSng(mag.GetLength(0))) 'Атомарный вклад очередной строки (right-side)
+        For i = 0 To mag.Length - 1
+            Dim lowDopplerNrg = MaxRGB(sideL.Red(0, i), sideL.Green(0, i), sideL.Blue(0, i))
+            Dim highDopplerNrg = MaxRGB(sideR.Red(0, i), sideR.Green(0, i), sideR.Blue(0, i))
+            Dim lowDopplerMotionVal = (lowDopplerNrg / CSng(Byte.MaxValue)) * (100 / CSng(mag.Length)) 'Атомарный вклад очередной строки (left-side)
+            Dim highDopplerMotionVal = (highDopplerNrg / CSng(Byte.MaxValue)) * (100 / CSng(mag.Length)) 'Атомарный вклад очередной строки (right-side)
             With result
                 .LowDoppler.AddLast(lowDopplerMotionVal)
                 .HighDoppler.AddLast(highDopplerMotionVal)
@@ -130,88 +120,19 @@ Public Class MotionExplorer
         If imageOutput Then
             Dim rightSideOffset = magRGB.Width - sideWidth
             Parallel.For(0, 3, Sub(channel)
-
-                                   'Изображения
                                    Dim image = magRGB.Matrix(channel)
                                    For i = 0 To magRGB.Height - 1
-                                       'Разметка полос
-                                       If displayCenter Then
+                                       For j = lowDopplerHighHarm To highDopplerLowHarm
+                                           If channel = _redChannel Then
+                                               image(j, i) = MaxRGB(sideR.Red(0, i), sideR.Green(0, i), sideR.Blue(0, i))
+                                           End If
+                                           If channel = _greenChannel Then
+                                               image(j, i) = 32
+                                           End If
                                            If channel = _blueChannel Then
-                                               image(lowDopplerHighHarm, i) = Byte.MaxValue
+                                               image(j, i) = MaxRGB(sideL.Red(0, i), sideL.Green(0, i), sideL.Blue(0, i))
                                            End If
-
-                                           If channel = _redChannel Then
-                                               image(highDopplerLowHarm, i) = Byte.MaxValue
-                                           End If
-                                       End If
-
-                                       If displayLeft Then
-                                           'Линии-ограничители "L"
-                                           If channel = _blueChannel Then
-                                               image(sideWidth - 1, i) = Byte.MaxValue * 1.0
-                                               image(sideWidth, i) = Byte.MaxValue * 0.75
-                                           Else
-                                               If displayRightWithLeft Then
-                                                   If channel = _greenChannel Then
-                                                       image(sideWidth - 1, i) = 0
-                                                       image(sideWidth, i) = 0
-                                                   End If
-                                               Else
-                                                   image(sideWidth - 1, i) = 0
-                                                   image(sideWidth, i) = 0
-                                               End If
-                                           End If
-
-                                           'Всплески "L"
-                                           For j = 0 To sideWidth - 2
-                                               If channel = _blueChannel Then
-                                                   image(j, i) = Math.Max(Math.Max(sideL.Red(j, i), sideL.Green(j, i)), sideL.Blue(j, i))
-                                               Else
-                                                   If displayRightWithLeft Then
-                                                       If channel = _greenChannel Then
-                                                           image(j, i) = 0
-                                                       End If
-                                                   Else
-                                                       image(j, i) = 0
-                                                   End If
-                                               End If
-                                           Next
-                                       End If
-
-                                       If displayRightWithLeft Then
-                                           'Линии-ограничители "R"
-                                           If channel = _redChannel Then
-                                               image(sideWidth - 1, i) = Byte.MaxValue * 1.0
-                                               image(sideWidth, i) = Byte.MaxValue * 0.75
-                                           End If
-
-                                           'Всплески "R"
-                                           For j = 0 To sideWidth - 2
-                                               If channel = _redChannel Then
-                                                   image(j, i) = Math.Max(Math.Max(sideR.Red(j, i), sideR.Green(j, i)), sideR.Blue(j, i))
-                                               End If
-                                           Next
-                                       End If
-
-                                       If displayRight Then
-                                           'Линии-ограничители "R"
-                                           If channel = _redChannel Then
-                                               image(rightSideOffset - 1, i) = Byte.MaxValue * 0.75
-                                               image(rightSideOffset, i) = Byte.MaxValue * 1.0
-                                           Else
-                                               image(rightSideOffset - 1, i) = 0
-                                               image(rightSideOffset, i) = 0
-                                           End If
-
-                                           'Всплески "R"
-                                           For j = 0 To sideWidth - 2
-                                               If channel = _redChannel Then
-                                                   image(j + rightSideOffset + 1, i) = Math.Max(Math.Max(sideR.Red(j, i), sideR.Green(j, i)), sideR.Blue(j, i))
-                                               Else
-                                                   image(j + rightSideOffset + 1, i) = 0
-                                               End If
-                                           Next
-                                       End If
+                                       Next
                                    Next
                                End Sub)
         End If
@@ -220,6 +141,10 @@ Public Class MotionExplorer
         result.Image = magRGB
 
         Return result
+    End Function
+
+    Private Function MaxRGB(R As Byte, G As Byte, B As Byte) As Byte
+        Return Math.Max(R, Math.Max(G, B))
     End Function
 
     ''' <summary>

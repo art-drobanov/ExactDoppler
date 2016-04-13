@@ -47,10 +47,6 @@ Partial Class MainForm
         Me._blocksLabel = New System.Windows.Forms.Label()
         Me._captureOnButton = New System.Windows.Forms.Button()
         Me._waterfallDisplayBitmapControl = New Bwl.Imaging.DisplayBitmapControl()
-        Me._displayLeftCheckBox = New System.Windows.Forms.CheckBox()
-        Me._displayRightCheckBox = New System.Windows.Forms.CheckBox()
-        Me._displayRightWithLeftCheckBox = New System.Windows.Forms.CheckBox()
-        Me._displayCenterCheckBox = New System.Windows.Forms.CheckBox()
         CType(Me._sineFreqLTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me._frequencyGroupBox.SuspendLayout()
         CType(Me._sineFreqRTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -309,60 +305,14 @@ Partial Class MainForm
         Me._waterfallDisplayBitmapControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me._waterfallDisplayBitmapControl.Location = New System.Drawing.Point(12, 475)
         Me._waterfallDisplayBitmapControl.Name = "_waterfallDisplayBitmapControl"
-        Me._waterfallDisplayBitmapControl.Size = New System.Drawing.Size(542, 177)
+        Me._waterfallDisplayBitmapControl.Size = New System.Drawing.Size(542, 189)
         Me._waterfallDisplayBitmapControl.TabIndex = 16
-        '
-        '_displayLeftCheckBox
-        '
-        Me._displayLeftCheckBox.AutoSize = True
-        Me._displayLeftCheckBox.Checked = True
-        Me._displayLeftCheckBox.CheckState = System.Windows.Forms.CheckState.Checked
-        Me._displayLeftCheckBox.Location = New System.Drawing.Point(12, 658)
-        Me._displayLeftCheckBox.Name = "_displayLeftCheckBox"
-        Me._displayLeftCheckBox.Size = New System.Drawing.Size(15, 14)
-        Me._displayLeftCheckBox.TabIndex = 16
-        Me._displayLeftCheckBox.UseVisualStyleBackColor = True
-        '
-        '_displayRightCheckBox
-        '
-        Me._displayRightCheckBox.AutoSize = True
-        Me._displayRightCheckBox.Checked = True
-        Me._displayRightCheckBox.CheckState = System.Windows.Forms.CheckState.Checked
-        Me._displayRightCheckBox.Location = New System.Drawing.Point(540, 658)
-        Me._displayRightCheckBox.Name = "_displayRightCheckBox"
-        Me._displayRightCheckBox.Size = New System.Drawing.Size(15, 14)
-        Me._displayRightCheckBox.TabIndex = 19
-        Me._displayRightCheckBox.UseVisualStyleBackColor = True
-        '
-        '_displayRightWithLeftCheckBox
-        '
-        Me._displayRightWithLeftCheckBox.AutoSize = True
-        Me._displayRightWithLeftCheckBox.Location = New System.Drawing.Point(30, 658)
-        Me._displayRightWithLeftCheckBox.Name = "_displayRightWithLeftCheckBox"
-        Me._displayRightWithLeftCheckBox.Size = New System.Drawing.Size(15, 14)
-        Me._displayRightWithLeftCheckBox.TabIndex = 17
-        Me._displayRightWithLeftCheckBox.UseVisualStyleBackColor = True
-        '
-        '_displayCenterCheckBox
-        '
-        Me._displayCenterCheckBox.AutoSize = True
-        Me._displayCenterCheckBox.Checked = True
-        Me._displayCenterCheckBox.CheckState = System.Windows.Forms.CheckState.Checked
-        Me._displayCenterCheckBox.Location = New System.Drawing.Point(278, 658)
-        Me._displayCenterCheckBox.Name = "_displayCenterCheckBox"
-        Me._displayCenterCheckBox.Size = New System.Drawing.Size(15, 14)
-        Me._displayCenterCheckBox.TabIndex = 18
-        Me._displayCenterCheckBox.UseVisualStyleBackColor = True
         '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(566, 676)
-        Me.Controls.Add(Me._displayCenterCheckBox)
-        Me.Controls.Add(Me._displayRightWithLeftCheckBox)
-        Me.Controls.Add(Me._displayRightCheckBox)
-        Me.Controls.Add(Me._displayLeftCheckBox)
         Me.Controls.Add(Me._waterfallDisplayBitmapControl)
         Me.Controls.Add(Me._inputGroupBox)
         Me.Controls.Add(Me._outputGroupBox)
@@ -370,7 +320,7 @@ Partial Class MainForm
         Me.MaximizeBox = False
         Me.Name = "MainForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "ExactDopplerTest (11.04.2016 21:42)"
+        Me.Text = "ExactDopplerTest (13.04.2016 22:07)"
         CType(Me._sineFreqLTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me._frequencyGroupBox.ResumeLayout(False)
         Me._frequencyGroupBox.PerformLayout()
@@ -382,7 +332,6 @@ Partial Class MainForm
         Me._inputGroupBox.PerformLayout()
         CType(Me._blindZoneTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
-        Me.PerformLayout()
 
     End Sub
 
@@ -410,9 +359,5 @@ Partial Class MainForm
     Friend WithEvents _blindZoneLabel As Label
     Friend WithEvents _sineHarmWidthLabel_ As Label
     Friend WithEvents _blindZoneTrackBar As TrackBar
-    Friend WithEvents _displayLeftCheckBox As CheckBox
-    Friend WithEvents _displayRightCheckBox As CheckBox
-    Friend WithEvents _displayRightWithLeftCheckBox As CheckBox
-    Friend WithEvents _displayCenterCheckBox As CheckBox
     Friend WithEvents _mixCheckBox As CheckBox
 End Class

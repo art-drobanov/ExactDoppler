@@ -79,7 +79,7 @@ Public Class FFTExplorer
         Return res
     End Function
 
-    Public Function HarmSlicesSumImageDb(mag As Double()(), width As Integer) As Double()()
+    Public Function HarmSlicesSumImageInDb(mag As Double()(), width As Integer) As Double()()
         Dim result = New Double(mag.Length - 1)() {}
         For i = 0 To result.Length - 1
             result(i) = New Double(width - 1) {}
@@ -91,15 +91,16 @@ Public Class FFTExplorer
                                         Dim sum As Double = 0
                                         For j = 0 To row.Length - 1
                                             If row(j) > Double.MinValue Then
-                                                sum += row(j)
+                                                sum += Math.Pow(10, row(j))
                                                 N += 1
                                             End If
                                         Next
                                         sum /= N
+                                        sum = Math.Log(sum)
 
                                         Dim target = result(i)
                                         For col = 0 To target.Length - 1
-                                            target(col) = sum
+                                            target(col) = If(Double.IsNaN(sum), Double.MinValue, sum)
                                         Next
                                     End Sub)
         Return result

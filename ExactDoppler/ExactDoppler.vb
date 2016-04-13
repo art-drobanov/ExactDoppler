@@ -169,8 +169,7 @@ Public Class ExactDoppler
             End If
 
             'Обработка
-            Dim motionExplorerResult = _motionExplorer.Process(pcmSamples, pcmSamplesCount, lowFreq, highFreq, _config.BlindZone, _config.DisplayLeft,
-                                                               _config.DisplayRightWithLeft, _config.DisplayCenter, _config.DisplayRight,
+            Dim motionExplorerResult = _motionExplorer.Process(pcmSamples, pcmSamplesCount, lowFreq, highFreq, _config.BlindZone,
                                                                _config.PcmOutput, _config.ImageOutput)
 
             'Допплер-лог

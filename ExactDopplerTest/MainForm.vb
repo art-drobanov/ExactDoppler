@@ -96,23 +96,14 @@ Public Class MainForm
 
         Dim centerFreq As Double
         Dim blindZone As Integer
-        Dim displayLeft As Boolean
-        Dim displayRightWithLeft As Boolean
-        Dim displayCenter As Boolean
-        Dim displayRight As Boolean
-
         Me.Invoke(Sub()
                       centerFreq = Math.Max(Convert.ToDouble(_sineFreqLLabel.Text), Convert.ToDouble(_sineFreqRLabel.Text))
                       blindZone = _blindZoneTrackBar.Value
-                      displayLeft = _displayLeftCheckBox.Checked
-                      displayRightWithLeft = _displayRightWithLeftCheckBox.Checked
-                      displayCenter = _displayCenterCheckBox.Checked
-                      displayRight = _displayRightCheckBox.Checked
                   End Sub)
 
         Dim pcmOutput = True
         Dim imageOutput = True
-        _exactDoppler.Config = New ExactDopplerConfig(0, 0, 1.0, centerFreq, blindZone, displayLeft, displayRightWithLeft, displayCenter, displayRight, pcmOutput, imageOutput)
+        _exactDoppler.Config = New ExactDopplerConfig(0, 0, 1.0, centerFreq, blindZone, pcmOutput, imageOutput)
     End Sub
 
     Private Sub _sineGenButton_Click(sender As Object, e As EventArgs) Handles _switchOnButton.Click
@@ -184,19 +175,19 @@ Public Class MainForm
         UpdateExactDopplerConfig()
     End Sub
 
-    Private Sub _displayLeftCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles _displayLeftCheckBox.CheckedChanged
+    Private Sub _displayLeftCheckBox_CheckedChanged(sender As Object, e As EventArgs)
         UpdateExactDopplerConfig()
     End Sub
 
-    Private Sub _displayRightWithLeftCheckBox_CheckStateChanged(sender As Object, e As EventArgs) Handles _displayRightWithLeftCheckBox.CheckStateChanged
+    Private Sub _displayRightWithLeftCheckBox_CheckStateChanged(sender As Object, e As EventArgs)
         UpdateExactDopplerConfig()
     End Sub
 
-    Private Sub _displayCenterCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles _displayCenterCheckBox.CheckedChanged
+    Private Sub _displayCenterCheckBox_CheckedChanged(sender As Object, e As EventArgs)
         UpdateExactDopplerConfig()
     End Sub
 
-    Private Sub _displayRightCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles _displayRightCheckBox.CheckedChanged
+    Private Sub _displayRightCheckBox_CheckedChanged(sender As Object, e As EventArgs)
         UpdateExactDopplerConfig()
     End Sub
 End Class

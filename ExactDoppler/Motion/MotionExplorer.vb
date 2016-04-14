@@ -8,6 +8,7 @@ Public Class MotionExplorer
     ''' Результат анализа блока PCM
     ''' </summary>
     Public Class MotionExplorerResult
+        Public Property CarrierLevel As Integer
         Public Property LowDoppler As New LinkedList(Of Single)
         Public Property HighDoppler As New LinkedList(Of Single)
         Public Property Duration As Double
@@ -27,6 +28,7 @@ Public Class MotionExplorer
     Private Const _brightness = 100 '100
     Private Const _minFreq = 200 '200
     Private Const _blindZone = 12 '12
+    Private Const _carrierRadius = 2 '2
 
     Private _targetNRG As Double = 0 '0
     Private _gain As Double = 1.0 '1.0
@@ -57,16 +59,13 @@ Public Class MotionExplorer
     ''' <param name="pcmSamplesCount">Количество семплов (для учета режима моно/стерео).</param>
     ''' <param name="lowFreq">Нижняя частота области интереса.</param>
     ''' <param name="highFreq">Верхняя частота области интереса.</param>
-    ''' <param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
-    ''' <param name="pcmOutput">Осуществлять вывод Pcm?</param>
-    ''' <param name="imageOutput">Выводить изображение?</param>
+    ''' <param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>    
     ''' <returns>"Результат анализа движения".</returns>
-    Public Function Process(pcmSamples As Single(), pcmSamplesCount As Integer, lowFreq As Double, highFreq As Double, blindZone As Integer,
-                            pcmOutput As Boolean, imageOutput As Boolean) As MotionExplorerResult
+    Public Function Process(pcmSamples As Single(), pcmSamplesCount As Integer, lowFreq As Double, highFreq As Double, blindZone As Integer) As MotionExplorerResult
         'FFT
         Dim mag = MyBase.Explore(pcmSamples, pcmSamplesCount, lowFreq, highFreq).MagL
         Dim result As New MotionExplorerResult With {.Duration = mag(0).Length * MyBase.SonogramRowDuration,
-                                                     .Pcm = If(pcmOutput, _waterfallPlayer.Process(mag, _blindZone), Nothing)}
+                                                     .Pcm = _waterfallPlayer.Process(mag, _blindZone)}
 
         'DSP
         Dim squelchInDb = MyBase.Db(AutoGainAndGetSquelch(mag, _brightness), _zeroDbLevel)
@@ -74,7 +73,7 @@ Public Class MotionExplorer
         DopplerFilterDb(mag, _NZeroes)
 
         'Detection
-        Return WaterfallDetector(result, mag, _zeroDbLevel, blindZone, imageOutput)
+        Return WaterfallDetector(result, mag, _zeroDbLevel, blindZone)
     End Function
 
     ''' <summary>
@@ -84,15 +83,14 @@ Public Class MotionExplorer
     ''' <param name="mag">Магнитудная сонограмма ("водопад").</param>
     ''' <param name="zeroDbLevel">"Нулевой" уровень логарифмической шкалы.</param>
     ''' <param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
-    ''' <param name="imageOutput">Выводить изображение?</param>
     ''' <returns>"Результат анализа движения".</returns>
-    Private Function WaterfallDetector(result As MotionExplorerResult, mag As Double()(), zeroDbLevel As Double, blindZone As Integer,
-                                       imageOutput As Boolean) As MotionExplorerResult
+    Private Function WaterfallDetector(result As MotionExplorerResult, mag As Double()(), zeroDbLevel As Double, blindZone As Integer) As MotionExplorerResult
         Dim dopplerWindowWidth = (mag(0).Length - blindZone) \ 2
         Dim lowDopplerLowHarm = 0
         Dim lowDopplerHighHarm = dopplerWindowWidth - 1
         Dim highDopplerLowHarm = mag(0).Length - dopplerWindowWidth
         Dim highDopplerHighHarm = mag(0).Length - 1
+        Dim centerHarm = (lowDopplerHighHarm + highDopplerLowHarm) \ 2
 
         Dim lowDoppler = ExactPlotter.SubBand(mag, lowDopplerLowHarm, lowDopplerHighHarm)
         Dim highDoppler = ExactPlotter.SubBand(mag, highDopplerLowHarm, highDopplerHighHarm)
@@ -100,9 +98,11 @@ Public Class MotionExplorer
         Dim lowDopplerImage = MyBase.HarmSlicesSumImageInDb(lowDoppler, 1)
         Dim highDopplerImage = MyBase.HarmSlicesSumImageInDb(highDoppler, 1)
 
-        Dim magRGB = If(imageOutput, _paletteProcessor.Process(mag), Nothing)
+        Dim magRGB = _paletteProcessor.Process(mag)
         Dim sideL = _paletteProcessor.Process(lowDopplerImage)
         Dim sideR = _paletteProcessor.Process(highDopplerImage)
+        Dim carrierLevel As Single = 0
+        Dim carrierNrgDivider As Single = 0
 
         'Наполнение векторов данными о доплеровских всплесках
         For i = 0 To mag.Length - 1
@@ -114,28 +114,45 @@ Public Class MotionExplorer
                 .LowDoppler.AddLast(lowDopplerMotionVal)
                 .HighDoppler.AddLast(highDopplerMotionVal)
             End With
+            '...и рассчитываем энергию несущей
+            For j = (centerHarm - _carrierRadius) + 1 To (centerHarm + _carrierRadius) - 1
+                carrierLevel += MaxRGB(magRGB.Red(j, i), magRGB.Green(j, i), magRGB.Blue(j, i))
+                carrierNrgDivider += 1
+            Next
         Next
+        carrierLevel /= carrierNrgDivider
+        result.CarrierLevel = carrierLevel * (100.0 / Byte.MaxValue)
 
         'Bitmap-вывод
-        If imageOutput Then
-            Dim rightSideOffset = magRGB.Width - sideWidth
-            Parallel.For(0, 3, Sub(channel)
-                                   Dim image = magRGB.Matrix(channel)
-                                   For i = 0 To magRGB.Height - 1
-                                       For j = lowDopplerHighHarm To highDopplerLowHarm
-                                           If channel = _redChannel Then
-                                               image(j, i) = MaxRGB(sideR.Red(0, i), sideR.Green(0, i), sideR.Blue(0, i))
-                                           End If
-                                           If channel = _greenChannel Then
-                                               image(j, i) = 32
-                                           End If
-                                           If channel = _blueChannel Then
-                                               image(j, i) = MaxRGB(sideL.Red(0, i), sideL.Green(0, i), sideL.Blue(0, i))
-                                           End If
-                                       Next
+        Dim rightSideOffset = magRGB.Width - sideWidth
+        Parallel.For(0, 3, Sub(channel)
+                               Dim image = magRGB.Matrix(channel)
+                               For i = 0 To magRGB.Height - 1
+                                   For j = lowDopplerHighHarm To centerHarm - _carrierRadius
+                                       If channel = _redChannel Then
+                                           image(j, i) = MaxRGB(sideR.Red(0, i), sideR.Green(0, i), sideR.Blue(0, i))
+                                       End If
+                                       If channel = _greenChannel Then
+                                           image(j, i) = 32
+                                       End If
+                                       If channel = _blueChannel Then
+                                           image(j, i) = MaxRGB(sideL.Red(0, i), sideL.Green(0, i), sideL.Blue(0, i))
+                                       End If
                                    Next
-                               End Sub)
-        End If
+                                   For j = centerHarm + _carrierRadius To highDopplerLowHarm
+                                       If channel = _redChannel Then
+                                           image(j, i) = MaxRGB(sideR.Red(0, i), sideR.Green(0, i), sideR.Blue(0, i))
+                                       End If
+                                       If channel = _greenChannel Then
+                                           image(j, i) = 32
+                                       End If
+                                       If channel = _blueChannel Then
+                                           image(j, i) = MaxRGB(sideL.Red(0, i), sideL.Green(0, i), sideL.Blue(0, i))
+                                       End If
+                                   Next
+
+                               Next
+                           End Sub)
 
         'Сохраняем графический результат - есть он или нет...
         result.Image = magRGB

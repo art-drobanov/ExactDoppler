@@ -103,7 +103,7 @@ Public Class MainForm
 
         Dim pcmOutput = True
         Dim imageOutput = True
-        _exactDoppler.Config = New ExactDopplerConfig(0, 0, 1.0, centerFreq, blindZone, pcmOutput, imageOutput)
+        _exactDoppler.Config = New ExactDopplerConfig(0, 0, 1.0, centerFreq, blindZone)
     End Sub
 
     Private Sub _sineGenButton_Click(sender As Object, e As EventArgs) Handles _switchOnButton.Click

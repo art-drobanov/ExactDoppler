@@ -169,15 +169,14 @@ Public Class ExactDoppler
             End If
 
             'Обработка
-            Dim motionExplorerResult = _motionExplorer.Process(pcmSamples, pcmSamplesCount, lowFreq, highFreq, _config.BlindZone,
-                                                               _config.PcmOutput, _config.ImageOutput)
+            Dim motionExplorerResult = _motionExplorer.Process(pcmSamples, pcmSamplesCount, lowFreq, highFreq, _config.BlindZone)
 
-            'Допплер-лог
+            'Доплер-лог
             Dim nowTimeStamp = DateTime.Now
             Dim lowDopplerSum = motionExplorerResult.LowDoppler.Sum()
             Dim highDopplerSum = motionExplorerResult.HighDoppler.Sum()
-            If lowDopplerSum <> 0 Or highDopplerSum <> 0 Then
-                _dopplerLog.Add(nowTimeStamp, lowDopplerSum, highDopplerSum)
+            If lowDopplerSum <> 0 Or highDopplerSum <> 0 Or motionExplorerResult.CarrierLevel = 0 Then
+                _dopplerLog.Add(nowTimeStamp, lowDopplerSum, highDopplerSum, motionExplorerResult.CarrierLevel)
             End If
 
             Return motionExplorerResult

@@ -17,8 +17,6 @@ Public Class ExactDopplerConfigFromStorage
         _volume = New DoubleSetting(storage, "Volume", 0.5)
         _centerFreq = New DoubleSetting(storage, "CenterFreq", 21000)
         _blindZone = New IntegerSetting(storage, "BlindZone", 70)
-        _pcmOutput = New BooleanSetting(storage, "PcmOutput", True)
-        _imageOutput = New BooleanSetting(storage, "ImageOutput", True)
     End Sub
 
     Public Sub Load()
@@ -28,8 +26,6 @@ Public Class ExactDopplerConfigFromStorage
             .Volume = _volume.Value
             .CenterFreq = _centerFreq.Value
             .BlindZone = _blindZone.Value
-            .PcmOutput = _pcmOutput.Value
-            .ImageOutput = _imageOutput.Value
         End With
     End Sub
 End Class

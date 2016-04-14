@@ -71,7 +71,7 @@ ExactDoppler
 	<param name="sampleRate">Частота семплирования.</param>
 	<param name="nBits">Разрядность.</param>
 	<param name="stereo">Стереорежим?</param>
-</member><member name="M:ExactAudio.MotionExplorer.Process(System.Single[],System.Int32,System.Double,System.Double,System.Int32,System.Boolean,System.Boolean)">
+</member><member name="M:ExactAudio.MotionExplorer.Process(System.Single[],System.Int32,System.Double,System.Double,System.Int32)">
 	<summary>
  Основной метод обработки.
  </summary>
@@ -80,10 +80,8 @@ ExactDoppler
 	<param name="lowFreq">Нижняя частота области интереса.</param>
 	<param name="highFreq">Верхняя частота области интереса.</param>
 	<param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
-	<param name="pcmOutput">Осуществлять вывод Pcm?</param>
-	<param name="imageOutput">Выводить изображение?</param>
 	<returns>"Результат анализа движения".</returns>
-</member><member name="M:ExactAudio.MotionExplorer.WaterfallDetector(ExactAudio.MotionExplorer.MotionExplorerResult,System.Double[][],System.Double,System.Int32,System.Boolean)">
+</member><member name="M:ExactAudio.MotionExplorer.WaterfallDetector(ExactAudio.MotionExplorer.MotionExplorerResult,System.Double[][],System.Double,System.Int32)">
 	<summary>
  Детектирование всплесков на "водопаде"
  </summary>
@@ -91,7 +89,6 @@ ExactDoppler
 	<param name="mag">Магнитудная сонограмма ("водопад").</param>
 	<param name="zeroDbLevel">"Нулевой" уровень логарифмической шкалы.</param>
 	<param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
-	<param name="imageOutput">Выводить изображение?</param>
 	<returns>"Результат анализа движения".</returns>
 </member><member name="M:ExactAudio.MotionExplorer.DopplerFilterDb(System.Double[][],System.Int32)">
 	<summary>

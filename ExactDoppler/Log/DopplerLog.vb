@@ -7,26 +7,30 @@ Public Class DopplerLog
         Public Property Time As DateTime
         Public Property LowDoppler As Single
         Public Property HighDoppler As Single
+        Public Property CarrierLevel As Single
+
         Public ReadOnly Property Type As String
             Get
-                If (HighDoppler - LowDoppler) > _diffThr Then Return "Incoming motion"
-                If (LowDoppler - HighDoppler) > _diffThr Then Return "Outcoming motion"
-                Return "Motion"
+                If (HighDoppler - LowDoppler) > _diffThr Then Return "Motion++"
+                If (LowDoppler - HighDoppler) > _diffThr Then Return "Motion--"
+                Return "Motion+-"
             End Get
         End Property
 
-        Public Sub New(T As DateTime, L As Single, H As Single)
-            Me.Time = T
+        Public Sub New(time As DateTime, L As Single, H As Single, carrierLevel As Single)
+            Me.Time = time
             Me.LowDoppler = If(L > 99.99, 99.99, If(L < 0, 0, L))
             Me.HighDoppler = If(H > 99.99, 99.99, If(H < 0, 0, H))
+            Me.CarrierLevel = carrierLevel
         End Sub
 
         Public Overrides Function ToString() As String
-            Return String.Format("DMY:{0}, L:{1}%, H:{2}%; Type:{3}",
+            Return String.Format("DMY:{0}, L:{1}%, H:{2}%; Type:{3}, CarrierLevel:{4}%;",
                                  Time.ToString(DateTimeFormat),
                                  LowDoppler.ToString("00.00").Replace(",", "."),
                                  HighDoppler.ToString("00.00").Replace(",", "."),
-                                 Type)
+                                 Type,
+                                 CarrierLevel.ToString("00.00"))
         End Function
     End Class
 
@@ -42,9 +46,9 @@ Public Class DopplerLog
         End Get
     End Property
 
-    Public Sub Add(T As DateTime, L As Single, H As Single)
+    Public Sub Add(time As DateTime, L As Single, H As Single, carrierLevel As Single)
         SyncLock SyncRoot
-            _items.AddLast(New Item(T, L, H))
+            _items.AddLast(New Item(time, L, H, carrierLevel))
         End SyncLock
     End Sub
 
@@ -67,13 +71,17 @@ Public Class DopplerLog
         While True
             Dim logItemString = sr.ReadLine()
             If logItemString Is Nothing Then Exit While
-            Dim logItemStrings = logItemString.ToUpper().Replace("DMY:", String.Empty).Replace("L:", String.Empty).Replace("H:", String.Empty) _
-                                                        .Replace("TYPE:", String.Empty).Replace("INCOMING", String.Empty).Replace("OUTCOMING", String.Empty) _
-                                                        .Replace("MOTION", String.Empty).Replace(";", String.Empty).Split(",")
+            Dim logItemStrings = logItemString.ToUpper().Replace("DMY", String.Empty).Replace("CARRIERLEVEL", String.Empty) _
+                                                        .Replace("L", String.Empty).Replace("H", String.Empty) _
+                                                        .Replace("TYPE", String.Empty).Replace("MOTION", String.Empty) _
+                                                        .Replace("+", String.Empty).Replace("-", String.Empty) _
+                                                        .Replace(";", String.Empty).Replace(":", String.Empty) _
+                                                        .Split(",")
 
             Dim T As DateTime
             Dim L As Single
             Dim H As Single
+            Dim C As Single
 
             If Not DateTime.TryParseExact(logItemStrings(0), DateTimeFormat, Nothing, DateTimeStyles.None, T) Then
                 Throw New Exception(String.Format("Can't parse 'DMY:{0}' from log", logItemStrings(0)))
@@ -93,7 +101,14 @@ Public Class DopplerLog
                 End If
             End If
 
-            newLog.Add(T, L, H)
+            logItemStrings(3) = logItemStrings(3).Replace("%", String.Empty)
+            If Not Single.TryParse(logItemStrings(3).Replace(".", ","), C) Then
+                If Not Single.TryParse(logItemStrings(3).Replace(",", "."), C) Then
+                    Throw New Exception(String.Format("Can't parse 'C:{0}' from log", logItemStrings(3)))
+                End If
+            End If
+
+            newLog.Add(T, L, H, C)
         End While
         sr.Close()
 

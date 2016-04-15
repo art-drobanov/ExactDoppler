@@ -173,11 +173,14 @@ Public Class ExactDoppler
 
             'Доплер-лог
             Dim nowTimeStamp = DateTime.Now
-            Dim lowDopplerSum = motionExplorerResult.LowDoppler.Sum()
-            Dim highDopplerSum = motionExplorerResult.HighDoppler.Sum()
-            If lowDopplerSum <> 0 Or highDopplerSum <> 0 Or motionExplorerResult.CarrierLevel = 0 Then
-                _dopplerLog.Add(nowTimeStamp, lowDopplerSum, highDopplerSum, motionExplorerResult.CarrierLevel)
-            End If
+            With motionExplorerResult
+                Dim lowDopplerAvg = .LowDoppler.Average()
+                Dim highDopplerAvg = .HighDoppler.Average()
+                Dim carrierLevelAvg = .CarrierLevel.Average()
+                If lowDopplerAvg <> 0 Or highDopplerAvg <> 0 Or carrierLevelAvg = 0 Then
+                    _dopplerLog.Add(nowTimeStamp, lowDopplerAvg, highDopplerAvg, carrierLevelAvg)
+                End If
+            End With
 
             Return motionExplorerResult
         End SyncLock

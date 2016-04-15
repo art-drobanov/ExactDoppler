@@ -8,7 +8,7 @@ Public Class MotionExplorer
     ''' Результат анализа блока PCM
     ''' </summary>
     Public Class MotionExplorerResult
-        Public Property CarrierLevel As Integer
+        Public Property CarrierLevel As New LinkedList(Of Single)
         Public Property LowDoppler As New LinkedList(Of Single)
         Public Property HighDoppler As New LinkedList(Of Single)
         Public Property Duration As Double
@@ -19,6 +19,7 @@ Public Class MotionExplorer
     Private Const _redChannel = 0 '0
     Private Const _greenChannel = 1 '1
     Private Const _blueChannel = 2 '2
+    Private Const _blankerLevel = 32 '32
     Private Const _sideFormDivider = 20 '20
     Private Const _gainHarmRadius = 2 '2
     Private Const _gainStep = 1.0 '1.0
@@ -91,6 +92,9 @@ Public Class MotionExplorer
         Dim highDopplerLowHarm = mag(0).Length - dopplerWindowWidth
         Dim highDopplerHighHarm = mag(0).Length - 1
         Dim centerHarm = (lowDopplerHighHarm + highDopplerLowHarm) \ 2
+        Dim carrierLowHarm = (centerHarm - _carrierRadius)
+        Dim carrierHighHarm = (centerHarm + _carrierRadius)
+        Dim carrierNorm = ((carrierHighHarm - carrierLowHarm) - 1)
 
         Dim lowDoppler = ExactPlotter.SubBand(mag, lowDopplerLowHarm, lowDopplerHighHarm)
         Dim highDoppler = ExactPlotter.SubBand(mag, highDopplerLowHarm, highDopplerHighHarm)
@@ -101,27 +105,26 @@ Public Class MotionExplorer
         Dim magRGB = _paletteProcessor.Process(mag)
         Dim sideL = _paletteProcessor.Process(lowDopplerImage)
         Dim sideR = _paletteProcessor.Process(highDopplerImage)
-        Dim carrierLevel As Single = 0
-        Dim carrierNrgDivider As Single = 0
 
         'Наполнение векторов данными о доплеровских всплесках
         For i = 0 To mag.Length - 1
             Dim lowDopplerNrg = MaxRGB(sideL.Red(0, i), sideL.Green(0, i), sideL.Blue(0, i))
             Dim highDopplerNrg = MaxRGB(sideR.Red(0, i), sideR.Green(0, i), sideR.Blue(0, i))
-            Dim lowDopplerMotionVal = (lowDopplerNrg / CSng(Byte.MaxValue)) * (100 / CSng(mag.Length)) 'Атомарный вклад очередной строки (left-side)
-            Dim highDopplerMotionVal = (highDopplerNrg / CSng(Byte.MaxValue)) * (100 / CSng(mag.Length)) 'Атомарный вклад очередной строки (right-side)
+            Dim lowDopplerMotionVal = (lowDopplerNrg / CSng(Byte.MaxValue)) * 100
+            Dim highDopplerMotionVal = (highDopplerNrg / CSng(Byte.MaxValue)) * 100
             With result
                 .LowDoppler.AddLast(lowDopplerMotionVal)
                 .HighDoppler.AddLast(highDopplerMotionVal)
             End With
-            '...и рассчитываем энергию несущей
-            For j = (centerHarm - _carrierRadius) + 1 To (centerHarm + _carrierRadius) - 1
+            '...и рассчитываем уровень несущей
+            Dim carrierLevel = 0
+            For j = carrierLowHarm + 1 To carrierHighHarm - 1
                 carrierLevel += MaxRGB(magRGB.Red(j, i), magRGB.Green(j, i), magRGB.Blue(j, i))
-                carrierNrgDivider += 1
             Next
+            carrierLevel /= carrierNorm
+            carrierLevel *= (100.0 / Byte.MaxValue)
+            result.CarrierLevel.AddLast(carrierLevel)
         Next
-        carrierLevel /= carrierNrgDivider
-        result.CarrierLevel = carrierLevel * (100.0 / Byte.MaxValue)
 
         'Bitmap-вывод
         Dim rightSideOffset = magRGB.Width - sideWidth
@@ -133,7 +136,7 @@ Public Class MotionExplorer
                                            image(j, i) = MaxRGB(sideR.Red(0, i), sideR.Green(0, i), sideR.Blue(0, i))
                                        End If
                                        If channel = _greenChannel Then
-                                           image(j, i) = 32
+                                           image(j, i) = _blankerLevel
                                        End If
                                        If channel = _blueChannel Then
                                            image(j, i) = MaxRGB(sideL.Red(0, i), sideL.Green(0, i), sideL.Blue(0, i))
@@ -144,7 +147,7 @@ Public Class MotionExplorer
                                            image(j, i) = MaxRGB(sideR.Red(0, i), sideR.Green(0, i), sideR.Blue(0, i))
                                        End If
                                        If channel = _greenChannel Then
-                                           image(j, i) = 32
+                                           image(j, i) = _blankerLevel
                                        End If
                                        If channel = _blueChannel Then
                                            image(j, i) = MaxRGB(sideL.Red(0, i), sideL.Green(0, i), sideL.Blue(0, i))

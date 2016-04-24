@@ -16,7 +16,7 @@ Public Class WaveInSource
         _waveIn = New WaveInEvent With {
                                           .DeviceNumber = deviceNumber,
                                           .WaveFormat = _waveFormat,
-                                          .BufferMilliseconds = Math.Ceiling(minSamplesCountInBlock / CDbl(sampleRate)) * 1000,
+                                          .BufferMilliseconds = Math.Ceiling((minSamplesCountInBlock / CDbl(sampleRate)) * 1000),
                                           .NumberOfBuffers = 3
                                        }
     End Sub

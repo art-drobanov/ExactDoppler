@@ -68,7 +68,6 @@ Public Class FFTExplorer
             .MagL = ExactPlotter.SubBand(res.MagL, lowFreq, highFreq, lowHarmIdx, highHarmIdx, _fftObj, _sampleRate, harmReverse)
             .MagR = ExactPlotter.SubBand(res.MagR, lowFreq, highFreq, lowHarmIdx, highHarmIdx, _fftObj, _sampleRate, harmReverse)
             .PhaseLR = ExactPlotter.SubBand(res.PhaseLR, lowFreq, highFreq, lowHarmIdx, highHarmIdx, _fftObj, _sampleRate, harmReverse)
-
             .ACH = Nothing
             .ArgL = Nothing
             .ArgR = Nothing

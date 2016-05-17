@@ -34,10 +34,8 @@ Public Class DopplerLog
         End Function
     End Class
 
-    Public Const DateTimeFormat As String = "dd.MM.yyyy HH.mm.ss"
-
+    Public Const DateTimeFormat As String = "yyyy.MM.dd__HH.mm.ss.ffff"
     Private _items As New LinkedList(Of Item)
-
     Public ReadOnly SyncRoot As New Object
 
     Public ReadOnly Property Items As LinkedList(Of Item)

@@ -1,0 +1,10 @@
+C:\Cleverflow.office\me.storage\ExactDoppler\debug\ExactDopplerServer\bin\ExactDopplerServer.exe.config
+C:\Cleverflow.office\me.storage\ExactDoppler\debug\ExactDopplerServer\bin\ExactDopplerServer.exe
+C:\Cleverflow.office\me.storage\ExactDoppler\debug\ExactDopplerServer\bin\ExactDopplerServer.pdb
+C:\Cleverflow.office\me.storage\ExactDoppler\debug\ExactDopplerServer\bin\ExactDopplerServer.xml
+C:\Cleverflow.office\me.storage\ExactDoppler\ExactDopplerServer\obj\Debug\ExactDopplerServer.vbprojResolveAssemblyReference.cache
+C:\Cleverflow.office\me.storage\ExactDoppler\ExactDopplerServer\obj\Debug\ExactDopplerServer.Resources.resources
+C:\Cleverflow.office\me.storage\ExactDoppler\ExactDopplerServer\obj\Debug\ExactDopplerServer.vbproj.GenerateResource.Cache
+C:\Cleverflow.office\me.storage\ExactDoppler\ExactDopplerServer\obj\Debug\ExactDopplerServer.exe
+C:\Cleverflow.office\me.storage\ExactDoppler\ExactDopplerServer\obj\Debug\ExactDopplerServer.xml
+C:\Cleverflow.office\me.storage\ExactDoppler\ExactDopplerServer\obj\Debug\ExactDopplerServer.pdb

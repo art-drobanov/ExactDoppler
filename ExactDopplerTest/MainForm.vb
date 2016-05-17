@@ -46,7 +46,7 @@ Public Class MainForm
         _exactDoppler.Stop()
 
         'FileName
-        Dim snapshotFilename = DateTime.Now.ToString("dd.MM.yyyy__HH.mm.ss.ffff")
+        Dim snapshotFilename = DateTime.Now.ToString("yyyy.MM.dd__HH.mm.ss.ffff")
 
         'DopplerLog
         If _exactDoppler.DopplerLog.Items.Any() Then

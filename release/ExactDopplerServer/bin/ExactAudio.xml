@@ -20,7 +20,7 @@ ExactAudio
  </summary>
 </member><member name="T:ExactAudio.PaletteProcessor">
 	<summary>
- Процессор double-изображений на основе загруженной палитры
+ "Раскрашиватель" монохромных изображений
  </summary>
 </member><member name="T:ExactAudio.Normalizer">
 	<summary>

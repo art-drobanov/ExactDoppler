@@ -112,9 +112,9 @@ Public Class WaterfallPlayer
         Dim FFT_S = New Double(_fftObj.NN - 1) {}
         Parallel.For(1, N2, Sub(i)
                                 Dim magValue = magRowFull(i - 1)
-                                FFT_T((i << 1) + 0) = magValue
+                                FFT_T((i << 1) + 0) = magValue / 4.0
                                 FFT_T((i << 1) + 1) = 0
-                                FFT_T(((_fftObj.N - i) << 1) + 0) = magValue
+                                FFT_T(((_fftObj.N - i) << 1) + 0) = magValue / 4.0
                                 FFT_T(((_fftObj.N - i) << 1) + 1) = 0
                             End Sub)
 
@@ -123,12 +123,11 @@ Public Class WaterfallPlayer
         Dim useTaperWindow = True
         Dim FFT_S_Offset = 0
         Dim recoverAfterTaperWindow = True
-        Dim useNorm = False
+        Dim useNorm = True
         Dim direction = False
         Dim usePolyphase = False
         ExactFFT.CFFT_Process(FFT_T, FFT_S_Offset, FFT_S, useTaperWindow, recoverAfterTaperWindow, useNorm, direction, usePolyphase, _fftObj)
         Dim rowPcm = GetPcm(FFT_S)
-
         Return rowPcm
     End Function
 
@@ -148,11 +147,9 @@ Public Class WaterfallPlayer
         If boundSize <> pcmOut.Length Then
             Throw New Exception("boundSize <> pcmOut.Length")
         End If
-
         For i = leftBound To rightBound
             pcmOut(i - leftBound) = CSng(FFT_S(i << 1))
         Next
-
         Return pcmOut
     End Function
 End Class

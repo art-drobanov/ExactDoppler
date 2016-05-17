@@ -23,8 +23,7 @@ Public Class MotionExplorer
     Private Const _sideFormDivider = 20 '20
     Private Const _gainHarmRadius = 2 '2
     Private Const _gainStep = 1.0 '1.0
-    Private Const _NZeroes = 3 ' 3
-    Private Const _noiseGuardCoeff = 1.05 '1.05
+    Private Const _NZeroes = 3 ' 3    
     Private Const _noiseScannerDepth = 0.1 '0.1
     Private Const _brightness = 100 '100
     Private Const _minFreq = 200 '200
@@ -49,7 +48,6 @@ Public Class MotionExplorer
         MyBase.New(frameWidth, frameStep, sampleRate, nBits, stereo)
         _targetNRG = Math.Pow(2, nBits - 1)
         _paletteProcessor = New PaletteProcessor()
-        _paletteProcessor.LoadPalette("..\..\..\palettes.raw\Uranium", "URANIUM_PALETTE")
         _waterfallPlayer = New WaterfallPlayer(frameWidth, frameStep, sampleRate, nBits, _minFreq)
     End Sub
 
@@ -67,7 +65,6 @@ Public Class MotionExplorer
         Dim mag = MyBase.Explore(pcmSamples, pcmSamplesCount, lowFreq, highFreq).MagL
         Dim result As New MotionExplorerResult With {.Duration = mag(0).Length * MyBase.SonogramRowDuration,
                                                      .Pcm = _waterfallPlayer.Process(mag, _blindZone)}
-
         'DSP
         Dim squelchInDb = MyBase.Db(AutoGainAndGetSquelch(mag, _brightness), _zeroDbLevel)
         MyBase.DbScale(mag, _zeroDbLevel, squelchInDb)
@@ -185,7 +182,11 @@ Public Class MotionExplorer
                                         For j = center To 0 Step -1
                                             If row(j) > Double.MinValue Then lastNonZero.Enqueue(row(j))
                                             If row(j) = Double.MinValue Then zeroCount += 1
-                                            If zeroCount > NZeroes Then row(j) = Double.MinValue Else row(j) = If(lastNonZero.Any(), lastNonZero.Average(), Double.MinValue)
+                                            If zeroCount > NZeroes Then
+                                                row(j) = Double.MinValue
+                                            Else
+                                                row(j) = If(lastNonZero.Any(), lastNonZero.Average(), Double.MinValue)
+                                            End If
                                         Next
 
                                         'Верхняя доплеровская полоса
@@ -194,7 +195,11 @@ Public Class MotionExplorer
                                         For j = center To row.Length - 1
                                             If row(j) > Double.MinValue Then lastNonZero.Enqueue(row(j))
                                             If row(j) = Double.MinValue Then zeroCount += 1
-                                            If zeroCount > NZeroes Then row(j) = Double.MinValue Else row(j) = If(lastNonZero.Any(), lastNonZero.Average(), Double.MinValue)
+                                            If zeroCount > NZeroes Then
+                                                row(j) = Double.MinValue
+                                            Else
+                                                row(j) = If(lastNonZero.Any(), lastNonZero.Average(), Double.MinValue)
+                                            End If
                                         Next
                                     End Sub)
     End Sub
@@ -238,7 +243,6 @@ Public Class MotionExplorer
                                         For j = 0 To row.Length - 1
                                             row(j) *= _gain
                                         Next
-
                                         'Максимальная энергия по границам слева и справа - её нужно отсечь!
                                         'Локатор сканирует боковые полосы - выбирая минимальный максимум из двух полос -
                                         'так обеспечивается невозможность "захвата" помехи в качестве уровня фонового шума.
@@ -246,10 +250,8 @@ Public Class MotionExplorer
                                             noiseMaxNRG = Math.Min(If(row(k) > noiseMaxNRG, row(k), noiseMaxNRG),
                                                                    If(row(row.Length - k - 1) > noiseMaxNRG, row(row.Length - k - 1), noiseMaxNRG))
                                         Next
-
                                     End Sub)
-        Dim result = noiseMaxNRG * _noiseGuardCoeff
-
+        Dim result = noiseMaxNRG
         Return result
     End Function
 End Class

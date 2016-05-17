@@ -1,0 +1,11 @@
+C:\Cleverflow.office\me.storage\ExactDoppler\release\ExactDopplerTest\bin\ExactDopplerTest.exe.config
+C:\Cleverflow.office\me.storage\ExactDoppler\release\ExactDopplerTest\bin\ExactDopplerTest.exe
+C:\Cleverflow.office\me.storage\ExactDoppler\release\ExactDopplerTest\bin\ExactDopplerTest.pdb
+C:\Cleverflow.office\me.storage\ExactDoppler\release\ExactDopplerTest\bin\ExactDopplerTest.xml
+C:\Cleverflow.office\me.storage\ExactDoppler\ExactDopplerTest\obj\Release\ExactDopplerTest.vbprojResolveAssemblyReference.cache
+C:\Cleverflow.office\me.storage\ExactDoppler\ExactDopplerTest\obj\Release\ExactDopplerTest.MainForm.resources
+C:\Cleverflow.office\me.storage\ExactDoppler\ExactDopplerTest\obj\Release\ExactDopplerTest.Resources.resources
+C:\Cleverflow.office\me.storage\ExactDoppler\ExactDopplerTest\obj\Release\ExactDopplerTest.vbproj.GenerateResource.Cache
+C:\Cleverflow.office\me.storage\ExactDoppler\ExactDopplerTest\obj\Release\ExactDopplerTest.exe
+C:\Cleverflow.office\me.storage\ExactDoppler\ExactDopplerTest\obj\Release\ExactDopplerTest.xml
+C:\Cleverflow.office\me.storage\ExactDoppler\ExactDopplerTest\obj\Release\ExactDopplerTest.pdb

@@ -2,7 +2,6 @@
 
 Public Class PcmLog
     Private _sampleRate As Integer
-
     Private _items As New LinkedList(Of Single())
     Public ReadOnly SyncRoot As New Object
 

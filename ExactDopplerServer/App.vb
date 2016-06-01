@@ -5,11 +5,13 @@ Imports ExactAudio.MotionExplorer
 Imports System.IO
 
 Module App
-    Private WithEvents _exactDoppler As ExactDoppler
-    Private _cfg As ExactDopplerConfigFromStorage
     Private _logTime As DateTime
     Private _pcmLog As PcmLog
     Private _waterfall As RGBWaterfall
+
+    Private _cfg As ExactDopplerConfigFromStorage
+    Private WithEvents _exactDoppler As ExactDoppler
+
     Private _consoleAppBase As ConsoleAppBase
 
     Sub Main()

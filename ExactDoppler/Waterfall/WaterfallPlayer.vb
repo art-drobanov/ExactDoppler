@@ -69,7 +69,6 @@ Public Class WaterfallPlayer
     ''' <param name="blindZone">"Слепая" зона в центре фрагмента.</param>
     ''' <returns>PCM-фрагмент, относящийся к одной строке "водопада".</returns>
     Private Function ProcessMagRow(magRow As Double(), blindZone As Integer) As Single()
-
         'Требуется определить, в какой части спектра будет располагаться сонограмма.
         'Если ширина блока больше ширины, установленной в конструкторе - исключение!
         'Если это полный блок - просто воспроизводим.
@@ -112,9 +111,9 @@ Public Class WaterfallPlayer
         Dim FFT_S = New Double(_fftObj.NN - 1) {}
         Parallel.For(1, N2, Sub(i)
                                 Dim magValue = magRowFull(i - 1)
-                                FFT_T((i << 1) + 0) = magValue / 4.0
+                                FFT_T((i << 1) + 0) = magValue / 2.0
                                 FFT_T((i << 1) + 1) = 0
-                                FFT_T(((_fftObj.N - i) << 1) + 0) = magValue / 4.0
+                                FFT_T(((_fftObj.N - i) << 1) + 0) = magValue / 2.0
                                 FFT_T(((_fftObj.N - i) << 1) + 1) = 0
                             End Sub)
 

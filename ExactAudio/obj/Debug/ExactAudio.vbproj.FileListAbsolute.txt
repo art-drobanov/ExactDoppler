@@ -1,9 +1,0 @@
-C:\Cleverflow.office\me.storage\ExactDoppler\debug\dll\ExactAudio.dll
-C:\Cleverflow.office\me.storage\ExactDoppler\debug\dll\ExactAudio.pdb
-C:\Cleverflow.office\me.storage\ExactDoppler\debug\dll\ExactAudio.xml
-C:\Cleverflow.office\me.storage\ExactDoppler\ExactAudio\obj\Debug\ExactAudio.vbprojResolveAssemblyReference.cache
-C:\Cleverflow.office\me.storage\ExactDoppler\ExactAudio\obj\Debug\ExactAudio.Resources.resources
-C:\Cleverflow.office\me.storage\ExactDoppler\ExactAudio\obj\Debug\ExactAudio.vbproj.GenerateResource.Cache
-C:\Cleverflow.office\me.storage\ExactDoppler\ExactAudio\obj\Debug\ExactAudio.dll
-C:\Cleverflow.office\me.storage\ExactDoppler\ExactAudio\obj\Debug\ExactAudio.xml
-C:\Cleverflow.office\me.storage\ExactDoppler\ExactAudio\obj\Debug\ExactAudio.pdb

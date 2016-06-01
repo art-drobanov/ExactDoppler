@@ -6,7 +6,7 @@
 Public Class ExactDoppler
     'Константы
     Private Const _windowSize = 32768 '32768
-    Private Const _windowStep = 1214 '1214 = Round(32768 / (3 * 3 * 3))
+    Private Const _windowStep = 809 '809 = Round(32768 / (3 * 3 * 3 * 1.5))
     Private Const _sampleRate = 48000 '48000
     Private Const _dopplerSize = 500 '500
     Private Const _nBitsCapture = 16 '16

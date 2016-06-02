@@ -82,8 +82,8 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\SineWaveProvider32.vb" />
     <Compile Include="Imaging\ImageUtils.vb" />
-    <Compile Include="Audio\DTMFGenerator.vb" />
     <Compile Include="FFT\FFTExplorer.vb" />
     <Compile Include="Audio\WaveInSource.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

@@ -86,8 +86,7 @@ Public Class MainForm
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         _outputAudioDevicesRefreshButton_Click(sender, e)
         _inputAudioDevicesRefreshButton_Click(sender, e)
-        _sineFreqLTrackBar_Scroll(sender, e)
-        _sineFreqRTrackBar_Scroll(sender, e)
+        _sineFreqTrackBar_Scroll(sender, e)
         _blindZoneTrackBar_Scroll(sender, e)
     End Sub
 
@@ -97,7 +96,7 @@ Public Class MainForm
         Dim centerFreq As Double
         Dim blindZone As Integer
         Me.Invoke(Sub()
-                      centerFreq = Math.Max(Convert.ToDouble(_sineFreqLLabel.Text), Convert.ToDouble(_sineFreqRLabel.Text))
+                      centerFreq = Convert.ToDouble(_sineFreqLabel.Text)
                       blindZone = _blindZoneTrackBar.Value
                   End Sub)
 
@@ -107,7 +106,7 @@ Public Class MainForm
     End Sub
 
     Private Sub _sineGenButton_Click(sender As Object, e As EventArgs) Handles _switchOnButton.Click
-        _exactDoppler.SwitchOnGen(_sineFreqLLabel.Text, _sineFreqRLabel.Text, _mixCheckBox.Checked)
+        _exactDoppler.SwitchOnGen(_sineFreqLabel.Text)
         _outputGroupBox.Text = "Output [ ON AIR! ]"
         _switchOnButton.BackColor = Me.BackColor
     End Sub
@@ -125,19 +124,13 @@ Public Class MainForm
         _captureOnButton.BackColor = Me.BackColor
     End Sub
 
-    Private Sub _sineFreqLTrackBar_Scroll(sender As Object, e As EventArgs) Handles _sineFreqLTrackBar.Scroll
-        _sineFreqLLabel.Text = _sineFreqLTrackBar.Value * _exactDoppler.DopplerSize
+    Private Sub _sineFreqTrackBar_Scroll(sender As Object, e As EventArgs) Handles _sineFreqTrackBar.Scroll
+        _sineFreqLabel.Text = _sineFreqTrackBar.Value * _exactDoppler.DopplerSize
         _volumeTrackBar_Scroll(sender, e)
         UpdateExactDopplerConfig()
     End Sub
 
-    Private Sub _sineFreqRTrackBar_Scroll(sender As Object, e As EventArgs) Handles _sineFreqRTrackBar.Scroll
-        _sineFreqRLabel.Text = _sineFreqRTrackBar.Value * _exactDoppler.DopplerSize
-        _volumeTrackBar_Scroll(sender, e)
-        UpdateExactDopplerConfig()
-    End Sub
-
-    Private Sub _mixCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles _mixCheckBox.CheckedChanged
+    Private Sub _mixCheckBox_CheckedChanged(sender As Object, e As EventArgs)
         _sineGenButton_Click(sender, e)
     End Sub
 

@@ -144,13 +144,11 @@ ExactDoppler
 	<summary>
  Включение генератора
  </summary>
-</member><member name="M:ExactAudio.ExactDoppler.SwitchOnGen(System.Int32,System.Int32,System.Boolean)">
+</member><member name="M:ExactAudio.ExactDoppler.SwitchOnGen(System.Int32)">
 	<summary>
  Включение генератора
  </summary>
-	<param name="sineFreqL">Частота левого канала.</param>
-	<param name="sineFreqR">Частота правого канала.</param>
-	<param name="mix">Смешивать каналы?</param>
+	<param name="sineFreq">Частота синуса.</param>
 </member><member name="M:ExactAudio.ExactDoppler.SwitchOffGen">
 	<summary>
  Выключение генератора

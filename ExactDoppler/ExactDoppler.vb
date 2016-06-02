@@ -21,7 +21,7 @@ Public Class ExactDoppler
 
     'Объекты
     Private _capture As WaveInSource
-    Private _generator As Generator
+    Private _sineGenerator As SineGenerator
     Private _motionExplorer As MotionExplorer
 
     Public ReadOnly SyncRoot As New Object
@@ -82,7 +82,7 @@ Public Class ExactDoppler
         Set(value As Integer)
             SyncLock SyncRoot
                 _outputDeviceIdx = value
-                _generator = New Generator(_outputDeviceIdx, _sampleRate)
+                _sineGenerator = New SineGenerator(_outputDeviceIdx, _sampleRate)
             End SyncLock
         End Set
     End Property
@@ -97,11 +97,11 @@ Public Class ExactDoppler
     ''' <summary>Громкость.</summary>
     Public Property Volume As Single
         Get
-            Return _generator.Volume
+            Return _sineGenerator.Volume
         End Get
         Set(value As Single)
             SyncLock SyncRoot
-                _generator.Volume = value
+                _sineGenerator.Volume = value
             End SyncLock
         End Set
     End Property
@@ -137,7 +137,7 @@ Public Class ExactDoppler
         If config IsNot Nothing Then
             _config = config
         End If
-        _generator = New Generator(_outputDeviceIdx, _sampleRate)
+        _sineGenerator = New SineGenerator(_outputDeviceIdx, _sampleRate)
         _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallSeconds)
         _motionExplorer = New MotionExplorer(_windowSize, _windowStep, _sampleRate, _nBitsPalette, False)
         InputDeviceIdx = _config.InputDeviceIdx
@@ -190,18 +190,16 @@ Public Class ExactDoppler
     ''' Включение генератора
     ''' </summary>
     Public Sub SwitchOnGen()
-        SwitchOnGen(Config.CenterFreq, Config.CenterFreq, False)
+        SwitchOnGen(Me.Config.CenterFreq)
     End Sub
 
     ''' <summary>
     ''' Включение генератора
     ''' </summary>
-    ''' <param name="sineFreqL">Частота левого канала.</param>
-    ''' <param name="sineFreqR">Частота правого канала.</param>
-    ''' <param name="mix">Смешивать каналы?</param>
-    Public Sub SwitchOnGen(sineFreqL As Integer, sineFreqR As Integer, mix As Boolean)
+    ''' <param name="sineFreq">Частота синуса.</param>    
+    Public Sub SwitchOnGen(sineFreq As Integer)
         SyncLock SyncRoot
-            _generator.SwitchOn(sineFreqL, sineFreqR, mix)
+            _sineGenerator.SwitchOn(sineFreq)
         End SyncLock
     End Sub
 
@@ -210,7 +208,7 @@ Public Class ExactDoppler
     ''' </summary>
     Public Sub SwitchOffGen()
         SyncLock SyncRoot
-            _generator.SwitchOff()
+            _sineGenerator.SwitchOff()
         End SyncLock
     End Sub
 

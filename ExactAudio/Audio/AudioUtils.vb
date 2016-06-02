@@ -25,6 +25,19 @@ Public Module AudioUtils
     End Function
 
     <Extension>
+    Public Function ToInt24(data As Byte(), offset As Integer) As Int32
+        Dim buffer = {data(offset + 0), data(offset + 1), data(offset + 2)}
+        Dim value As Integer = 0
+        For i = buffer.Length - 1 To 0 Step -1
+            value += (CInt(buffer(i)) << (i << 3))
+        Next i
+        If (buffer(buffer.Length - 1) And &H80) = &H80 Then
+            value = value Or (&HFFFFFF << (buffer.Length << 3))
+        End If
+        Return value
+    End Function
+
+    <Extension>
     Public Function ToByteArray24(ints32 As Integer(), monoToStereo As Boolean) As Byte()
         Using ms = New MemoryStream()
             For Each elem In ints32

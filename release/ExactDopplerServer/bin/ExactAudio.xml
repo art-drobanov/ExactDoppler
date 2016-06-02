@@ -10,11 +10,7 @@ ExactAudio
 	<summary>
  Аудиоутилиты
  </summary>
-</member><member name="T:ExactAudio.Generator.SineGenerator">
-	<summary>
- "Математический" генератор синусоидального сигнала
- </summary>
-</member><member name="T:ExactAudio.Generator">
+</member><member name="T:ExactAudio.SineGenerator">
 	<summary>
  Стерео-генератор синусоидального сигнала
  </summary>
@@ -42,10 +38,6 @@ ExactAudio
 </member><member name="T:ExactAudio.FFTExplorer">
 	<summary>
  FFT-анализатор
- </summary>
-</member><member name="T:ExactAudio.DTMFGenerator">
-	<summary>
- Генератор DTMF
  </summary>
 </member>
 </members>

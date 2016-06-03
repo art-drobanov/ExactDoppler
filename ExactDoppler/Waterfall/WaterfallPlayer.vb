@@ -121,7 +121,7 @@ Public Class WaterfallPlayer
         'с нормализацией - направление обратное
         Dim useTaperWindow = True
         Dim FFT_S_Offset = 0
-        Dim recoverAfterTaperWindow = True
+        Dim recoverAfterTaperWindow = False
         Dim useNorm = True
         Dim direction = False
         Dim usePolyphase = False
@@ -147,7 +147,7 @@ Public Class WaterfallPlayer
             Throw New Exception("boundSize <> pcmOut.Length")
         End If
         For i = leftBound To rightBound
-            pcmOut(i - leftBound) = CSng(FFT_S(i << 1))
+            pcmOut(i - leftBound) = CSng(FFT_S(i << 1)) / 1024.0F
         Next
         Return pcmOut
     End Function

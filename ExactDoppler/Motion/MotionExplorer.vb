@@ -1,5 +1,4 @@
-﻿Imports Bwl.Imaging
-Imports DrAF.DSP
+﻿Imports DrAF.DSP
 
 Public Class MotionExplorer
     Inherits FFTExplorer
@@ -49,12 +48,11 @@ Public Class MotionExplorer
     ''' <param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>    
     ''' <returns>"Результат анализа движения".</returns>
     Public Function Process(pcmSamples As Single(), pcmSamplesCount As Integer, lowFreq As Double, highFreq As Double, blindZone As Integer) As MotionExplorerResult
-        'FFT
+        'FFT+DSP
         Dim mag = MyBase.Explore(pcmSamples, pcmSamplesCount, lowFreq, highFreq).MagL
-        Dim result As New MotionExplorerResult With {.Duration = mag(0).Length * MyBase.SonogramRowDuration,
-                                                     .Pcm = _waterfallPlayer.Process(mag, _blindZone)}
-        'DSP
+        Dim result As New MotionExplorerResult With {.Duration = mag(0).Length * MyBase.SonogramRowDuration}
         Dim squelchInDb = MyBase.Db(AutoGainAndGetSquelch(mag, _brightness), _zeroDbLevel)
+        result.Pcm = _waterfallPlayer.Process(mag, _blindZone)
         MyBase.DbScale(mag, _zeroDbLevel, squelchInDb)
         DopplerFilterDb(mag, _NZeroes)
 
@@ -199,9 +197,6 @@ Public Class MotionExplorer
     ''' <param name="brightness">"Яркость".</param>
     ''' <returns>Порог отсечки (для разделения сигнал/шум).</returns>
     Private Function AutoGainAndGetSquelch(mag As Double()(), brightness As Double) As Double
-        'Порог "отсечки"
-        Dim squelchInDb As Double = 0
-
         'Корректировка яркости
         If brightness < 1 Then brightness = 1
         If brightness > 100 Then brightness = 100

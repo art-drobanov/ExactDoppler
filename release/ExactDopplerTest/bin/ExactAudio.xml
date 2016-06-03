@@ -39,6 +39,10 @@ ExactAudio
 	<summary>
  FFT-анализатор
  </summary>
+</member><member name="T:ExactAudio.DTMFGenerator">
+	<summary>
+ Генератор DTMF
+ </summary>
 </member>
 </members>
 </doc>

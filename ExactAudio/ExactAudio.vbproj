@@ -82,6 +82,8 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\DTMFGenerator.vb" />
+    <Compile Include="Audio\SineTaskBlock.vb" />
     <Compile Include="Audio\SineWaveProvider32.vb" />
     <Compile Include="Imaging\ImageUtils.vb" />
     <Compile Include="FFT\FFTExplorer.vb" />

@@ -50,6 +50,9 @@
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Iconleak-Atrous-Speaker.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Bwl.Imaging">
       <HintPath>..\refs\Bwl.Imaging.dll</HintPath>
@@ -145,6 +148,9 @@
       <Project>{94ca58fe-f34b-4784-8c2d-68177a610a65}</Project>
       <Name>ExactDoppler</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Iconleak-Atrous-Speaker.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

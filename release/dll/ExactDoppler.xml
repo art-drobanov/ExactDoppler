@@ -58,7 +58,7 @@ ExactDoppler
 	<summary>
   A strongly-typed resource class, for looking up localized strings, etc.
 </summary>
-</member><member name="T:ExactAudio.MotionExplorer.MotionExplorerResult">
+</member><member name="T:ExactAudio.MotionExplorerResult">
 	<summary>
  Результат анализа блока PCM
  </summary>
@@ -81,7 +81,7 @@ ExactDoppler
 	<param name="highFreq">Верхняя частота области интереса.</param>
 	<param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
 	<returns>"Результат анализа движения".</returns>
-</member><member name="M:ExactAudio.MotionExplorer.WaterfallDetector(ExactAudio.MotionExplorer.MotionExplorerResult,System.Double[][],System.Double,System.Int32)">
+</member><member name="M:ExactAudio.MotionExplorer.WaterfallDetector(ExactAudio.MotionExplorerResult,System.Double[][],System.Double,System.Int32)">
 	<summary>
  Детектирование всплесков на "водопаде"
  </summary>
@@ -144,11 +144,11 @@ ExactDoppler
 	<summary>
  Включение генератора
  </summary>
-</member><member name="M:ExactAudio.ExactDoppler.SwitchOnGen(System.Int32)">
+</member><member name="M:ExactAudio.ExactDoppler.SwitchOnGen(System.Single)">
 	<summary>
  Включение генератора
  </summary>
-	<param name="sineFreq">Частота синуса.</param>
+	<param name="frequency">Частота синуса.</param>
 </member><member name="M:ExactAudio.ExactDoppler.SwitchOffGen">
 	<summary>
  Выключение генератора

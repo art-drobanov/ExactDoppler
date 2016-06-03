@@ -106,6 +106,7 @@ Public Class MainForm
     End Sub
 
     Private Sub _sineGenButton_Click(sender As Object, e As EventArgs) Handles _switchOnButton.Click
+        _exactDoppler.Volume = _volumeTrackBar.Value / 100.0F
         _exactDoppler.SwitchOnGen(_sineFreqLabel.Text)
         _outputGroupBox.Text = "Output [ ON AIR! ]"
         _switchOnButton.BackColor = Me.BackColor
@@ -182,5 +183,12 @@ Public Class MainForm
 
     Private Sub _displayRightCheckBox_CheckedChanged(sender As Object, e As EventArgs)
         UpdateExactDopplerConfig()
+    End Sub
+
+    Private Sub _outTestButton_Click(sender As Object, e As EventArgs) Handles _outTestButton.Click
+        If MessageBox.Show("Play DTMF: '151 262 888 111'", "Output Test", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+            Dim dtmf = New DTMFGenerator(_outputAudioDevicesListBox.SelectedIndex, 48000) With {.Volume = _volumeTrackBar.Value / 100.0F}
+            dtmf.Play("151 262 888 111")
+        End If
     End Sub
 End Class

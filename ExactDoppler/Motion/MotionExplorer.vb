@@ -4,18 +4,6 @@ Imports DrAF.DSP
 Public Class MotionExplorer
     Inherits FFTExplorer
 
-    ''' <summary>
-    ''' Результат анализа блока PCM
-    ''' </summary>
-    Public Class MotionExplorerResult
-        Public Property CarrierLevel As New LinkedList(Of Single)
-        Public Property LowDoppler As New LinkedList(Of Single)
-        Public Property HighDoppler As New LinkedList(Of Single)
-        Public Property Duration As Double
-        Public Property Pcm As Single()
-        Public Property Image As RGBMatrix
-    End Class
-
     Private Const _redChannel = 0 '0
     Private Const _greenChannel = 1 '1
     Private Const _blueChannel = 2 '2

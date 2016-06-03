@@ -64,7 +64,9 @@ Public Class ExactDoppler
     ''' <summary>Индекс устройства захвата аудио.</summary>
     Public Property InputDeviceIdx As Integer
         Get
-            Return _inputDeviceIdx
+            SyncLock SyncRoot
+                Return _inputDeviceIdx
+            End SyncLock
         End Get
         Set(value As Integer)
             SyncLock SyncRoot
@@ -77,7 +79,9 @@ Public Class ExactDoppler
     ''' <summary>Индекс устройства вывода аудио.</summary>
     Public Property OutputDeviceIdx As Integer
         Get
-            Return _outputDeviceIdx
+            SyncLock SyncRoot
+                Return _outputDeviceIdx
+            End SyncLock
         End Get
         Set(value As Integer)
             SyncLock SyncRoot
@@ -97,7 +101,9 @@ Public Class ExactDoppler
     ''' <summary>Громкость.</summary>
     Public Property Volume As Single
         Get
-            Return _sineGenerator.Volume
+            SyncLock SyncRoot
+                Return _sineGenerator.Volume
+            End SyncLock
         End Get
         Set(value As Single)
             SyncLock SyncRoot
@@ -114,7 +120,9 @@ Public Class ExactDoppler
             End SyncLock
         End Get
         Set(value As ExactDopplerConfig)
-            _config = value
+            SyncLock SyncRoot
+                _config = value
+            End SyncLock
         End Set
     End Property
     Private _config As ExactDopplerConfig
@@ -196,10 +204,10 @@ Public Class ExactDoppler
     ''' <summary>
     ''' Включение генератора
     ''' </summary>
-    ''' <param name="sineFreq">Частота синуса.</param>    
-    Public Sub SwitchOnGen(sineFreq As Integer)
+    ''' <param name="frequency">Частота синуса.</param>
+    Public Sub SwitchOnGen(frequency As Single)
         SyncLock SyncRoot
-            _sineGenerator.SwitchOn(sineFreq)
+            _sineGenerator.SwitchOn({frequency})
         End SyncLock
     End Sub
 

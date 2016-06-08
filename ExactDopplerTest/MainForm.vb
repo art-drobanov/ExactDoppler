@@ -26,7 +26,7 @@ Public Class MainForm
         Dim waterfallBlock = motionExplorerResult.Image
         _waterfall.Add(waterfallBlock)
         _waterfallDisplayBitmapControl.Invoke(Sub()
-                                                  Dim disp = New Bitmap(waterfallBlock.ToBitmap(), _waterfallDisplayBitmapControl.Width, _waterfallDisplayBitmapControl.Height)
+                                                  Dim disp = New Bitmap(waterfallBlock.ToBitmap(1.0), _waterfallDisplayBitmapControl.Width, _waterfallDisplayBitmapControl.Height)
                                                   With _waterfallDisplayBitmapControl
                                                       .DisplayBitmap.DrawBitmap(disp)
                                                       .Refresh()

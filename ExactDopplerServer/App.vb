@@ -1,7 +1,6 @@
 ﻿Imports Bwl.Framework
 Imports System.Threading
 Imports ExactAudio
-Imports ExactAudio.MotionExplorer
 Imports System.IO
 
 Module App

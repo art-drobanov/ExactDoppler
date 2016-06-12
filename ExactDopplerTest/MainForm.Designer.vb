@@ -45,6 +45,8 @@ Partial Class MainForm
         Me._captureOnButton = New System.Windows.Forms.Button()
         Me._waterfallDisplayBitmapControl = New Bwl.Imaging.DisplayBitmapControl()
         Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
+        Me._dopplerLogItemLabel_ = New System.Windows.Forms.Label()
+        Me._dopplerLogItemLabel = New System.Windows.Forms.Label()
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me._frequencyGroupBox.SuspendLayout()
         CType(Me._volumeTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -277,11 +279,33 @@ Partial Class MainForm
         Me.LinkLabel1.TabStop = True
         Me.LinkLabel1.Text = "http://iconleak.com/"
         '
+        '_dopplerLogItemLabel_
+        '
+        Me._dopplerLogItemLabel_.AutoSize = True
+        Me._dopplerLogItemLabel_.Font = New System.Drawing.Font("Arial Narrow", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me._dopplerLogItemLabel_.Location = New System.Drawing.Point(291, 645)
+        Me._dopplerLogItemLabel_.Name = "_dopplerLogItemLabel_"
+        Me._dopplerLogItemLabel_.Size = New System.Drawing.Size(114, 25)
+        Me._dopplerLogItemLabel_.TabIndex = 22
+        Me._dopplerLogItemLabel_.Text = "DopplerLog: "
+        '
+        '_dopplerLogItemLabel
+        '
+        Me._dopplerLogItemLabel.AutoSize = True
+        Me._dopplerLogItemLabel.Font = New System.Drawing.Font("Arial Narrow", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me._dopplerLogItemLabel.Location = New System.Drawing.Point(411, 646)
+        Me._dopplerLogItemLabel.Name = "_dopplerLogItemLabel"
+        Me._dopplerLogItemLabel.Size = New System.Drawing.Size(98, 25)
+        Me._dopplerLogItemLabel.TabIndex = 23
+        Me._dopplerLogItemLabel.Text = " No Motion"
+        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(566, 676)
+        Me.Controls.Add(Me._dopplerLogItemLabel)
+        Me.Controls.Add(Me._dopplerLogItemLabel_)
         Me.Controls.Add(Me.LinkLabel1)
         Me.Controls.Add(Me._waterfallDisplayBitmapControl)
         Me.Controls.Add(Me._inputGroupBox)
@@ -291,7 +315,7 @@ Partial Class MainForm
         Me.MaximizeBox = False
         Me.Name = "MainForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "ExactDopplerTest (03.06.2016 19:14)"
+        Me.Text = "ExactDopplerTest (12.06.2016 15:40)"
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me._frequencyGroupBox.ResumeLayout(False)
         Me._frequencyGroupBox.PerformLayout()
@@ -330,4 +354,6 @@ Partial Class MainForm
     Friend WithEvents _blindZoneTrackBar As TrackBar
     Friend WithEvents _outTestButton As Button
     Friend WithEvents LinkLabel1 As LinkLabel
+    Friend WithEvents _dopplerLogItemLabel_ As Label
+    Friend WithEvents _dopplerLogItemLabel As Label
 End Class

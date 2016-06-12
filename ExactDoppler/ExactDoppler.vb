@@ -180,15 +180,46 @@ Public Class ExactDoppler
             Dim motionExplorerResult = _motionExplorer.Process(pcmSamples, pcmSamplesCount, lowFreq, highFreq, _config.BlindZone)
 
             'Доплер-лог
+            Static Dim lowDopplerAvgSum As Single
+            Static Dim highDopplerAvgSum As Single
             Dim nowTimeStamp = DateTime.Now
+
             With motionExplorerResult
-                Dim lowDopplerAvg = .LowDoppler.Average()
-                Dim highDopplerAvg = .HighDoppler.Average()
-                Dim carrierLevelAvg = .CarrierLevel.Average()
+                lowDopplerAvgSum += .LowDoppler.Average() 'Накопление по нижней полосе
+                highDopplerAvgSum += .HighDoppler.Average() 'Накопление по верхней полосе
+
+                Dim lowDopplerAvg As Single = 0
+                Dim highDopplerAvg As Single = 0
+
+                'Если в конце фрагмента сонограммы нет энергии - всплеск "закрыт"
+                If .LowDoppler.Last.Value = 0 Then
+                    lowDopplerAvg = lowDopplerAvgSum
+                    lowDopplerAvgSum = 0
+                End If
+
+                'Если в конце фрагмента сонограммы нет энергии - всплеск "закрыт"
+                If .HighDoppler.Last.Value = 0 Then
+                    highDopplerAvg = highDopplerAvgSum
+                    highDopplerAvgSum = 0
+                End If
+
+                Dim carrierLevelAvg = .CarrierLevel.Average() 'Несущая
+
+                'Пишем в лог!
                 If lowDopplerAvg <> 0 Or highDopplerAvg <> 0 Or carrierLevelAvg = 0 Then
-                    _dopplerLog.Add(nowTimeStamp, lowDopplerAvg, highDopplerAvg, carrierLevelAvg)
+                    motionExplorerResult.DopplerLogItem = _dopplerLog.Add(nowTimeStamp, lowDopplerAvg, highDopplerAvg, carrierLevelAvg)
+                Else
+                    motionExplorerResult.DopplerLogItem = New DopplerLog.Item(nowTimeStamp, 0, 0, 0)
                 End If
             End With
+
+            'Проверка на нормализацию L/H
+            If motionExplorerResult.DopplerLogItem.LowDoppler > 99.99 Then
+                Throw New Exception("motionExplorerResult.DopplerLogItem.LowDoppler > 99.99")
+            End If
+            If motionExplorerResult.DopplerLogItem.HighDoppler > 99.99 Then
+                Throw New Exception("motionExplorerResult.DopplerLogItem.HighDoppler > 99.99")
+            End If
 
             Return motionExplorerResult
         End SyncLock

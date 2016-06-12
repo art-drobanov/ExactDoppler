@@ -1,6 +1,5 @@
 ﻿Imports Bwl.Imaging
 Imports ExactAudio
-Imports ExactAudio.MotionExplorer
 
 Public Class MainForm
     Private WithEvents _exactDoppler As New ExactDoppler()
@@ -39,6 +38,7 @@ Public Class MainForm
         _blocksCounter += 1
         _blocksLabel.Invoke(Sub()
                                 _blocksLabel.Text = _blocksCounter.ToString()
+                                _dopplerLogItemLabel.Text = motionExplorerResult.DopplerLogItem.Type
                             End Sub)
     End Sub
 

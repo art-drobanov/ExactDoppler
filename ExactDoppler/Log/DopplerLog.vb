@@ -13,12 +13,18 @@ Public Class DopplerLog
             Get
                 If (HighDoppler - LowDoppler) > _diffThr Then Return "Motion++"
                 If (LowDoppler - HighDoppler) > _diffThr Then Return "Motion--"
-                Return "Motion+-"
+                If LowDoppler <> 0 Or HighDoppler <> 0 Then Return "Motion+-"
+                Return "No Motion"
             End Get
         End Property
 
         Public Sub New(time As DateTime, L As Single, H As Single, carrierLevel As Single)
             Me.Time = time
+            If L > 100 OrElse H > 100 Then
+                Dim top = Math.Max(L, H)
+                L = (L / top) * 100
+                H = (H / top) * 100
+            End If
             Me.LowDoppler = If(L > 99.99, 99.99, If(L < 0, 0, L))
             Me.HighDoppler = If(H > 99.99, 99.99, If(H < 0, 0, H))
             Me.CarrierLevel = carrierLevel
@@ -44,11 +50,13 @@ Public Class DopplerLog
         End Get
     End Property
 
-    Public Sub Add(time As DateTime, L As Single, H As Single, carrierLevel As Single)
+    Public Function Add(time As DateTime, L As Single, H As Single, carrierLevel As Single) As DopplerLog.Item
         SyncLock SyncRoot
-            _items.AddLast(New Item(time, L, H, carrierLevel))
+            Dim item = New Item(time, L, H, carrierLevel)
+            _items.AddLast(item)
+            Return item
         End SyncLock
-    End Sub
+    End Function
 
     Public Sub Write(stream As Stream)
         SyncLock SyncRoot

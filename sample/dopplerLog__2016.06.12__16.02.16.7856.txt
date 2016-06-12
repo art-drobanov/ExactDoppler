@@ -1,0 +1,17 @@
+﻿DMY:2016.06.12__16.01.54.2474, L:00.00%, H:49.71%; Type:Motion++, CarrierLevel:98,60%;
+DMY:2016.06.12__16.01.54.9145, L:45.12%, H:00.00%; Type:Motion--, CarrierLevel:99,59%;
+DMY:2016.06.12__16.01.56.9719, L:03.26%, H:00.00%; Type:Motion+-, CarrierLevel:99,58%;
+DMY:2016.06.12__16.01.57.6596, L:00.00%, H:48.05%; Type:Motion++, CarrierLevel:99,10%;
+DMY:2016.06.12__16.01.59.0337, L:00.00%, H:36.84%; Type:Motion++, CarrierLevel:98,80%;
+DMY:2016.06.12__16.01.59.7234, L:89.93%, H:00.17%; Type:Motion--, CarrierLevel:99,18%;
+DMY:2016.06.12__16.02.01.7450, L:08.52%, H:00.00%; Type:Motion+-, CarrierLevel:95,24%;
+DMY:2016.06.12__16.02.02.4299, L:00.00%, H:60.73%; Type:Motion++, CarrierLevel:95,53%;
+DMY:2016.06.12__16.02.03.7962, L:00.00%, H:16.03%; Type:Motion++, CarrierLevel:99,58%;
+DMY:2016.06.12__16.02.04.4940, L:67.01%, H:00.70%; Type:Motion--, CarrierLevel:99,59%;
+DMY:2016.06.12__16.02.06.5534, L:00.13%, H:00.00%; Type:Motion+-, CarrierLevel:99,63%;
+DMY:2016.06.12__16.02.07.9061, L:25.51%, H:90.47%; Type:Motion++, CarrierLevel:97,88%;
+DMY:2016.06.12__16.02.08.5841, L:11.02%, H:08.71%; Type:Motion+-, CarrierLevel:98,93%;
+DMY:2016.06.12__16.02.10.6401, L:55.85%, H:00.00%; Type:Motion--, CarrierLevel:99,56%;
+DMY:2016.06.12__16.02.13.3775, L:04.02%, H:47.03%; Type:Motion++, CarrierLevel:97,88%;
+DMY:2016.06.12__16.02.14.7354, L:04.07%, H:02.57%; Type:Motion+-, CarrierLevel:98,24%;
+DMY:2016.06.12__16.02.16.7846, L:66.49%, H:32.10%; Type:Motion--, CarrierLevel:99,45%;

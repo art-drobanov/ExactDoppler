@@ -90,11 +90,12 @@ ExactDoppler
 	<param name="zeroDbLevel">"Нулевой" уровень логарифмической шкалы.</param>
 	<param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
 	<returns>"Результат анализа движения".</returns>
-</member><member name="M:ExactAudio.MotionExplorer.DopplerFilterDb(System.Double[][],System.Int32)">
+</member><member name="M:ExactAudio.MotionExplorer.DopplerFilterDb(System.Double[][],System.Int32,System.Int32)">
 	<summary>
  Фильтр доплеровских всплесков
  </summary>
 	<param name="mag">Магнитудная сонограмма ("водопад").</param>
+	<param name="binMemorySize">Размер "двоичной" памяти.</param>
 	<param name="NZeroes">Допустимое количество "нулевых" уровней.</param>
 </member><member name="M:ExactAudio.MotionExplorer.AutoGainAndGetSquelch(System.Double[][],System.Double)">
 	<summary>

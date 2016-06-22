@@ -315,7 +315,7 @@ Partial Class MainForm
         Me.MaximizeBox = False
         Me.Name = "MainForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "ExactDopplerTest (12.06.2016 15:40)"
+        Me.Text = "ExactDopplerTest (22.06.2016 09:16)"
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me._frequencyGroupBox.ResumeLayout(False)
         Me._frequencyGroupBox.PerformLayout()

@@ -87,6 +87,7 @@
     <Compile Include="Log\PcmLog.vb" />
     <Compile Include="Motion\MotionExplorer.vb" />
     <Compile Include="Motion\MotionExplorerResult.vb" />
+    <Compile Include="Motion\RowNZeroesFilter.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

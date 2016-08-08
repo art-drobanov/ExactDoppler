@@ -11,7 +11,7 @@ Public Class MotionExplorer
     Private Const _sideFormDivider = 20 '20
     Private Const _gainHarmRadius = 2 '2
     Private Const _gainStep = 1.0 '1.0
-    Private Const _binMemorySize = 3 '3
+    Private Const _rowFilterMemorySize = 3 '3
     Private Const _NZeroes = 3 '3
     Private Const _noiseScannerDepth = 0.1 '0.1
     Private Const _brightness = 100 '100
@@ -48,13 +48,13 @@ Public Class MotionExplorer
     ''' <param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>    
     ''' <returns>"Результат анализа движения".</returns>
     Public Function Process(pcmSamples As Single(), pcmSamplesCount As Integer, lowFreq As Double, highFreq As Double, blindZone As Integer) As MotionExplorerResult
-        'FFT+DSP
+        'FFT + DSP
         Dim mag = MyBase.Explore(pcmSamples, pcmSamplesCount, lowFreq, highFreq).MagL
         Dim result As New MotionExplorerResult With {.Duration = mag(0).Length * MyBase.SonogramRowDuration}
         Dim squelchInDb = MyBase.Db(AutoGainAndGetSquelch(mag, _brightness), _zeroDbLevel)
         result.Pcm = _waterfallPlayer.Process(mag, blindZone)
         MyBase.DbScale(mag, _zeroDbLevel, squelchInDb)
-        DopplerFilterDb(mag, _binMemorySize, _NZeroes)
+        DopplerFilterDb(mag, _rowFilterMemorySize, _NZeroes)
 
         'Detection
         Return WaterfallDetector(result, mag, _zeroDbLevel, blindZone)
@@ -136,7 +136,6 @@ Public Class MotionExplorer
                                            image(j, i) = MaxRGB(sideL.Red(0, i), sideL.Green(0, i), sideL.Blue(0, i))
                                        End If
                                    Next
-
                                Next
                            End Sub)
 
@@ -154,49 +153,23 @@ Public Class MotionExplorer
     ''' Фильтр доплеровских всплесков
     ''' </summary>
     ''' <param name="mag">Магнитудная сонограмма ("водопад").</param>
-    ''' <param name="binMemorySize">Размер "двоичной" памяти.</param>
+    ''' <param name="rowFilterMemorySize">Размер "двоичной" памяти.</param>
     ''' <param name="NZeroes">Допустимое количество "нулевых" уровней.</param>
-    Private Sub DopplerFilterDb(mag As Double()(), binMemorySize As Integer, NZeroes As Integer)
+    Private Sub DopplerFilterDb(mag As Double()(), rowFilterMemorySize As Integer, NZeroes As Integer)
         Dim center = mag(0).Length / 2
         Parallel.For(0, mag.Length, Sub(i)
                                         Dim row = mag(i)
 
                                         'Нижняя доплеровская полоса
-                                        Dim binMemory = New Queue(Of Double)
-                                        Dim rowMemory = New Queue(Of Double)
-                                        For k = 1 To binMemorySize
-                                            binMemory.Enqueue(1)
-                                        Next
-                                        Dim zeroCount = 0
+                                        Dim rowNZeroesFilter As New RowNZeroesFilter(rowFilterMemorySize, NZeroes)
                                         For j = center To 0 Step -1
-                                            Dim binValue = If(row(j) > Double.MinValue, 1, 0)
-                                            binMemory.Dequeue() : binMemory.Enqueue(binValue)
-                                            If binMemory.Sum() = 0 Then zeroCount += 1
-                                            If binValue Then rowMemory.Enqueue(row(j))
-                                            If zeroCount > NZeroes Then
-                                                row(j) = Double.MinValue
-                                            Else
-                                                row(j) = If(rowMemory.Any(), rowMemory.Average(), Double.MinValue)
-                                            End If
+                                            row(j) = rowNZeroesFilter.Process(row(j))
                                         Next
 
                                         'Верхняя доплеровская полоса
-                                        binMemory = New Queue(Of Double)
-                                        rowMemory = New Queue(Of Double)
-                                        For k = 1 To binMemorySize
-                                            binMemory.Enqueue(1)
-                                        Next
-                                        zeroCount = 0
+                                        rowNZeroesFilter.Reset(rowFilterMemorySize, NZeroes)
                                         For j = center To row.Length - 1
-                                            Dim binValue = If(row(j) > Double.MinValue, 1, 0)
-                                            binMemory.Dequeue() : binMemory.Enqueue(binValue)
-                                            If binMemory.Sum() = 0 Then zeroCount += 1
-                                            If binValue Then rowMemory.Enqueue(row(j))
-                                            If zeroCount > NZeroes Then
-                                                row(j) = Double.MinValue
-                                            Else
-                                                row(j) = If(rowMemory.Any(), rowMemory.Average(), Double.MinValue)
-                                            End If
+                                            row(j) = rowNZeroesFilter.Process(row(j))
                                         Next
                                     End Sub)
     End Sub

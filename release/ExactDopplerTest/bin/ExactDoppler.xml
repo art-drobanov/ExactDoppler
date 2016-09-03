@@ -95,7 +95,7 @@ ExactDoppler
  Фильтр доплеровских всплесков
  </summary>
 	<param name="mag">Магнитудная сонограмма ("водопад").</param>
-	<param name="binMemorySize">Размер "двоичной" памяти.</param>
+	<param name="rowFilterMemorySize">Размер "двоичной" памяти.</param>
 	<param name="NZeroes">Допустимое количество "нулевых" уровней.</param>
 </member><member name="M:ExactAudio.MotionExplorer.AutoGainAndGetSquelch(System.Double[][],System.Double)">
 	<summary>

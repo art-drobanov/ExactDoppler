@@ -15,8 +15,8 @@ Public Class ExactDoppler
     Private Const _topFreq = 23000 '23000
 
     'Данные
-    Private _inputDeviceIdx As Integer = 0
-    Private _outputDeviceIdx As Integer = 0
+    Private _inputDeviceIdx As Integer = -1
+    Private _outputDeviceIdx As Integer = -1
     Private _dopplerLog As New DopplerLog()
 
     'Объекты
@@ -70,8 +70,12 @@ Public Class ExactDoppler
         End Get
         Set(value As Integer)
             SyncLock SyncRoot
-                _inputDeviceIdx = value
-                _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallSeconds) With {.SampleProcessor = AddressOf SampleProcessor}
+                If value >= 0 AndAlso value < Me.InputAudioDevices.Count Then
+                    _inputDeviceIdx = value
+                    _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallSeconds) With {.SampleProcessor = AddressOf SampleProcessor}
+                Else
+                    _inputDeviceIdx = -1
+                End If
             End SyncLock
         End Set
     End Property
@@ -85,8 +89,12 @@ Public Class ExactDoppler
         End Get
         Set(value As Integer)
             SyncLock SyncRoot
-                _outputDeviceIdx = value
-                _sineGenerator = New SineGenerator(_outputDeviceIdx, _sampleRate)
+                If value >= 0 AndAlso value < Me.OutputAudioDevices.Count Then
+                    _outputDeviceIdx = value
+                    _sineGenerator = New SineGenerator(_outputDeviceIdx, _sampleRate)
+                Else
+                    _outputDeviceIdx = -1
+                End If
             End SyncLock
         End Set
     End Property

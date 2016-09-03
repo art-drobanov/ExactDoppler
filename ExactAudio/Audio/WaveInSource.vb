@@ -5,6 +5,7 @@ Public Delegate Sub SampleProcessorDelegate(samples As Single(), samplesCount As
 Public Class WaveInSource
     Private _started As Boolean
     Private _waveFormat As WaveFormat
+    Private _deviceNumber As Integer
     Private WithEvents _waveIn As WaveInEvent
 
     Public SampleProcessor As SampleProcessorDelegate
@@ -12,6 +13,7 @@ Public Class WaveInSource
     Public Sub New(deviceNumber As Integer, sampleRate As Integer, bitDepth As Integer, stereo As Boolean, minSamplesCountInBlock As Integer)
         _started = False
         _waveFormat = New WaveFormat(sampleRate, bitDepth, If(stereo, 2, 1))
+        _deviceNumber = deviceNumber
         _waveIn = New WaveInEvent With {
                                           .DeviceNumber = deviceNumber,
                                           .WaveFormat = _waveFormat,
@@ -21,7 +23,7 @@ Public Class WaveInSource
     End Sub
 
     Public Sub Start()
-        If Not _started Then
+        If _deviceNumber >= 0 AndAlso Not _started Then
             SyncLock _waveIn
                 _waveIn.StartRecording()
                 _started = True

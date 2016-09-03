@@ -14,10 +14,18 @@ Public Class MainForm
         _inputAudioDevicesRefreshButton_Click(Nothing, Nothing)
         Application.DoEvents()
 
-        _outputAudioDevicesListBox.SelectedIndex = _exactDoppler.OutputDeviceIdx
-        _inputAudioDevicesListBox.SelectedIndex = _exactDoppler.InputDeviceIdx
-        _outputAudioDevicesRefreshButton.Text = _outputAudioDevicesListBox.Items(_exactDoppler.OutputDeviceIdx) + " / Refresh"
-        _inputAudioDevicesRefreshButton.Text = _inputAudioDevicesListBox.Items(_exactDoppler.InputDeviceIdx) + " / Refresh"
+        If _exactDoppler.OutputDeviceIdx >= 0 Then
+            _outputAudioDevicesListBox.SelectedIndex = _exactDoppler.OutputDeviceIdx
+            _outputAudioDevicesRefreshButton.Text = _outputAudioDevicesListBox.Items(_exactDoppler.OutputDeviceIdx) + " / Refresh"
+        Else
+            _outputAudioDevicesRefreshButton.Text = "Refresh"
+        End If
+        If _exactDoppler.InputDeviceIdx >= 0 Then
+            _inputAudioDevicesListBox.SelectedIndex = _exactDoppler.InputDeviceIdx
+            _inputAudioDevicesRefreshButton.Text = _inputAudioDevicesListBox.Items(_exactDoppler.InputDeviceIdx) + " / Refresh"
+        Else
+            _inputAudioDevicesRefreshButton.Text = "Refresh"
+        End If
     End Sub
 
     Private Sub SamplesProcessedHandler(motionExplorerResult As MotionExplorerResult) Handles _exactDoppler.PcmSamplesProcessed

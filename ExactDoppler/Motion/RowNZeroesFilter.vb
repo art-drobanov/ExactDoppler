@@ -1,5 +1,5 @@
 ﻿Public Class RowNZeroesFilter
-    Private _memorySize As Double
+    Private _binMemorySize As Double
     Private _NZeroes As Integer
     Private _zeroCount As Integer
     Private _binMemory As Queue(Of Double)
@@ -10,12 +10,12 @@
     End Sub
 
     Public Sub Reset(memorySize As Double, NZeroes As Integer)
-        _memorySize = memorySize
+        _binMemorySize = memorySize
         _NZeroes = NZeroes
         _zeroCount = 0
         _binMemory = New Queue(Of Double)
         _rowMemory = New Queue(Of Double)
-        For k = 1 To _memorySize
+        For k = 1 To _binMemorySize
             _binMemory.Enqueue(1)
         Next
     End Sub

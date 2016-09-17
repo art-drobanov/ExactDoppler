@@ -1,0 +1,4 @@
+﻿DMY:2016.09.16__21.49.41.3076, L:00.00%, H:23.18%; Type:Motion++, CarrierLevel:97,50%;
+DMY:2016.09.16__21.49.41.9698, L:00.00%, H:01.78%; Type:Motion+-, CarrierLevel:97,32%;
+DMY:2016.09.16__21.49.49.4953, L:99.99%, H:84.89%; Type:Motion--, CarrierLevel:98,55%;
+DMY:2016.09.16__21.49.50.8502, L:42.41%, H:60.06%; Type:Motion++, CarrierLevel:97,70%;

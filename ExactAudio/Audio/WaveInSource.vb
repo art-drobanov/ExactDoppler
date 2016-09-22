@@ -54,7 +54,7 @@ Public Class WaveInSource
             Case 24
                 samples = New Single((e.Buffer.Length \ 3) - 1) {}
                 Parallel.For(0, samples.Length, Sub(bufferIdx)
-                                                    Dim intSample = BitConverterToInt24(e.Buffer, bufferIdx * 3)
+                                                    Dim intSample = BytesToInt24(e.Buffer, bufferIdx * 3)
                                                     samples(bufferIdx) = intSample / maxValue
                                                 End Sub)
             Case Else
@@ -66,7 +66,7 @@ Public Class WaveInSource
         End If
     End Sub
 
-    Private Function BitConverterToInt24(data As Byte(), offset As Integer) As Int32
+    Private Function BytesToInt24(data As Byte(), offset As Integer) As Int32
         Dim buffer = {data(offset + 0), data(offset + 1), data(offset + 2)}
         Dim value As Integer = 0
         For i = buffer.Length - 1 To 0 Step -1

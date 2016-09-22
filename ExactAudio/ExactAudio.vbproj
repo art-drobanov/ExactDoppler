@@ -82,9 +82,9 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Audio\DTMFGenerator.vb" />
-    <Compile Include="Audio\SineTaskBlock.vb" />
-    <Compile Include="Audio\SineWaveProvider32.vb" />
+    <Compile Include="Audio\Utils\DTMFGenerator.vb" />
+    <Compile Include="Audio\SineGenerator\SineTaskBlock.vb" />
+    <Compile Include="Audio\SineGenerator\SineWaveProvider32.vb" />
     <Compile Include="Imaging\ImageUtils.vb" />
     <Compile Include="FFT\FFTExplorer.vb" />
     <Compile Include="Audio\WaveInSource.vb" />
@@ -105,8 +105,8 @@
     </Compile>
     <Compile Include="Imaging\Normalizer.vb" />
     <Compile Include="Imaging\PaletteProcessor.vb" />
-    <Compile Include="Audio\SineGenerator.vb" />
-    <Compile Include="Audio\AudioUtils.vb" />
+    <Compile Include="Audio\SineGenerator\SineGenerator.vb" />
+    <Compile Include="Audio\Utils\AudioUtils.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

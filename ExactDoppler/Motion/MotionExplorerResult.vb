@@ -11,4 +11,5 @@ Public Class MotionExplorerResult
     Public Property Duration As Double
     Public Property Pcm As Single()
     Public Property Image As RGBMatrix
+    Public Property IsWarning As Boolean
 End Class

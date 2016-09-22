@@ -33,9 +33,9 @@ Public Class MainForm
         Dim waterfallBlock = motionExplorerResult.Image
         _waterfall.Add(waterfallBlock)
         _waterfallDisplayBitmapControl.Invoke(Sub()
-                                                  Dim disp = New Bitmap(waterfallBlock.ToBitmap(1.0), _waterfallDisplayBitmapControl.Width, _waterfallDisplayBitmapControl.Height)
+                                                  Dim bmp = New Bitmap(waterfallBlock.ToBitmap(1.0), _waterfallDisplayBitmapControl.Width, _waterfallDisplayBitmapControl.Height)
                                                   With _waterfallDisplayBitmapControl
-                                                      .DisplayBitmap.DrawBitmap(disp)
+                                                      .DisplayBitmap.DrawBitmap(bmp)
                                                       .Refresh()
                                                   End With
                                               End Sub)
@@ -44,10 +44,10 @@ Public Class MainForm
 
         'GUI
         _blocksCounter += 1
-        _blocksLabel.Invoke(Sub()
-                                _blocksLabel.Text = _blocksCounter.ToString()
-                                _dopplerLogItemLabel.Text = motionExplorerResult.DopplerLogItem.Type
-                            End Sub)
+        Me.Invoke(Sub()
+                      _blocksLabel.Text = _blocksCounter.ToString()
+                      _dopplerLogItemLabel.Text = motionExplorerResult.DopplerLogItem.Type
+                  End Sub)
     End Sub
 
     Private Sub _captureOffButton_Click(sender As Object, e As EventArgs) Handles _captureOffButton.Click
@@ -99,7 +99,9 @@ Public Class MainForm
     End Sub
 
     Private Sub UpdateExactDopplerConfig()
-        If Not Me.Visible Then Return
+        If Not Me.Visible Then
+            Return
+        End If
 
         Dim centerFreq As Double
         Dim blindZone As Integer
@@ -110,7 +112,7 @@ Public Class MainForm
 
         Dim pcmOutput = True
         Dim imageOutput = True
-        _exactDoppler.Config = New ExactDopplerConfig(0, 0, 1.0, centerFreq, blindZone)
+        _exactDoppler.Config = New ExactDopplerConfig(0, 0, 1.0, centerFreq, blindZone, 10)
     End Sub
 
     Private Sub _sineGenButton_Click(sender As Object, e As EventArgs) Handles _switchOnButton.Click

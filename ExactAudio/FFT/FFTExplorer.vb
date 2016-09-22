@@ -28,7 +28,7 @@ Public Class FFTExplorer
         Dim isComplex = False
         _fftObj = ExactFFT.CFFT_Constructor_Cosine(frameWidth, cosTW, polyDiv2, frameStep, isComplex)
 
-        'Считываем длительность одной строки сонограммы
+        'Вычисляем длительность одной строки сонограммы
         Dim frameDuration, sleepCoeff, timeSliceDuration As Double
         ExactPlotter.GetFrameParameters(_fftObj.N, _fftObj.WindowStep, _sampleRate, frameDuration, sleepCoeff, timeSliceDuration)
         _timeSliceDuration = timeSliceDuration

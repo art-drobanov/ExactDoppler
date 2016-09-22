@@ -29,14 +29,14 @@ Public Class ExactDoppler
     ''' <summary>Список аудиоустройств вывода.</summary>
     Public ReadOnly Property OutputAudioDevices As String()
         Get
-            Return AudioUtils.GetAudioDeviceNamesWaveOut()
+            Return AudioUtils.GetWaveOutNames()
         End Get
     End Property
 
     ''' <summary>Список аудиоустройств ввода.</summary>
     Public ReadOnly Property InputAudioDevices As String()
         Get
-            Return AudioUtils.GetAudioDeviceNamesWaveIn()
+            Return AudioUtils.GetWaveInNames()
         End Get
     End Property
 
@@ -213,11 +213,12 @@ Public Class ExactDoppler
 
                 Dim carrierLevelAvg = .CarrierLevel.Average() 'Несущая
 
-                'Пишем в лог!
-                If lowDopplerAvg <> 0 Or highDopplerAvg <> 0 Or carrierLevelAvg = 0 Then
-                    motionExplorerResult.DopplerLogItem = _dopplerLog.Add(nowTimeStamp, lowDopplerAvg, highDopplerAvg, carrierLevelAvg)
-                Else
-                    motionExplorerResult.DopplerLogItem = New DopplerLog.Item(nowTimeStamp, 0, 0, 0)
+                'Элемент лога
+                Dim logItem = New DopplerLog.Item(nowTimeStamp, lowDopplerAvg, highDopplerAvg, carrierLevelAvg)
+                motionExplorerResult.DopplerLogItem = logItem
+                If lowDopplerAvg <> 0 OrElse highDopplerAvg <> 0 OrElse carrierLevelAvg < _config.CarrierWarningLevel Then 'Если несущей нет - это тоже событие!
+                    motionExplorerResult.IsWarning = True
+                    _dopplerLog.Add(logItem) 'Пишем в лог - если есть данные!
                 End If
             End With
 

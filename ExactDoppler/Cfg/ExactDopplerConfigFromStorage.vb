@@ -8,8 +8,7 @@ Public Class ExactDopplerConfigFromStorage
     Private _volume As DoubleSetting
     Private _centerFreq As DoubleSetting
     Private _blindZone As IntegerSetting
-    Private _pcmOutput As BooleanSetting
-    Private _imageOutput As BooleanSetting
+    Private _carrierWarningLevel As IntegerSetting
 
     Public Sub New(storage As SettingsStorage)
         _inputDeviceIdx = New IntegerSetting(storage, "InputDeviceIdx", 0)
@@ -17,6 +16,7 @@ Public Class ExactDopplerConfigFromStorage
         _volume = New DoubleSetting(storage, "Volume", 0.5)
         _centerFreq = New DoubleSetting(storage, "CenterFreq", 21000)
         _blindZone = New IntegerSetting(storage, "BlindZone", 70)
+        _carrierWarningLevel = New IntegerSetting(storage, "CarrierWarningLevel", 10)
     End Sub
 
     Public Sub Load()
@@ -26,6 +26,7 @@ Public Class ExactDopplerConfigFromStorage
             .Volume = _volume.Value
             .CenterFreq = _centerFreq.Value
             .BlindZone = _blindZone.Value
+            .CarrierWarningLevel = _carrierWarningLevel.Value
         End With
     End Sub
 End Class

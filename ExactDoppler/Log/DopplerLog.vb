@@ -13,7 +13,7 @@ Public Class DopplerLog
             Get
                 If (HighDoppler - LowDoppler) > _diffThr Then Return "Motion++"
                 If (LowDoppler - HighDoppler) > _diffThr Then Return "Motion--"
-                If LowDoppler <> 0 Or HighDoppler <> 0 Then Return "Motion+-"
+                If (LowDoppler + HighDoppler) > _diffThr Then Return "Motion+-"
                 Return "NoMotion"
             End Get
         End Property

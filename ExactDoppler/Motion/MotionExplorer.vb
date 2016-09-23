@@ -114,6 +114,7 @@ Public Class MotionExplorer
         Parallel.For(0, 3, Sub(channel)
                                Dim image = magRGB.Matrix(channel)
                                For i = 0 To magRGB.Height - 1
+                                   'Левая часть "индикатора"
                                    For j = lowDopplerHighHarm To centerHarm - _carrierRadius
                                        If channel = _redChannel Then
                                            image(j, i) = MaxRGB(sideR.Red(0, i), sideR.Green(0, i), sideR.Blue(0, i))
@@ -125,6 +126,7 @@ Public Class MotionExplorer
                                            image(j, i) = MaxRGB(sideL.Red(0, i), sideL.Green(0, i), sideL.Blue(0, i))
                                        End If
                                    Next
+                                   'Правая часть "индикатора"
                                    For j = centerHarm + _carrierRadius To highDopplerLowHarm
                                        If channel = _redChannel Then
                                            image(j, i) = MaxRGB(sideR.Red(0, i), sideR.Green(0, i), sideR.Blue(0, i))

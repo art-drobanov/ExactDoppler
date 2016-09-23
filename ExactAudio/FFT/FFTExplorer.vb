@@ -85,17 +85,14 @@ Public Class FFTExplorer
         Next
         Parallel.For(0, mag.Length, Sub(i)
                                         Dim row = mag(i)
-
-                                        Dim N As Double = 0
                                         Dim sum As Double = 0
                                         For j = 0 To row.Length - 1
                                             If row(j) > Double.MinValue Then
-                                                sum += Math.Pow(10, row(j))
-                                                N += 1
+                                                sum += Math.Pow(20, row(j)) 'Magic!
                                             End If
                                         Next
-                                        sum /= N
-                                        sum = Math.Log(sum)
+                                        sum /= CDbl(row.Length)
+                                        sum = Math.Log(sum) 'Magic!
 
                                         Dim target = result(i)
                                         For col = 0 To target.Length - 1

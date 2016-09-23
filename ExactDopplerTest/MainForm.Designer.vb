@@ -204,7 +204,7 @@ Partial Class MainForm
         Me._blindZoneTrackBar.Size = New System.Drawing.Size(240, 45)
         Me._blindZoneTrackBar.TabIndex = 15
         Me._blindZoneTrackBar.TickStyle = System.Windows.Forms.TickStyle.TopLeft
-        Me._blindZoneTrackBar.Value = 70
+        Me._blindZoneTrackBar.Value = 80
         '
         '_inputAudioDevicesRefreshButton
         '
@@ -315,7 +315,7 @@ Partial Class MainForm
         Me.MaximizeBox = False
         Me.Name = "MainForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "ExactDopplerTest (03.09.2016 00:34)"
+        Me.Text = "ExactDopplerTest (24.09.2016 00:48)"
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me._frequencyGroupBox.ResumeLayout(False)
         Me._frequencyGroupBox.PerformLayout()

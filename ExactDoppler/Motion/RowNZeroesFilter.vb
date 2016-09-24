@@ -33,7 +33,8 @@
         If _zeroCount > _NZeroes Then
             result = Double.MinValue
         Else
-            result = If(_rowMemory.Any(), _rowMemory.Average(), Double.MinValue)
+            Dim correctionCoeff = 0.3 + 0.7 * (CDbl(_zeroCount + 1) / CDbl(_NZeroes))
+            result = If(_rowMemory.Any(), _rowMemory.Average() * correctionCoeff, Double.MinValue)
         End If
         Return result
     End Function

@@ -77,47 +77,4 @@ Public Class FFTExplorer
 
         Return res
     End Function
-
-    Public Function HarmSlicesSumImageInDb(mag As Double()(), width As Integer) As Double()()
-        Dim result = New Double(mag.Length - 1)() {}
-        For i = 0 To result.Length - 1
-            result(i) = New Double(width - 1) {}
-        Next
-        Parallel.For(0, mag.Length, Sub(i)
-                                        Dim row = mag(i)
-                                        Dim sum As Double = 0
-                                        For j = 0 To row.Length - 1
-                                            If row(j) > Double.MinValue Then
-                                                sum += Math.Pow(20, row(j)) 'Magic!
-                                            End If
-                                        Next
-                                        sum /= CDbl(row.Length)
-                                        sum = Math.Log(sum) 'Magic!
-
-                                        Dim target = result(i)
-                                        For col = 0 To target.Length - 1
-                                            target(col) = If(Double.IsNaN(sum), Double.MinValue, sum)
-                                        Next
-                                    End Sub)
-        Return result
-    End Function
-
-    Public Sub DbScale(data As Double()(), zeroDbLevel As Double, squelchInDb As Double)
-        Parallel.For(0, data.Length, Sub(i)
-                                         DbScale(data(i), zeroDbLevel, squelchInDb)
-                                     End Sub)
-    End Sub
-
-    Public Sub DbScale(data As Double(), zeroDbLevel As Double, squelchInDb As Double)
-        Parallel.For(0, data.Length, Sub(i)
-                                         Dim val = 10.0 * Math.Log(data(i) / zeroDbLevel)  'log
-                                         val = If(val < squelchInDb, Double.MinValue, val) 'squelch
-                                         data(i) = val
-                                     End Sub)
-    End Sub
-
-    Public Function Db(data As Double, zeroDbLevel As Double) As Double
-        Dim val = 10.0 * Math.Log(data / zeroDbLevel) 'log
-        Return val
-    End Function
 End Class

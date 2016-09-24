@@ -12,7 +12,7 @@ Public Class MotionExplorer
     Private Const _gainHarmRadius = 2 '2
     Private Const _gainStep = 1.0 '1.0
     Private Const _rowFilterMemorySize = 3 '3
-    Private Const _NZeroes = 3 '3
+    Private Const _NZeroes = 7 '7
     Private Const _noiseScannerDepth = 0.1 '0.1
     Private Const _brightness = 100 '100
     Private Const _minFreq = 200 '200
@@ -51,9 +51,9 @@ Public Class MotionExplorer
         'FFT + DSP
         Dim mag = MyBase.Explore(pcmSamples, pcmSamplesCount, lowFreq, highFreq).MagL
         Dim result As New MotionExplorerResult With {.Duration = mag(0).Length * MyBase.SonogramRowDuration}
-        Dim squelchInDb = MyBase.Db(AutoGainAndGetSquelch(mag, _brightness), _zeroDbLevel)
+        Dim squelchInDb = ExactMath.Db(AutoGainAndGetSquelch(mag, _brightness), _zeroDbLevel)
         result.Pcm = _waterfallPlayer.Process(mag, blindZone)
-        MyBase.DbScale(mag, _zeroDbLevel, squelchInDb)
+        ExactMath.DbScale(mag, _zeroDbLevel, squelchInDb)
         DopplerFilterDb(mag, _rowFilterMemorySize, _NZeroes)
 
         'Detection
@@ -82,8 +82,8 @@ Public Class MotionExplorer
         Dim lowDoppler = ExactPlotter.SubBand(mag, lowDopplerLowHarm, lowDopplerHighHarm)
         Dim highDoppler = ExactPlotter.SubBand(mag, highDopplerLowHarm, highDopplerHighHarm)
         Dim sideWidth = mag(0).Length \ _sideFormDivider
-        Dim lowDopplerImage = MyBase.HarmSlicesSumImageInDb(lowDoppler, 1)
-        Dim highDopplerImage = MyBase.HarmSlicesSumImageInDb(highDoppler, 1)
+        Dim lowDopplerImage = HarmSlicesSumImageInDb(lowDoppler, 1)
+        Dim highDopplerImage = HarmSlicesSumImageInDb(highDoppler, 1)
 
         Dim magRGB = _paletteProcessor.Process(mag)
         Dim sideL = _paletteProcessor.Process(lowDopplerImage)
@@ -147,8 +147,28 @@ Public Class MotionExplorer
         Return result
     End Function
 
-    Private Function MaxRGB(R As Byte, G As Byte, B As Byte) As Byte
-        Return Math.Max(R, Math.Max(G, B))
+    Private Function HarmSlicesSumImageInDb(mag As Double()(), width As Integer) As Double()()
+        Dim result = New Double(mag.Length - 1)() {}
+        For i = 0 To result.Length - 1
+            result(i) = New Double(width - 1) {}
+        Next
+        Parallel.For(0, mag.Length, Sub(i)
+                                        Dim row = mag(i)
+                                        Dim sum As Double = 0
+                                        For j = 0 To row.Length - 1
+                                            If row(j) > Double.MinValue Then
+                                                sum += ExactMath.DbInv(row(j), _zeroDbLevel) '[1] Re-Exp
+                                            End If
+                                        Next
+                                        sum /= CDbl(row.Length)
+                                        sum = ExactMath.Db(sum, _zeroDbLevel) '[2] Re-Log
+
+                                        Dim target = result(i)
+                                        For col = 0 To target.Length - 1
+                                            target(col) = If(Double.IsNaN(sum), Double.MinValue, sum)
+                                        Next
+                                    End Sub)
+        Return result
     End Function
 
     ''' <summary>
@@ -222,5 +242,9 @@ Public Class MotionExplorer
                                     End Sub)
         Dim result = noiseMaxNRG
         Return result
+    End Function
+
+    Private Function MaxRGB(R As Byte, G As Byte, B As Byte) As Byte
+        Return Math.Max(R, Math.Max(G, B))
     End Function
 End Class

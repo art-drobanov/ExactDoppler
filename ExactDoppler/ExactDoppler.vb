@@ -211,12 +211,13 @@ Public Class ExactDoppler
                     highDopplerAvgSum = 0
                 End If
 
-                Dim carrierLevelAvg = .CarrierLevel.Average() 'Несущая
+                'Несущая не должна иметь слишком низкий уровень
+                Dim carrierIsOK = .CarrierLevel.Min() >= _config.CarrierWarningLevel
 
                 'Элемент лога
-                Dim logItem = New DopplerLog.Item(nowTimeStamp, lowDopplerAvg, highDopplerAvg, carrierLevelAvg)
+                Dim logItem = New DopplerLog.Item(nowTimeStamp, lowDopplerAvg, highDopplerAvg, carrierIsOK)
                 motionExplorerResult.DopplerLogItem = logItem
-                If lowDopplerAvg <> 0 OrElse highDopplerAvg <> 0 OrElse carrierLevelAvg < _config.CarrierWarningLevel Then 'Если несущей нет - это тоже событие!
+                If lowDopplerAvg <> 0 OrElse highDopplerAvg <> 0 OrElse Not carrierIsOK Then 'Если несущей нет - это тоже событие!
                     motionExplorerResult.IsWarning = True
                     _dopplerLog.Add(logItem) 'Пишем в лог - если есть данные!
                 End If
@@ -238,7 +239,7 @@ Public Class ExactDoppler
     ''' Включение генератора
     ''' </summary>
     Public Sub SwitchOnGen()
-        SwitchOnGen(Me.Config.CenterFreq)
+        SwitchOnGen(_config.CenterFreq)
     End Sub
 
     ''' <summary>

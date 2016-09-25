@@ -1,0 +1,9 @@
+25.09.2016 11:09:18 ROOT [Msg] Application startup
+25.09.2016 11:09:18 ROOT [Inf] Application executable path: D:\Cleverflow.home\me.storage\ExactDoppler\release\ExactDopplerServer\bin\ExactDopplerServer.exe
+25.09.2016 11:09:18 ROOT [Inf] Application executable date: 25.09.2016 11:04:10
+25.09.2016 11:09:47 ROOT [Msg] Application startup
+25.09.2016 11:09:47 ROOT [Inf] Application executable path: D:\Cleverflow.home\me.storage\ExactDoppler\release\ExactDopplerServer\bin\ExactDopplerServer.exe
+25.09.2016 11:09:47 ROOT [Inf] Application executable date: 25.09.2016 11:04:10
+25.09.2016 13:46:51 ROOT [Msg] Application startup
+25.09.2016 13:46:51 ROOT [Inf] Application executable path: D:\Cleverflow.home\me.storage\ExactDoppler\release\ExactDopplerServer\bin\ExactDopplerServer.exe
+25.09.2016 13:46:51 ROOT [Inf] Application executable date: 25.09.2016 13:46:36

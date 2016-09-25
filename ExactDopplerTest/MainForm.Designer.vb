@@ -47,6 +47,8 @@ Partial Class MainForm
         Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
         Me._dopplerLogItemLabel_ = New System.Windows.Forms.Label()
         Me._dopplerLogItemLabel = New System.Windows.Forms.Label()
+        Me._carrierLogItemLabel_ = New System.Windows.Forms.Label()
+        Me._carrierLogItemLabel = New System.Windows.Forms.Label()
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me._frequencyGroupBox.SuspendLayout()
         CType(Me._volumeTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -283,27 +285,49 @@ Partial Class MainForm
         '
         Me._dopplerLogItemLabel_.AutoSize = True
         Me._dopplerLogItemLabel_.Font = New System.Drawing.Font("Arial Narrow", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me._dopplerLogItemLabel_.Location = New System.Drawing.Point(291, 645)
+        Me._dopplerLogItemLabel_.Location = New System.Drawing.Point(359, 647)
         Me._dopplerLogItemLabel_.Name = "_dopplerLogItemLabel_"
-        Me._dopplerLogItemLabel_.Size = New System.Drawing.Size(114, 25)
+        Me._dopplerLogItemLabel_.Size = New System.Drawing.Size(109, 25)
         Me._dopplerLogItemLabel_.TabIndex = 22
-        Me._dopplerLogItemLabel_.Text = "DopplerLog: "
+        Me._dopplerLogItemLabel_.Text = "DopplerLog:"
         '
         '_dopplerLogItemLabel
         '
         Me._dopplerLogItemLabel.AutoSize = True
         Me._dopplerLogItemLabel.Font = New System.Drawing.Font("Arial Narrow", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me._dopplerLogItemLabel.Location = New System.Drawing.Point(411, 646)
+        Me._dopplerLogItemLabel.Location = New System.Drawing.Point(466, 647)
         Me._dopplerLogItemLabel.Name = "_dopplerLogItemLabel"
-        Me._dopplerLogItemLabel.Size = New System.Drawing.Size(98, 25)
+        Me._dopplerLogItemLabel.Size = New System.Drawing.Size(88, 25)
         Me._dopplerLogItemLabel.TabIndex = 23
-        Me._dopplerLogItemLabel.Text = " No Motion"
+        Me._dopplerLogItemLabel.Text = "NoMotion"
+        '
+        '_carrierLogItemLabel_
+        '
+        Me._carrierLogItemLabel_.AutoSize = True
+        Me._carrierLogItemLabel_.Font = New System.Drawing.Font("Arial Narrow", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me._carrierLogItemLabel_.Location = New System.Drawing.Point(233, 647)
+        Me._carrierLogItemLabel_.Name = "_carrierLogItemLabel_"
+        Me._carrierLogItemLabel_.Size = New System.Drawing.Size(76, 25)
+        Me._carrierLogItemLabel_.TabIndex = 24
+        Me._carrierLogItemLabel_.Text = "Carrier: "
+        '
+        '_carrierLogItemLabel
+        '
+        Me._carrierLogItemLabel.AutoSize = True
+        Me._carrierLogItemLabel.Font = New System.Drawing.Font("Arial Narrow", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me._carrierLogItemLabel.Location = New System.Drawing.Point(299, 648)
+        Me._carrierLogItemLabel.Name = "_carrierLogItemLabel"
+        Me._carrierLogItemLabel.Size = New System.Drawing.Size(18, 25)
+        Me._carrierLogItemLabel.TabIndex = 25
+        Me._carrierLogItemLabel.Text = "-"
         '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(566, 676)
+        Me.Controls.Add(Me._carrierLogItemLabel)
+        Me.Controls.Add(Me._carrierLogItemLabel_)
         Me.Controls.Add(Me._dopplerLogItemLabel)
         Me.Controls.Add(Me._dopplerLogItemLabel_)
         Me.Controls.Add(Me.LinkLabel1)
@@ -315,7 +339,7 @@ Partial Class MainForm
         Me.MaximizeBox = False
         Me.Name = "MainForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "ExactDopplerTest (25.09.2016 00:42)"
+        Me.Text = "ExactDopplerTest (25.09.2016 12:47)"
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me._frequencyGroupBox.ResumeLayout(False)
         Me._frequencyGroupBox.PerformLayout()
@@ -356,4 +380,6 @@ Partial Class MainForm
     Friend WithEvents LinkLabel1 As LinkLabel
     Friend WithEvents _dopplerLogItemLabel_ As Label
     Friend WithEvents _dopplerLogItemLabel As Label
+    Friend WithEvents _carrierLogItemLabel_ As System.Windows.Forms.Label
+    Friend WithEvents _carrierLogItemLabel As System.Windows.Forms.Label
 End Class

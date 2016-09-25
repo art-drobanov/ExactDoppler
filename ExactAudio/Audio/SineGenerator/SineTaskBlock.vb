@@ -5,8 +5,8 @@
     Public Property Amplitude As List(Of Single)
 
     Public Sub New(frequency As IEnumerable(Of Single), amplitude As IEnumerable(Of Single), Optional samplesTotal As ULong = ULong.MaxValue)
-        Me.Frequency = New List(Of Single)(frequency)
-        Me.Amplitude = New List(Of Single)(amplitude)
+        _Frequency = New List(Of Single)(frequency)
+        _Amplitude = New List(Of Single)(amplitude)
         _samplesTotal = samplesTotal
         _samplesGenerated = 0
     End Sub

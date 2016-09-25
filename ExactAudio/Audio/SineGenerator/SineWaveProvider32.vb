@@ -10,11 +10,11 @@ Public Class SineWaveProvider32
     End Sub
 
     Public Sub New(program As Queue(Of SineTaskBlock))
-        Me.Program = New Queue(Of SineTaskBlock)(program)
+        _Program = New Queue(Of SineTaskBlock)(program)
     End Sub
 
     Public Sub New(frequency As IEnumerable(Of Single))
-        Me.Program = New Queue(Of SineTaskBlock)({New SineTaskBlock(frequency, frequency.Select(Function(item) 1.0F).ToArray())})
+        _Program = New Queue(Of SineTaskBlock)({New SineTaskBlock(frequency, frequency.Select(Function(item) 1.0F).ToArray())})
     End Sub
 
     Public Overrides Function Read(buffer As Single(), offset As Integer, sampleCount As Integer) As Integer
@@ -23,7 +23,7 @@ Public Class SineWaveProvider32
             buffer(i + offset) = 0
         Next
         For i As Integer = 0 To sampleCount - 1
-            Dim pr = Me.Program.FirstOrDefault()
+            Dim pr = _Program.FirstOrDefault()
             If pr IsNot Nothing Then
                 Dim ampSum = pr.Amplitude.Sum()
                 For sineIdx = 0 To pr.Frequency.Count - 1
@@ -31,7 +31,7 @@ Public Class SineWaveProvider32
                 Next
                 NextSample(sampleRate)
                 If Not pr.NextSampleAllowed() Then
-                    Me.Program.Dequeue()
+                    _Program.Dequeue()
                 End If
             Else
                 Return 0

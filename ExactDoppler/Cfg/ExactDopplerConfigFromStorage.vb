@@ -15,7 +15,7 @@ Public Class ExactDopplerConfigFromStorage
         _outputDeviceIdx = New IntegerSetting(storage, "OutputDeviceIdx", 0)
         _volume = New DoubleSetting(storage, "Volume", 0.5)
         _centerFreq = New DoubleSetting(storage, "CenterFreq", 21000)
-        _blindZone = New IntegerSetting(storage, "BlindZone", 70)
+        _blindZone = New IntegerSetting(storage, "BlindZone", 80)
         _carrierWarningLevel = New IntegerSetting(storage, "CarrierWarningLevel", 10)
     End Sub
 

@@ -46,7 +46,10 @@ Public Class MainForm
         _blocksCounter += 1
         Me.Invoke(Sub()
                       _blocksLabel.Text = _blocksCounter.ToString()
-                      _dopplerLogItemLabel.Text = motionExplorerResult.DopplerLogItem.Type
+                      With motionExplorerResult.DopplerLogItem
+                          _carrierLogItemLabel.Text = .Carrier
+                          _dopplerLogItemLabel.Text = .Type
+                      End With
                   End Sub)
     End Sub
 

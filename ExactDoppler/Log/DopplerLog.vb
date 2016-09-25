@@ -7,36 +7,46 @@ Public Class DopplerLog
         Public Property Time As DateTime
         Public Property LowDoppler As Single
         Public Property HighDoppler As Single
-        Public Property CarrierLevel As Single
+        Public Property CarrierIsOK As Boolean
 
-        Public ReadOnly Property Type As String
+        Public ReadOnly Property Carrier As String
             Get
-                If (HighDoppler - LowDoppler) > _diffThr Then Return "Motion++"
-                If (LowDoppler - HighDoppler) > _diffThr Then Return "Motion--"
-                If (LowDoppler + HighDoppler) > _diffThr Then Return "Motion+-"
-                Return "NoMotion"
+                Return If(CarrierIsOK, "OK", "ERR")
             End Get
         End Property
 
-        Public Sub New(time As DateTime, L As Single, H As Single, carrierLevel As Single)
-            Me.Time = time
+        Public ReadOnly Property Type As String
+            Get
+                If CarrierIsOK Then
+                    If (HighDoppler - LowDoppler) > _diffThr Then Return "Motion++"
+                    If (LowDoppler - HighDoppler) > _diffThr Then Return "Motion--"
+                    If (LowDoppler + HighDoppler) > _diffThr Then Return "Motion+-"
+                    Return "NoMotion"
+                Else
+                    Return "Carrier!"
+                End If
+            End Get
+        End Property
+
+        Public Sub New(time As DateTime, L As Single, H As Single, carrierIsOK As Boolean)
+            _Time = time
             If L > 100 OrElse H > 100 Then
                 Dim top = Math.Max(L, H)
                 L = (L / top) * 100
                 H = (H / top) * 100
             End If
-            Me.LowDoppler = If(L > 99.99, 99.99, If(L < 0, 0, L))
-            Me.HighDoppler = If(H > 99.99, 99.99, If(H < 0, 0, H))
-            Me.CarrierLevel = If(carrierLevel > 99.99, 99.99, If(carrierLevel < 0, 0, carrierLevel))
+            _LowDoppler = If(L > 99.99, 99.99, If(L < 0, 0, L))
+            _HighDoppler = If(H > 99.99, 99.99, If(H < 0, 0, H))
+            _CarrierIsOK = carrierIsOK
         End Sub
 
         Public Overrides Function ToString() As String
-            Return String.Format("DMY:{0}, L:{1}%, H:{2}%; Type:{3}, CarrierLevel:{4}%;",
+            Return String.Format("DMY:{0}, L:{1}%, H:{2}%; Type:{3}, Carrier:{4};",
                                  Time.ToString(DateTimeFormat),
                                  LowDoppler.ToString("00.00").Replace(",", "."),
                                  HighDoppler.ToString("00.00").Replace(",", "."),
                                  Type,
-                                 CarrierLevel.ToString("00.00"))
+                                 Carrier)
         End Function
     End Class
 
@@ -50,9 +60,9 @@ Public Class DopplerLog
         End Get
     End Property
 
-    Public Sub Add(time As DateTime, L As Single, H As Single, carrierLevel As Single)
+    Public Sub Add(time As DateTime, L As Single, H As Single, carrierIsOK As Boolean)
         SyncLock SyncRoot
-            Dim item = New Item(time, L, H, carrierLevel)
+            Dim item = New Item(time, L, H, carrierIsOK)
             _items.AddLast(item)
         End SyncLock
     End Sub
@@ -67,8 +77,9 @@ Public Class DopplerLog
         SyncLock SyncRoot
             If _items.Any() Then
                 Dim sw = New StreamWriter(stream, Text.Encoding.UTF8)
-                For Each logItem In _items.Select(Function(item) item.ToString())
-                    sw.WriteLine(logItem)
+                For Each logItem In _items
+                    Dim str = logItem.ToString()
+                    sw.WriteLine(str)
                 Next
                 sw.Flush()
             End If
@@ -83,22 +94,24 @@ Public Class DopplerLog
             Dim logItemString = sr.ReadLine()
             If logItemString Is Nothing Then Exit While
             Dim logItemStrings = logItemString.ToUpper().Replace("DMY", String.Empty) _
-                                                        .Replace("CARRIERLEVEL", String.Empty) _
+                                                        .Replace("CARRIER", String.Empty) _
                                                         .Replace("L", String.Empty) _
                                                         .Replace("H", String.Empty) _
                                                         .Replace("TYPE", String.Empty) _
                                                         .Replace("NO", String.Empty) _
                                                         .Replace("MOTION", String.Empty) _
+                                                        .Replace("!", String.Empty) _
                                                         .Replace("+", String.Empty) _
                                                         .Replace("-", String.Empty) _
                                                         .Replace(";", String.Empty) _
                                                         .Replace(":", String.Empty) _
+                                                        .Replace(" ", String.Empty) _
                                                         .Split(",")
 
             Dim T As DateTime
             Dim L As Single
             Dim H As Single
-            Dim C As Single
+            Dim C As Boolean
 
             If Not DateTime.TryParseExact(logItemStrings(0), DateTimeFormat, Nothing, DateTimeStyles.None, T) Then
                 Throw New Exception(String.Format("Can't parse 'DMY:{0}' from log", logItemStrings(0)))
@@ -118,11 +131,10 @@ Public Class DopplerLog
                 End If
             End If
 
-            logItemStrings(3) = logItemStrings(3).Replace("%", String.Empty)
-            If Not Single.TryParse(logItemStrings(3).Replace(".", ","), C) Then
-                If Not Single.TryParse(logItemStrings(3).Replace(",", "."), C) Then
-                    Throw New Exception(String.Format("Can't parse 'C:{0}' from log", logItemStrings(3)))
-                End If
+            If logItemStrings(3).Contains("OK") AndAlso Not logItemStrings(3).Contains("ERR") Then
+                C = True
+            Else
+                C = False
             End If
 
             newLog.Add(T, L, H, C)

@@ -84,7 +84,7 @@
     <Compile Include="Cfg\ExactDopplerConfigFromStorage.vb" />
     <Compile Include="ExactDoppler.vb" />
     <Compile Include="Log\DopplerLog.vb" />
-    <Compile Include="Log\PcmLog.vb" />
+    <Compile Include="Log\DopplerLogItem.vb" />
     <Compile Include="Math\ExactMath.vb" />
     <Compile Include="Motion\MotionExplorer.vb" />
     <Compile Include="Motion\MotionExplorerResult.vb" />
@@ -105,7 +105,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Waterfall\RGBWaterfall.vb" />
-    <Compile Include="Waterfall\WaterfallPlayer.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

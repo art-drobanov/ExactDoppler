@@ -3,7 +3,6 @@ Imports ExactAudio
 
 Public Class MainForm
     Private WithEvents _exactDoppler As New ExactDoppler()
-    Private _pcmLog As New PcmLog(_exactDoppler.SampleRate)
     Private _waterfall As New RGBWaterfall
     Private _blocksCounter As Long = 0
 
@@ -38,10 +37,7 @@ Public Class MainForm
                                                       .DisplayBitmap.DrawBitmap(bmp)
                                                       .Refresh()
                                                   End With
-                                              End Sub)
-        'Pcm
-        _pcmLog.Add(motionExplorerResult.Pcm)
-
+                                              End Sub)        
         'GUI
         _blocksCounter += 1
         Me.Invoke(Sub()
@@ -81,13 +77,6 @@ Public Class MainForm
             waterfall.Save("dopplerImg__" + snapshotFilename + ".png")
         End If
         _waterfall.Clear()
-
-        'PCM
-        If _pcmLog.Items.Any() Then
-            Dim wavFilename = "dopplerWav__" + snapshotFilename + ".wav"
-            _pcmLog.Write(wavFilename)
-            _pcmLog.Clear()
-        End If
 
         'GUI
         _inputGroupBox.Text = "Input [ OFF ]"

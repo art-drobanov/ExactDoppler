@@ -21,7 +21,7 @@ Public Class RGBWaterfall
             If waterfallRowBlock IsNot Nothing Then
                 If _waterfallRowBlocks.Any() Then
                     If _waterfallRowBlocks.Peek().Width <> waterfallRowBlock.Width Then
-                        Throw New Exception("_waterfallBlocks.Peek().Width <> waterfallBlock.Width")
+                        Throw New Exception("RGBWaterfall: _waterfallBlocks.Peek().Width <> waterfallBlock.Width")
                     End If
                 End If
                 _waterfallRowBlocks.Enqueue(waterfallRowBlock)

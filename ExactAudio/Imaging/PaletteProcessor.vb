@@ -43,13 +43,12 @@ Public Class PaletteProcessor
         Dim rgb = New RGBMatrix(data.Length, 1)
         Parallel.For(0, data.Length(), Sub(i)
                                            Dim val = If(Double.IsNaN(data(i)), 0, data(i))
-                                           If val < 0 Then val = 0
-                                           If val > _maxPaletteIdx Then val = _maxPaletteIdx
+                                           val = If(val < 0, 0, val)
+                                           val = If(val > _maxPaletteIdx, _maxPaletteIdx, val)
                                            rgb.Red(i, 0) = _red(val)
                                            rgb.Green(i, 0) = _green(val)
                                            rgb.Blue(i, 0) = _blue(val)
                                        End Sub)
-
         Return rgb
     End Function
 
@@ -69,9 +68,15 @@ Public Class PaletteProcessor
         Dim redPath = IO.Path.Combine(path, name + "_R.raw")
         Dim greenPath = IO.Path.Combine(path, name + "_G.raw")
         Dim bluePath = IO.Path.Combine(path, name + "_B.raw")
-        If Not IO.File.Exists(redPath) Then Throw New Exception(String.Format("Red channel of {0} is not accessible!", name))
-        If Not IO.File.Exists(greenPath) Then Throw New Exception(String.Format("Green channel of {0} is not accessible!", name))
-        If Not IO.File.Exists(bluePath) Then Throw New Exception(String.Format("Blue channel of {0} is not accessible!", name))
+        If Not IO.File.Exists(redPath) Then
+            Throw New Exception(String.Format("PaletteProcessor: Red channel of {0} is not accessible!", name))
+        End If
+        If Not IO.File.Exists(greenPath) Then
+            Throw New Exception(String.Format("PaletteProcessor: Green channel of {0} is not accessible!", name))
+        End If
+        If Not IO.File.Exists(bluePath) Then
+            Throw New Exception(String.Format("PaletteProcessor: Blue channel of {0} is not accessible!", name))
+        End If
         _red = IO.File.ReadAllBytes(redPath)
         _green = IO.File.ReadAllBytes(greenPath)
         _blue = IO.File.ReadAllBytes(bluePath)
@@ -79,8 +84,8 @@ Public Class PaletteProcessor
     End Sub
 
     Public Sub ChechPaletteBits()
-        If _red.Length <> _green.Length Or _red.Length <> _blue.Length Or _green.Length <> _blue.Length Then
-            Throw New Exception(String.Format("Wrong palette!"))
+        If _red.Length <> _green.Length OrElse _red.Length <> _blue.Length OrElse _green.Length <> _blue.Length Then
+            Throw New Exception("PaletteProcessor: Wrong palette!")
         End If
         Dim bit8 = CInt(Math.Pow(2, 8))
         Dim bit16 = CInt(Math.Pow(2, 16))
@@ -94,17 +99,17 @@ Public Class PaletteProcessor
             Case bit24
                 _nBits = 24
             Case Else
-                Throw New Exception("Palette is broken!")
+                Throw New Exception("PaletteProcessor: Palette is broken!")
         End Select
         _maxPaletteIdx = Math.Pow(2, _nBits) - 1
     End Sub
 
     Private Sub CheckPalette()
-        If _red Is Nothing Or _green Is Nothing Or _blue Is Nothing Then
+        If _red Is Nothing OrElse _green Is Nothing OrElse _blue Is Nothing Then
             DefaultPalette()
         End If
-        If _red.Length <> _green.Length Or _red.Length <> _blue.Length Or _green.Length <> _blue.Length Then
-            Throw New Exception("Palette is broken!")
+        If _red.Length <> _green.Length OrElse _red.Length <> _blue.Length OrElse _green.Length <> _blue.Length Then
+            Throw New Exception("PaletteProcessor: Palette is broken!")
         End If
     End Sub
 End Class

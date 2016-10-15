@@ -37,7 +37,7 @@ Public Class SineGenerator
     Public Sub New(ByRef selectedDeviceNumber As Integer, sampleRate As Integer) 'DeviceNumber -> Out variable
         selectedDeviceNumber = If(selectedDeviceNumber < 0, 0, selectedDeviceNumber)
         _sampleRate = sampleRate
-        Dim waveFormat = New WaveFormat(_sampleRate, 16, 1)
+        Dim waveFormat = New WaveFormat(_sampleRate, 16, 2)
         Dim waveProvider = New BufferedWaveProvider(waveFormat)
         Try
             _waveOut = New WaveOut() With {.DeviceNumber = selectedDeviceNumber}
@@ -55,7 +55,9 @@ Public Class SineGenerator
                         _waveOut = Nothing
                         exc = True
                     End Try
-                    If Not exc Then Exit For
+                    If Not exc Then
+                        Exit For
+                    End If
                 End If
             Next
         End Try
@@ -64,13 +66,13 @@ Public Class SineGenerator
 
     Public Sub Play(program As Queue(Of SineTaskBlock))
         SyncLock SyncRoot
-            PlayWith(New SineWaveProvider32(program))
+            PlayWith(New SineWaveProgramProvider32(program))
         End SyncLock
     End Sub
 
     Public Sub SwitchOn(frequency As Single())
         SyncLock SyncRoot
-            PlayWith(New SineWaveProvider32(frequency))
+            PlayWith(New SineWaveProgramProvider32(frequency))
         End SyncLock
     End Sub
 
@@ -86,10 +88,10 @@ Public Class SineGenerator
         End SyncLock
     End Sub
 
-    Private Sub PlayWith(sineWaveProvider As SineWaveProvider32)
+    Private Sub PlayWith(sineWaveProvider As SineWaveProgramProvider32)
         SyncLock SyncRoot
             If _waveOut Is Nothing Then
-                sineWaveProvider.SetWaveFormat(_sampleRate, 1)
+                sineWaveProvider.SetWaveFormat(_sampleRate, 2)
                 _waveOut = New WaveOut() With {.DeviceNumber = _deviceNumber}
                 With _waveOut
                     .Init(sineWaveProvider)

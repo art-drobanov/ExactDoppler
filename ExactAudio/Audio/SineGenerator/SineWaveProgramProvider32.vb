@@ -1,6 +1,6 @@
 ﻿Imports NAudio.Wave
 
-Public Class SineWaveProvider32
+Public Class SineWaveProgramProvider32
     Inherits WaveProvider32
 
     Private _sampleIdx As Integer
@@ -18,26 +18,29 @@ Public Class SineWaveProvider32
     End Sub
 
     Public Overrides Function Read(buffer As Single(), offset As Integer, sampleCount As Integer) As Integer
-        Dim sampleRate As Integer = WaveFormat.SampleRate
-        For i As Integer = 0 To sampleCount - 1
-            buffer(i + offset) = 0
-        Next
-        For i As Integer = 0 To sampleCount - 1
-            Dim pr = _Program.FirstOrDefault()
-            If pr IsNot Nothing Then
-                Dim ampSum = pr.Amplitude.Sum()
-                For sineIdx = 0 To pr.Frequency.Count - 1
-                    buffer(i + offset) += CSng((pr.Amplitude(sineIdx) / ampSum) * Math.Sin((2 * Math.PI * _sampleIdx * pr.Frequency(sineIdx)) / sampleRate))
+        Dim sampleRate = WaveFormat.SampleRate
+        Dim nChannels = WaveFormat.Channels
+        sampleCount \= nChannels
+        For sampleIdx = 0 To sampleCount - 1
+            Dim program = _Program.FirstOrDefault()
+            If program IsNot Nothing Then
+                Dim ampSum = program.Amplitude.Sum()
+                Dim sample As Single = 0
+                For sineIdx = 0 To program.Frequency.Count - 1
+                    sample += CSng((program.Amplitude(sineIdx) / ampSum) * Math.Sin((2 * Math.PI * _sampleIdx * program.Frequency(sineIdx)) / sampleRate))
+                Next
+                For channel = 0 To nChannels - 1
+                    buffer(((nChannels * sampleIdx) + channel) + offset) = sample
                 Next
                 NextSample(sampleRate)
-                If Not pr.NextSampleAllowed() Then
+                If Not program.NextSampleAllowed() Then
                     _Program.Dequeue()
                 End If
             Else
                 Return 0
             End If
         Next
-        Return sampleCount
+        Return sampleCount * nChannels
     End Function
 
     Private Sub NextSample(sampleRate As Integer)

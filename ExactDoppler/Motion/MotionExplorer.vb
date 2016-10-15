@@ -6,7 +6,6 @@ Public Class MotionExplorer
     Private Const _redChannel = 0 '0
     Private Const _greenChannel = 1 '1
     Private Const _blueChannel = 2 '2
-
     Private Const _blankerLevel = 32 '32
     Private Const _sideFormDivider = 20 '20
     Private Const _gainHarmRadius = 2 '2
@@ -20,8 +19,7 @@ Public Class MotionExplorer
     Private _targetNRG As Double = 0 '0
     Private _gain As Double = 1.0 '1.0
 
-    Private _paletteProcessor As PaletteProcessor
-    Private _waterfallPlayer As WaterfallPlayer
+    Private _paletteProcessor As PaletteProcessor 'Объект для работы с палитрой
 
     ''' <summary>
     ''' Конструктор.
@@ -34,8 +32,7 @@ Public Class MotionExplorer
     Public Sub New(frameWidth As Integer, frameStep As Integer, sampleRate As Integer, nBits As Integer, stereo As Boolean)
         MyBase.New(frameWidth, frameStep, sampleRate, nBits, stereo)
         _targetNRG = Math.Pow(2, nBits - 1)
-        _paletteProcessor = New PaletteProcessor()
-        _waterfallPlayer = New WaterfallPlayer(frameWidth, frameStep, sampleRate, nBits, _minFreq)
+        _paletteProcessor = New PaletteProcessor()        
     End Sub
 
     ''' <summary>
@@ -51,8 +48,9 @@ Public Class MotionExplorer
         'FFT + DSP
         Dim mag = MyBase.Explore(pcmSamples, pcmSamplesCount, lowFreq, highFreq).MagL
         Dim result As New MotionExplorerResult With {.Duration = mag(0).Length * MyBase.SonogramRowDuration}
+
+        'DbScale + Filtering
         Dim squelchInDb = ExactMath.Db(AutoGainAndGetSquelch(mag, _brightness), _zeroDbLevel)
-        result.Pcm = _waterfallPlayer.Process(mag, blindZone)
         ExactMath.DbScale(mag, _zeroDbLevel, squelchInDb)
         DopplerFilterDb(mag, _rowFilterMemorySize, _NZeroes)
 
@@ -204,8 +202,8 @@ Public Class MotionExplorer
     ''' <returns>Порог отсечки (для разделения сигнал/шум).</returns>
     Private Function AutoGainAndGetSquelch(mag As Double()(), brightness As Double) As Double
         'Корректировка яркости
-        If brightness < 1 Then brightness = 1
-        If brightness > 100 Then brightness = 100
+        brightness = If(brightness < 1, 1, brightness)
+        brightness = If(brightness > 100, 100, brightness)
 
         'Вычисление средней энергии по центру спектра
         Dim center = mag(0).Length / 2

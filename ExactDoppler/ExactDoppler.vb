@@ -215,7 +215,7 @@ Public Class ExactDoppler
                 Dim carrierIsOK = .CarrierLevel.Min() >= _config.CarrierWarningLevel
 
                 'Элемент лога
-                Dim logItem = New DopplerLog.Item(nowTimeStamp, lowDopplerAvg, highDopplerAvg, carrierIsOK)
+                Dim logItem = New DopplerLogItem(nowTimeStamp, lowDopplerAvg, highDopplerAvg, carrierIsOK)
                 motionExplorerResult.DopplerLogItem = logItem
                 If lowDopplerAvg <> 0 OrElse highDopplerAvg <> 0 OrElse Not carrierIsOK Then 'Если несущей нет - это тоже событие!
                     motionExplorerResult.IsWarning = True
@@ -225,10 +225,10 @@ Public Class ExactDoppler
 
             'Проверка на нормализацию L/H
             If motionExplorerResult.DopplerLogItem.LowDoppler > 99.99 Then
-                Throw New Exception("motionExplorerResult.DopplerLogItem.LowDoppler > 99.99")
+                Throw New Exception("ExactDoppler: motionExplorerResult.DopplerLogItem.LowDoppler > 99.99")
             End If
             If motionExplorerResult.DopplerLogItem.HighDoppler > 99.99 Then
-                Throw New Exception("motionExplorerResult.DopplerLogItem.HighDoppler > 99.99")
+                Throw New Exception("ExactDoppler: motionExplorerResult.DopplerLogItem.HighDoppler > 99.99")
             End If
 
             Return motionExplorerResult

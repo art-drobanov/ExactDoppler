@@ -43,7 +43,6 @@ Public Class WaveInSource
     Private Sub WaveDataAvailable(sender As Object, e As WaveInEventArgs) Handles _waveIn.DataAvailable
         Dim samples As Single() = Nothing
         Dim maxValue As Single = Math.Pow(2, _waveFormat.BitsPerSample - 1)
-
         Select Case _waveFormat.BitsPerSample
             Case 16
                 samples = New Single((e.Buffer.Length \ 2) - 1) {}
@@ -58,7 +57,7 @@ Public Class WaveInSource
                                                     samples(bufferIdx) = intSample / maxValue
                                                 End Sub)
             Case Else
-                Throw New Exception("Supported recording modes: 16 and 24 bit per sample only!")
+                Throw New Exception("WaveInSource: Supported recording modes: 16 and 24 bit per sample only!")
         End Select
 
         If SampleProcessor IsNot Nothing AndAlso samples IsNot Nothing Then

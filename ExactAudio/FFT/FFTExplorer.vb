@@ -57,8 +57,7 @@ Public Class FFTExplorer
                                          _fftObj)
 
         'Разбор данных после преобразования Фурье
-        Dim res = ExactPlotter.Explore(FFT_T, usePolyphase,
-                                       _fftObj)
+        Dim res = ExactPlotter.Explore(FFT_T, usePolyphase, _fftObj)
 
         'Выделение поддиапазона гармоник
         Dim lowHarmIdx As Integer = 0

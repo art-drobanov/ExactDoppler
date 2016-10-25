@@ -22,5 +22,108 @@ Bwl.Imaging
   обращений к ресурсу с помощью этого класса ресурса со строгой типизацией.
 </summary>
 </member>
+<member name="M:Bwl.Imaging.ImagingMath.Bilinear(System.Double,System.Double,System.Double,System.Double)">
+ <summary>
+ Билинейная интерполяция между двумя значениями
+ </summary>
+ <param name="value1">Значение 1.</param>
+ <param name="value2">Значение 2.</param>
+ <param name="weight1">Вес для значения 1.</param>
+ <param name="weight2">Вес для значения 2.</param>
+</member>
+<member name="M:Bwl.Imaging.ImagingMath.Bilinear(System.Drawing.PointF,System.Drawing.PointF,System.Double,System.Double)">
+ <summary>
+ Билинейная интерполяция между двумя точками
+ </summary>
+ <param name="point1">Точка 1.</param>
+ <param name="point2">Точка 2.</param>
+ <param name="weight1">Вес для точки 1.</param>
+ <param name="weight2">Вес для точки 2.</param>
+</member>
+<member name="M:Bwl.Imaging.ImagingMath.MedianFilter2D(Bwl.Imaging.GrayMatrix,System.Int32)">
+ <summary>
+ 2D-медианный фильтр
+ </summary>    
+ <param name="img">Исходные данные.</param>
+ <param name="N">Размер фильтра (нечетное значение).</param>    
+</member>
+<member name="M:Bwl.Imaging.ImagingMath.MinMax2D(Bwl.Imaging.GrayMatrix,System.Byte@,System.Byte@)">
+ <summary>
+ Поиск минимального/максимального значения в полутоновой матрице
+ </summary>
+ <param name="img">Исходная матрица.</param>
+ <param name="min">Найденный минимум.</param>
+ <param name="max">Найденный максимум.</param>
+</member>
+<member name="M:Bwl.Imaging.MatrixTools.GrayMatrixAlign4(Bwl.Imaging.GrayMatrix)">
+ <summary>
+ Выравнивание полутоновой матрицы до ширины кратной 4
+ </summary>
+</member>
+<member name="M:Bwl.Imaging.MatrixTools.RGBMatrixAlign4(Bwl.Imaging.RGBMatrix)">
+ <summary>
+ Выравнивание цветной матрицы до ширины кратной 4
+ </summary>
+</member>
+<member name="M:Bwl.Imaging.MatrixTools.RectangleAlign(System.Drawing.Rectangle,System.Int32)">
+ <summary>
+ Установка прямогольника по "выровненным" позициям (каждая позиция становится кратной padding)
+ </summary>
+</member>
+<member name="M:Bwl.Imaging.MatrixTools.GrayMatrixSubRect(Bwl.Imaging.GrayMatrix,System.Drawing.Rectangle)">
+ <summary>
+ Получение полутоной подматрицы
+ </summary>
+</member>
+<member name="M:Bwl.Imaging.MatrixTools.RGBMatrixSubRect(Bwl.Imaging.RGBMatrix,System.Drawing.Rectangle)">
+ <summary>
+ Получение цветной подматрицы
+ </summary>
+</member>
+<member name="M:Bwl.Imaging.MatrixTools.InverseGray(Bwl.Imaging.GrayMatrix)">
+ <summary>
+ Инверсия полутонового изображения
+ </summary>    
+</member>
+<member name="M:Bwl.Imaging.MatrixTools.InverseRGB(Bwl.Imaging.RGBMatrix)">
+ <summary>
+ Инверсия цветного изображения
+ </summary>
+</member>
+<member name="M:Bwl.Imaging.VectorTools.Vector.AngleAB(Bwl.Imaging.VectorTools.Vector,Bwl.Imaging.VectorTools.Vector)">
+ <summary>
+ При вычислении вектора между (1,1) и (1,-1) этот метод дает - Pi/2! Это угловой переход от первого вектора ко второму
+ </summary>
+</member>
+<member name="M:Bwl.Imaging.VectorTools.PolygonIsEmpty(System.Drawing.PointF[])">
+ <summary>
+ Тест: полигон пустой?
+ </summary>
+</member>
+<member name="M:Bwl.Imaging.VectorTools.PointInPolygon(System.Drawing.PointF,System.Drawing.PointF[])">
+ <summary>
+ Тест: точка находится внутри полигона?
+ </summary>
+</member>
+<member name="M:Bwl.Imaging.VectorTools.NormalizeVector(System.Drawing.PointF,System.Single)">
+ <summary>
+ Нормализация длины вектора
+ </summary>    
+</member>
+<member name="M:Bwl.Imaging.VectorTools.VectorInBounds(System.Drawing.PointF,System.Drawing.PointF,System.Drawing.PointF,System.Double)">
+ <summary>
+ Проверка на нахождение вектора между векторами-границами
+ </summary>
+</member>
+<member name="M:Bwl.Imaging.VectorTools.AngleBetweenVectors(System.Drawing.PointF,System.Drawing.PointF)">
+ <summary>
+ Вычисление модуля угла между векторами №1
+ </summary>
+</member>
+<member name="M:Bwl.Imaging.VectorTools.AnglePathBetweenVectors(System.Drawing.PointF,System.Drawing.PointF)">
+ <summary>
+ Вычисление углового перехода между двумя векторами
+ </summary>    
+</member>
 </members>
 </doc>

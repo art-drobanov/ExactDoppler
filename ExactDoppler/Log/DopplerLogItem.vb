@@ -1,5 +1,5 @@
 ﻿Public Class DopplerLogItem
-    Public Shared ReadOnly DateTimeFormat As String = "yyyy.MM.dd__HH.mm.ss.ffff"
+    Public Shared ReadOnly DateTimeFormat As String = "yyyy-MM-dd HH:mm:ss zzz"
     Private Const _diffThr = 15
     Public Property Time As DateTime
     Public Property LowDoppler As Single
@@ -44,7 +44,7 @@
     End Sub
 
     Public Overrides Function ToString() As String
-        Return String.Format("DMY:{0}, L:{1}%, H:{2}%; Type:{3}, Carrier:{4};",
+        Return String.Format("{0}, L:{1}%, H:{2}%, Type:{3}, Carrier:{4};",
                              Time.ToString(DateTimeFormat),
                              LowDoppler.ToString("00.00").Replace(",", "."),
                              HighDoppler.ToString("00.00").Replace(",", "."),

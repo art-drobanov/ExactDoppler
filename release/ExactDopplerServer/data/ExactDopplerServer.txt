@@ -1,4 +1,4 @@
-DMY:2016.10.15__19.28.17.5570, L:00.00%, H:52.18%; Type:Motion++, Carrier:OK;
-DMY:2016.10.15__19.28.18.2665, L:90.29%, H:00.00%; Type:Motion--, Carrier:OK;
-DMY:2016.10.15__19.28.18.9275, L:00.00%, H:80.45%; Type:Motion++, Carrier:OK;
-DMY:2016.10.15__19.28.19.6028, L:69.85%, H:35.06%; Type:Motion--, Carrier:OK;
+2016-10-30 00:16:44 +03:00, L:00.00%, H:99.99%, Type:Motion++, Carrier:OK;
+2016-10-30 00:16:45 +03:00, L:99.99%, H:01.33%, Type:Motion--, Carrier:OK;
+2016-10-30 00:16:47 +03:00, L:00.00%, H:99.99%, Type:Motion++, Carrier:OK;
+2016-10-30 00:16:48 +03:00, L:99.99%, H:62.84%, Type:Motion--, Carrier:OK;

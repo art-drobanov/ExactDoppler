@@ -12,9 +12,9 @@ Public Class DopplerLog
         End Get
     End Property
 
-    Public Sub Add(time As DateTime, L As Single, H As Single, carrierIsOK As Boolean)
+    Public Sub Add(timestamp As DateTime, L As Single, H As Single, carrierIsOK As Boolean)
         SyncLock SyncRoot
-            Dim item = New DopplerLogItem(time, L, H, carrierIsOK)
+            Dim item = New DopplerLogItem(timestamp, L, H, carrierIsOK)
             _items.AddLast(item)
         End SyncLock
     End Sub
@@ -45,45 +45,40 @@ Public Class DopplerLog
         While True
             Dim logItemString = sr.ReadLine()
             If logItemString Is Nothing Then Exit While
-            Dim logItemStrings = logItemString.ToUpper().Replace("DMY", String.Empty) _
-                                                        .Replace("CARRIER", String.Empty) _
-                                                        .Replace("L", String.Empty) _
-                                                        .Replace("H", String.Empty) _
-                                                        .Replace("TYPE", String.Empty) _
-                                                        .Replace("NO", String.Empty) _
-                                                        .Replace("MOTION", String.Empty) _
-                                                        .Replace("!", String.Empty) _
-                                                        .Replace("+", String.Empty) _
-                                                        .Replace("-", String.Empty) _
+            Dim logItemStrings = logItemString.ToUpper().Replace("L:", String.Empty) _
+                                                        .Replace("H:", String.Empty) _
+                                                        .Replace("%", String.Empty) _
+                                                        .Replace("TYPE:MOTION++", String.Empty) _
+                                                        .Replace("TYPE:MOTION--", String.Empty) _
+                                                        .Replace("TYPE:MOTION+-", String.Empty) _
+                                                        .Replace("TYPE:NOMOTION", String.Empty) _
+                                                        .Replace("CARRIER!", String.Empty) _                                                        
                                                         .Replace(";", String.Empty) _
-                                                        .Replace(":", String.Empty) _
-                                                        .Replace(" ", String.Empty) _
                                                         .Split(",")
-
             Dim T As DateTime
             Dim L As Single
             Dim H As Single
             Dim C As Boolean
 
             If Not DateTime.TryParseExact(logItemStrings(0), DopplerLogItem.DateTimeFormat, Nothing, DateTimeStyles.None, T) Then
-                Throw New Exception(String.Format("DopplerLog: Can't parse 'DMY:{0}' from log", logItemStrings(0)))
+                Throw New Exception(String.Format("DopplerLog: Can't parse '{0}' from log", logItemStrings(0)))
             End If
 
-            logItemStrings(1) = logItemStrings(1).Replace("%", String.Empty)
+            logItemStrings(1) = logItemStrings(1).Trim()
             If Not Single.TryParse(logItemStrings(1).Replace(".", ","), L) Then
                 If Not Single.TryParse(logItemStrings(1).Replace(",", "."), L) Then
                     Throw New Exception(String.Format("DopplerLog: Can't parse 'L:{0}' from log", logItemStrings(1)))
                 End If
             End If
 
-            logItemStrings(2) = logItemStrings(2).Replace("%", String.Empty)
+            logItemStrings(2) = logItemStrings(2).Trim()
             If Not Single.TryParse(logItemStrings(2).Replace(".", ","), H) Then
                 If Not Single.TryParse(logItemStrings(2).Replace(",", "."), H) Then
                     Throw New Exception(String.Format("DopplerLog: Can't parse 'H:{0}' from log", logItemStrings(2)))
                 End If
             End If
 
-            If logItemStrings(3).Contains("OK") AndAlso Not logItemStrings(3).Contains("ERR") Then
+            If logItemStrings(4).Contains("OK") AndAlso Not logItemStrings(3).Contains("ERR") Then
                 C = True
             Else
                 C = False

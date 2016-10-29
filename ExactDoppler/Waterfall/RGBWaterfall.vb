@@ -7,12 +7,42 @@ Imports ExactAudio
 ''' </summary>
 Public Class RGBWaterfall
     Private _waterfallRowBlocks As New Queue(Of RGBMatrix)
+    Private _maxBlocksCount As Integer = 1500
+    Private _droppedBlocksCount As Long = 0
+
+    Public Property MaxBlocksCount As Integer
+        Get
+            SyncLock SyncRoot
+                Return _maxBlocksCount
+            End SyncLock
+        End Get
+        Set(value As Integer)
+            _maxBlocksCount = value
+        End Set
+    End Property
+
+    Public ReadOnly Property BlocksCount As Integer
+        Get
+            SyncLock SyncRoot
+                Return _waterfallRowBlocks.Count
+            End SyncLock
+        End Get
+    End Property
+
+    Public ReadOnly Property DroppedBlocksCount As Long
+        Get
+            SyncLock SyncRoot
+                Return _droppedBlocksCount
+            End SyncLock
+        End Get
+    End Property
 
     Public ReadOnly SyncRoot As New Object
 
     Public Sub Clear()
         SyncLock SyncRoot
             _waterfallRowBlocks.Clear()
+            _droppedBlocksCount = 0
         End SyncLock
     End Sub
 
@@ -25,6 +55,11 @@ Public Class RGBWaterfall
                     End If
                 End If
                 _waterfallRowBlocks.Enqueue(waterfallRowBlock)
+                Dim blocksToRemove = _waterfallRowBlocks.Count - MaxBlocksCount
+                For i = 1 To blocksToRemove
+                    _waterfallRowBlocks.Dequeue()
+                    _droppedBlocksCount += 1
+                Next
             End If
         End SyncLock
     End Sub
@@ -37,7 +72,7 @@ Public Class RGBWaterfall
 
             Dim globalRowOffset As Integer = 0
             For Each rowBlock In _waterfallRowBlocks
-                Parallel.For(0, 3, Sub(channel)
+                Parallel.For(0, 3, Sub(channel As Integer)
                                        Dim target = waterfall.Matrix(channel)
                                        Dim source = rowBlock.Matrix(channel)
                                        For i = 0 To rowBlock.Height - 1

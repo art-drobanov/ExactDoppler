@@ -19,7 +19,7 @@ Public Class Normalizer
     End Sub
 
     Public Sub Normalize(data As Double(,))
-        Parallel.For(0, data.GetLength(0), Sub(i)
+        Parallel.For(0, data.GetLength(0), Sub(i As Integer)
                                                For j = 0 To data.GetLength(1) - 1
                                                    data(i, j) = ((data(i, j) + PreOffset) * Mult) + PostOffset
                                                Next
@@ -27,7 +27,7 @@ Public Class Normalizer
     End Sub
 
     Public Sub Normalize(data As Double()())
-        Parallel.For(0, data.Length, Sub(i)
+        Parallel.For(0, data.Length, Sub(i As Integer)
                                          Dim row = data(i)
                                          For j = 0 To row.Length - 1
                                              row(j) = ((row(j) + PreOffset) * Mult) + PostOffset
@@ -36,7 +36,7 @@ Public Class Normalizer
     End Sub
 
     Public Sub Normalize(data As Double())
-        Parallel.For(0, data.Length, Sub(i)
+        Parallel.For(0, data.Length, Sub(i As Integer)
                                          data(i) = ((data(i) + PreOffset) * Mult) + PostOffset
                                      End Sub)
     End Sub

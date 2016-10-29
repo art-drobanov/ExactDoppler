@@ -85,7 +85,7 @@
     <Compile Include="ExactDoppler.vb" />
     <Compile Include="Log\DopplerLog.vb" />
     <Compile Include="Log\DopplerLogItem.vb" />
-    <Compile Include="Math\ExactMath.vb" />
+    <Compile Include="Math\ExactAudioMath.vb" />
     <Compile Include="Motion\MotionExplorer.vb" />
     <Compile Include="Motion\MotionExplorerResult.vb" />
     <Compile Include="Motion\RowNZeroesFilter.vb" />

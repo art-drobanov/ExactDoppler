@@ -49,6 +49,7 @@ Partial Class MainForm
         Me._dopplerLogItemLabel = New System.Windows.Forms.Label()
         Me._carrierLogItemLabel_ = New System.Windows.Forms.Label()
         Me._carrierLogItemLabel = New System.Windows.Forms.Label()
+        Me._PNGButton = New System.Windows.Forms.Button()
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me._frequencyGroupBox.SuspendLayout()
         CType(Me._volumeTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -163,6 +164,7 @@ Partial Class MainForm
         '
         '_inputGroupBox
         '
+        Me._inputGroupBox.Controls.Add(Me._PNGButton)
         Me._inputGroupBox.Controls.Add(Me._centralBlindZoneGroupBox)
         Me._inputGroupBox.Controls.Add(Me._inputAudioDevicesRefreshButton)
         Me._inputGroupBox.Controls.Add(Me._inputAudioDevicesListBox)
@@ -321,6 +323,16 @@ Partial Class MainForm
         Me._carrierLogItemLabel.TabIndex = 25
         Me._carrierLogItemLabel.Text = "-"
         '
+        '_PNGButton
+        '
+        Me._PNGButton.BackColor = System.Drawing.Color.Silver
+        Me._PNGButton.Location = New System.Drawing.Point(214, 289)
+        Me._PNGButton.Name = "_PNGButton"
+        Me._PNGButton.Size = New System.Drawing.Size(47, 32)
+        Me._PNGButton.TabIndex = 20
+        Me._PNGButton.Text = "PNG"
+        Me._PNGButton.UseVisualStyleBackColor = False
+        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -339,7 +351,7 @@ Partial Class MainForm
         Me.MaximizeBox = False
         Me.Name = "MainForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "ExactDopplerTest (25.10.2016)"
+        Me.Text = "ExactDopplerTest (30.10.2016)"
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me._frequencyGroupBox.ResumeLayout(False)
         Me._frequencyGroupBox.PerformLayout()
@@ -382,4 +394,5 @@ Partial Class MainForm
     Friend WithEvents _dopplerLogItemLabel As Label
     Friend WithEvents _carrierLogItemLabel_ As System.Windows.Forms.Label
     Friend WithEvents _carrierLogItemLabel As System.Windows.Forms.Label
+    Friend WithEvents _PNGButton As System.Windows.Forms.Button
 End Class

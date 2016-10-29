@@ -20,7 +20,7 @@ Public Class PaletteProcessor
     Public Function Process(data As Double()()) As RGBMatrix
         CheckPalette()
         Dim rgbResult As New RGBMatrix(data(0).Length, data.Length)
-        Parallel.For(0, data.Length(), Sub(i)
+        Parallel.For(0, data.Length(), Sub(i As Integer)
                                            Dim rgbRow = Process(data(i))
                                            For j = 0 To rgbRow.Width - 1
                                                Dim R = rgbRow.Red(j, 0)
@@ -41,7 +41,7 @@ Public Class PaletteProcessor
             .Normalize(data)
         End With
         Dim rgb = New RGBMatrix(data.Length, 1)
-        Parallel.For(0, data.Length(), Sub(i)
+        Parallel.For(0, data.Length(), Sub(i As Integer)
                                            Dim val = If(Double.IsNaN(data(i)), 0, data(i))
                                            val = If(val < 0, 0, val)
                                            val = If(val > _maxPaletteIdx, _maxPaletteIdx, val)

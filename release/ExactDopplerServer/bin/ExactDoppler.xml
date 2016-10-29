@@ -55,6 +55,12 @@ ExactDoppler
 	<param name="zeroDbLevel">"Нулевой" уровень логарифмической шкалы.</param>
 	<param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
 	<returns>"Результат анализа движения".</returns>
+</member><member name="M:ExactAudio.MotionExplorer.HarmSlicesSumImageInDb(System.Double[][],System.Int32)">
+	<summary>
+ Получение изображения, каждая строка которого содержит "размноженную" сумму гармоник исходной строки
+ </summary>
+	<param name="mag">Магнитудная сонограмма ("водопад").</param>
+	<param name="width">Требуемая ширина итогового изображения.</param>
 </member><member name="M:ExactAudio.MotionExplorer.DopplerFilterDb(System.Double[][],System.Int32,System.Int32)">
 	<summary>
  Фильтр доплеровских всплесков
@@ -99,12 +105,13 @@ ExactDoppler
  Конструктор
  </summary>
 	<param name="config">Конфигурация доплеровского анализатора.</param>
-</member><member name="M:ExactAudio.ExactDoppler.Process(System.Single[],System.Int32)">
+</member><member name="M:ExactAudio.ExactDoppler.Process(System.Single[],System.Int32,System.DateTime)">
 	<summary>
  Основной метод обработки
  </summary>
 	<param name="pcmSamples">Pcm-семплы.</param>
 	<param name="pcmSamplesCount">Количество семплов (для учета режима моно/стерео).</param>
+	<param name="timestamp">Штамп даты/времени.</param>
 	<returns>"Результат анализа движения".</returns>
 </member><member name="M:ExactAudio.ExactDoppler.SwitchOnGen">
 	<summary>
@@ -127,12 +134,13 @@ ExactDoppler
 	<summary>
  Останов
  </summary>
-</member><member name="M:ExactAudio.ExactDoppler.SampleProcessor(System.Single[],System.Int32)">
+</member><member name="M:ExactAudio.ExactDoppler.SampleProcessor(System.Single[],System.Int32,System.DateTime)">
 	<summary>
  Обработчик Pcm-семплов
  </summary>
 	<param name="pcmSamples">Pcm-семплы.</param>
 	<param name="pcmSamplesCount">Количество семплов (для учета режима моно/стерео).</param>
+	<param name="timestamp">Штамп даты/времени.</param>
 </member><member name="T:ExactAudio.ExactDoppler">
 	<summary>
  Доплеровский акустический детектор

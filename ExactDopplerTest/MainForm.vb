@@ -3,7 +3,7 @@ Imports ExactAudio
 
 Public Class MainForm
     Private WithEvents _exactDoppler As New ExactDoppler()
-    Private _waterfall As New RGBWaterfall
+    Private _waterfall As New RGBWaterfall With {.MaxBlocksCount = 12}
     Private _blocksCounter As Long = 0
 
     Public Sub New()
@@ -32,12 +32,15 @@ Public Class MainForm
         Dim waterfallBlock = motionExplorerResult.Image
         _waterfall.Add(waterfallBlock)
         _waterfallDisplayBitmapControl.Invoke(Sub()
-                                                  Dim bmp = New Bitmap(waterfallBlock.ToBitmap(1.0), _waterfallDisplayBitmapControl.Width, _waterfallDisplayBitmapControl.Height)
-                                                  With _waterfallDisplayBitmapControl
-                                                      .DisplayBitmap.DrawBitmap(bmp)
-                                                      .Refresh()
-                                                  End With
-                                              End Sub)        
+                                                  Dim wfBmp = _waterfall.ToBitmap(1.0)
+                                                  If wfBmp IsNot Nothing Then
+                                                      Dim bmp = New Bitmap(wfBmp, _waterfallDisplayBitmapControl.Width, _waterfallDisplayBitmapControl.Height)
+                                                      With _waterfallDisplayBitmapControl
+                                                          .DisplayBitmap.DrawBitmap(bmp)
+                                                          .Refresh()
+                                                      End With
+                                                  End If
+                                              End Sub)
         'GUI
         _blocksCounter += 1
         Me.Invoke(Sub()
@@ -53,7 +56,7 @@ Public Class MainForm
         _exactDoppler.Stop()
 
         'FileName
-        Dim snapshotFilename = DateTime.Now.ToString("yyyy.MM.dd__HH.mm.ss.ffff")
+        Dim snapshotFilename = DateTime.Now.ToString("yyyy-MM-dd__HH.mm.ss.ffff")
 
         'DopplerLog
         If _exactDoppler.DopplerLog.Items.Any() Then
@@ -81,6 +84,15 @@ Public Class MainForm
         'GUI
         _inputGroupBox.Text = "Input [ OFF ]"
         _captureOnButton.BackColor = Color.MediumSpringGreen
+    End Sub
+
+    Private Sub _PNGButton_Click(sender As Object, e As EventArgs) Handles _PNGButton.Click
+        Dim snapshotFilename = DateTime.Now.ToString("yyyy-MM-dd__HH.mm.ss.ffff")
+        'WaterFall
+        Dim waterfall = _waterfall.ToBitmap()
+        If waterfall IsNot Nothing Then
+            waterfall.Save("dopplerImg__" + snapshotFilename + ".png")
+        End If
     End Sub
 
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load

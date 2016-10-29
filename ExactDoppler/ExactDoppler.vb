@@ -1,4 +1,6 @@
-﻿Imports ExactAudio.MotionExplorer
+﻿Imports System.Drawing
+Imports Bwl.Imaging
+Imports ExactAudio.MotionExplorer
 
 ''' <summary>
 ''' Доплеровский акустический детектор
@@ -166,8 +168,9 @@ Public Class ExactDoppler
     ''' </summary>
     ''' <param name="pcmSamples">Pcm-семплы.</param>
     ''' <param name="pcmSamplesCount">Количество семплов (для учета режима моно/стерео).</param>
+    ''' <param name="timestamp">Штамп даты/времени.</param>
     ''' <returns>"Результат анализа движения".</returns>
-    Public Function Process(pcmSamples As Single(), pcmSamplesCount As Integer) As MotionExplorerResult
+    Public Function Process(pcmSamples As Single(), pcmSamplesCount As Integer, timestamp As DateTime) As MotionExplorerResult
         SyncLock SyncRoot
             'Параметры
             Dim lowFreq As Double = 0
@@ -186,11 +189,46 @@ Public Class ExactDoppler
 
             'Обработка
             Dim motionExplorerResult = _motionExplorer.Process(pcmSamples, pcmSamplesCount, lowFreq, highFreq, _config.BlindZone)
+            motionExplorerResult.Timestamp = timestamp
+
+            'Штамп даты и времени
+            Dim strW = 220
+            Dim strH = 20
+            If motionExplorerResult.Image.Height >= strH Then
+                Dim resW = strW + motionExplorerResult.Image.Width
+                Dim resH = motionExplorerResult.Image.Height
+                Dim result = New RGBMatrix(resW, resH)
+                Dim stringImg As RGBMatrix
+                Using bmp = New Bitmap(strW, strH)
+                    Using gr = Graphics.FromImage(bmp)
+                        Dim timeStr = timestamp.ToString("yyyy-MM-dd HH:mm:ss zzz")
+                        gr.DrawString(timeStr, New System.Drawing.Font("Microsoft Sans Serif", 12.0F), Brushes.AntiqueWhite, New PointF(0, 0))
+                    End Using
+                    stringImg = BitmapConverter.BitmapToRGBMatrix(bmp)
+                    'bmp.Save(Now.Ticks.ToString() + ".bmp", System.Drawing.Imaging.ImageFormat.Bmp)
+                End Using
+                Parallel.For(0, 3, Sub(channel As Integer)
+                                       For i = 0 To stringImg.Height - 1
+                                           For j = 0 To stringImg.Width - 1
+                                               result.Matrix(channel)(j, i) = stringImg.Matrix(channel)(j, i)
+                                           Next
+                                       Next
+                                   End Sub)
+                Parallel.For(0, 3, Sub(channel As Integer)
+                                       For i = 0 To motionExplorerResult.Image.Height - 1
+                                           For j = 0 To motionExplorerResult.Image.Width - 1
+                                               result.Matrix(channel)(strW + j, i) = motionExplorerResult.Image.Matrix(channel)(j, i)
+                                           Next
+                                       Next
+                                   End Sub)
+                motionExplorerResult.Image = result
+            Else
+                Return Nothing
+            End If
 
             'Доплер-лог
             Static Dim lowDopplerAvgSum As Single
             Static Dim highDopplerAvgSum As Single
-            Dim nowTimeStamp = DateTime.Now
 
             With motionExplorerResult
                 lowDopplerAvgSum += .LowDoppler.Average() 'Накопление по нижней полосе
@@ -215,7 +253,7 @@ Public Class ExactDoppler
                 Dim carrierIsOK = .CarrierLevel.Min() >= _config.CarrierWarningLevel
 
                 'Элемент лога
-                Dim logItem = New DopplerLogItem(nowTimeStamp, lowDopplerAvg, highDopplerAvg, carrierIsOK)
+                Dim logItem = New DopplerLogItem(timestamp, lowDopplerAvg, highDopplerAvg, carrierIsOK)
                 motionExplorerResult.DopplerLogItem = logItem
                 If lowDopplerAvg <> 0 OrElse highDopplerAvg <> 0 OrElse Not carrierIsOK Then 'Если несущей нет - это тоже событие!
                     motionExplorerResult.IsWarning = True
@@ -287,8 +325,11 @@ Public Class ExactDoppler
     ''' </summary>
     ''' <param name="pcmSamples">Pcm-семплы.</param>
     ''' <param name="pcmSamplesCount">Количество семплов (для учета режима моно/стерео).</param>
-    Private Sub SampleProcessor(pcmSamples As Single(), pcmSamplesCount As Integer)
-        Dim motionExplorerResult = Process(pcmSamples, pcmSamplesCount)
-        RaiseEvent PcmSamplesProcessed(motionExplorerResult)
+    ''' <param name="timestamp">Штамп даты/времени.</param>
+    Private Sub SampleProcessor(pcmSamples As Single(), pcmSamplesCount As Integer, timestamp As DateTime)
+        Dim motionExplorerResult = Process(pcmSamples, pcmSamplesCount, timestamp)
+        If motionExplorerResult IsNot Nothing Then
+            RaiseEvent PcmSamplesProcessed(motionExplorerResult)
+        End If
     End Sub
 End Class

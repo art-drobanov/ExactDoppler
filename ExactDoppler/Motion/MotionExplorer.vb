@@ -50,8 +50,8 @@ Public Class MotionExplorer
         Dim result As New MotionExplorerResult With {.Duration = mag(0).Length * MyBase.SonogramRowDuration}
 
         'DbScale + Filtering
-        Dim squelchInDb = ExactMath.Db(AutoGainAndGetSquelch(mag, _brightness), _zeroDbLevel)
-        ExactMath.DbScale(mag, _zeroDbLevel, squelchInDb)
+        Dim squelchInDb = ExactAudioMath.Db(AutoGainAndGetSquelch(mag, _brightness), _zeroDbLevel)
+        ExactAudioMath.DbScale(mag, _zeroDbLevel, squelchInDb)
         DopplerFilterDb(mag, _rowFilterMemorySize, _NZeroes)
 
         'Detection
@@ -109,7 +109,7 @@ Public Class MotionExplorer
 
         'Bitmap-вывод
         Dim rightSideOffset = magRGB.Width - sideWidth
-        Parallel.For(0, 3, Sub(channel)
+        Parallel.For(0, 3, Sub(channel As Integer)
                                Dim image = magRGB.Matrix(channel)
                                For i = 0 To magRGB.Height - 1
                                    'Левая часть "индикатора"
@@ -145,21 +145,26 @@ Public Class MotionExplorer
         Return result
     End Function
 
+    ''' <summary>
+    ''' Получение изображения, каждая строка которого содержит "размноженную" сумму гармоник исходной строки
+    ''' </summary>
+    ''' <param name="mag">Магнитудная сонограмма ("водопад").</param>
+    ''' <param name="width">Требуемая ширина итогового изображения.</param>
     Private Function HarmSlicesSumImageInDb(mag As Double()(), width As Integer) As Double()()
         Dim result = New Double(mag.Length - 1)() {}
         For i = 0 To result.Length - 1
             result(i) = New Double(width - 1) {}
         Next
-        Parallel.For(0, mag.Length, Sub(i)
+        Parallel.For(0, mag.Length, Sub(i As Integer)
                                         Dim row = mag(i)
                                         Dim sum As Double = 0
                                         For j = 0 To row.Length - 1
                                             If row(j) > Double.MinValue Then
-                                                sum += ExactMath.DbInv(row(j), _zeroDbLevel) '[1] Re-Exp
+                                                sum += ExactAudioMath.DbInv(row(j), _zeroDbLevel) '[1] Re-Exp
                                             End If
                                         Next
                                         sum /= CDbl(row.Length)
-                                        sum = ExactMath.Db(sum, _zeroDbLevel) '[2] Re-Log
+                                        sum = ExactAudioMath.Db(sum, _zeroDbLevel) '[2] Re-Log
 
                                         Dim target = result(i)
                                         For col = 0 To target.Length - 1
@@ -177,7 +182,7 @@ Public Class MotionExplorer
     ''' <param name="NZeroes">Допустимое количество "нулевых" уровней.</param>
     Private Sub DopplerFilterDb(mag As Double()(), rowFilterMemorySize As Integer, NZeroes As Integer)
         Dim center = mag(0).Length / 2
-        Parallel.For(0, mag.Length, Sub(i)
+        Parallel.For(0, mag.Length, Sub(i As Integer)
                                         Dim row = mag(i)
 
                                         'Нижняя доплеровская полоса
@@ -208,7 +213,7 @@ Public Class MotionExplorer
         'Вычисление средней энергии по центру спектра
         Dim center = mag(0).Length / 2
         Dim currentNRG As Double = 0
-        Parallel.For(0, mag.Length, Sub(i)
+        Parallel.For(0, mag.Length, Sub(i As Integer)
                                         Dim row = mag(i)
                                         For j = center - _gainHarmRadius To center + _gainHarmRadius Step 1
                                             currentNRG += row(j)
@@ -224,7 +229,7 @@ Public Class MotionExplorer
 
         'Уровень "шумовой" энергии
         Dim noiseMaxNRG = Double.MinValue
-        Parallel.For(0, mag.Length, Sub(i)
+        Parallel.For(0, mag.Length, Sub(i As Integer)
                                         'Усиление
                                         Dim row = mag(i)
                                         For j = 0 To row.Length - 1

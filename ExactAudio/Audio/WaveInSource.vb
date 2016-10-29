@@ -1,6 +1,6 @@
 ﻿Imports NAudio.Wave
 
-Public Delegate Sub SampleProcessorDelegate(samples As Single(), samplesCount As Integer)
+Public Delegate Sub SampleProcessorDelegate(samples As Single(), samplesCount As Integer, timestamp As DateTime)
 
 Public Class WaveInSource
     Private _started As Boolean
@@ -41,18 +41,19 @@ Public Class WaveInSource
     End Sub
 
     Private Sub WaveDataAvailable(sender As Object, e As WaveInEventArgs) Handles _waveIn.DataAvailable
+        Dim timestamp = DateTime.Now
         Dim samples As Single() = Nothing
         Dim maxValue As Single = Math.Pow(2, _waveFormat.BitsPerSample - 1)
         Select Case _waveFormat.BitsPerSample
             Case 16
                 samples = New Single((e.Buffer.Length \ 2) - 1) {}
-                Parallel.For(0, samples.Length, Sub(bufferIdx)
+                Parallel.For(0, samples.Length, Sub(bufferIdx As Integer)
                                                     Dim intSample = BitConverter.ToInt16(e.Buffer, bufferIdx * 2)
                                                     samples(bufferIdx) = intSample / maxValue
                                                 End Sub)
             Case 24
                 samples = New Single((e.Buffer.Length \ 3) - 1) {}
-                Parallel.For(0, samples.Length, Sub(bufferIdx)
+                Parallel.For(0, samples.Length, Sub(bufferIdx As Integer)
                                                     Dim intSample = BytesToInt24(e.Buffer, bufferIdx * 3)
                                                     samples(bufferIdx) = intSample / maxValue
                                                 End Sub)
@@ -61,7 +62,7 @@ Public Class WaveInSource
         End Select
 
         If SampleProcessor IsNot Nothing AndAlso samples IsNot Nothing Then
-            SampleProcessor(samples, samples.Length / _waveFormat.Channels)
+            SampleProcessor(samples, samples.Length / _waveFormat.Channels, timestamp)
         End If
     End Sub
 

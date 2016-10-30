@@ -34,6 +34,7 @@ Partial Class MainForm
         Me._outputAudioDevicesRefreshButton = New System.Windows.Forms.Button()
         Me._outputAudioDevicesListBox = New System.Windows.Forms.ListBox()
         Me._inputGroupBox = New System.Windows.Forms.GroupBox()
+        Me._scrButton = New System.Windows.Forms.Button()
         Me._centralBlindZoneGroupBox = New System.Windows.Forms.GroupBox()
         Me._blindZoneLabel = New System.Windows.Forms.Label()
         Me._blindZoneTrackBar = New System.Windows.Forms.TrackBar()
@@ -49,7 +50,6 @@ Partial Class MainForm
         Me._dopplerLogItemLabel = New System.Windows.Forms.Label()
         Me._carrierLogItemLabel_ = New System.Windows.Forms.Label()
         Me._carrierLogItemLabel = New System.Windows.Forms.Label()
-        Me._PNGButton = New System.Windows.Forms.Button()
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me._frequencyGroupBox.SuspendLayout()
         CType(Me._volumeTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -164,7 +164,7 @@ Partial Class MainForm
         '
         '_inputGroupBox
         '
-        Me._inputGroupBox.Controls.Add(Me._PNGButton)
+        Me._inputGroupBox.Controls.Add(Me._scrButton)
         Me._inputGroupBox.Controls.Add(Me._centralBlindZoneGroupBox)
         Me._inputGroupBox.Controls.Add(Me._inputAudioDevicesRefreshButton)
         Me._inputGroupBox.Controls.Add(Me._inputAudioDevicesListBox)
@@ -178,6 +178,16 @@ Partial Class MainForm
         Me._inputGroupBox.TabIndex = 10
         Me._inputGroupBox.TabStop = False
         Me._inputGroupBox.Text = "Input [ OFF ]"
+        '
+        '_scrButton
+        '
+        Me._scrButton.BackColor = System.Drawing.Color.Silver
+        Me._scrButton.Location = New System.Drawing.Point(214, 289)
+        Me._scrButton.Name = "_scrButton"
+        Me._scrButton.Size = New System.Drawing.Size(47, 32)
+        Me._scrButton.TabIndex = 20
+        Me._scrButton.Text = "Scr"
+        Me._scrButton.UseVisualStyleBackColor = False
         '
         '_centralBlindZoneGroupBox
         '
@@ -323,16 +333,6 @@ Partial Class MainForm
         Me._carrierLogItemLabel.TabIndex = 25
         Me._carrierLogItemLabel.Text = "-"
         '
-        '_PNGButton
-        '
-        Me._PNGButton.BackColor = System.Drawing.Color.Silver
-        Me._PNGButton.Location = New System.Drawing.Point(214, 289)
-        Me._PNGButton.Name = "_PNGButton"
-        Me._PNGButton.Size = New System.Drawing.Size(47, 32)
-        Me._PNGButton.TabIndex = 20
-        Me._PNGButton.Text = "PNG"
-        Me._PNGButton.UseVisualStyleBackColor = False
-        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -351,7 +351,7 @@ Partial Class MainForm
         Me.MaximizeBox = False
         Me.Name = "MainForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "ExactDopplerTest (30.10.2016)"
+        Me.Text = "ExactDopplerTest v0.1"
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me._frequencyGroupBox.ResumeLayout(False)
         Me._frequencyGroupBox.PerformLayout()
@@ -394,5 +394,5 @@ Partial Class MainForm
     Friend WithEvents _dopplerLogItemLabel As Label
     Friend WithEvents _carrierLogItemLabel_ As System.Windows.Forms.Label
     Friend WithEvents _carrierLogItemLabel As System.Windows.Forms.Label
-    Friend WithEvents _PNGButton As System.Windows.Forms.Button
+    Friend WithEvents _scrButton As System.Windows.Forms.Button
 End Class

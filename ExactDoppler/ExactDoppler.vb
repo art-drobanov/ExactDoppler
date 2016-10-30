@@ -8,7 +8,7 @@ Imports ExactAudio.MotionExplorer
 Public Class ExactDoppler
     'Константы
     Private Const _windowSize = 32768 '32768
-    Private Const _windowStep = 809 '809 = Round(32768 / (3 * 3 * 3 * 1.5))
+    Private Const _windowStep = 809 '809 = Round(32768 / (3 * 3 * 3 * 1.5)) -> 2/81
     Private Const _sampleRate = 48000 '48000
     Private Const _dopplerSize = 500 '500
     Private Const _nBitsCapture = 16 '16
@@ -20,6 +20,7 @@ Public Class ExactDoppler
     Private _inputDeviceIdx As Integer = -1
     Private _outputDeviceIdx As Integer = -1
     Private _dopplerLog As New DopplerLog()
+    Private _config As ExactDopplerConfig
 
     'Объекты
     Private _capture As WaveInSource
@@ -135,7 +136,6 @@ Public Class ExactDoppler
             End SyncLock
         End Set
     End Property
-    Private _config As ExactDopplerConfig
 
     ''' <summary>
     ''' Событие "Pcm-семплы обработаны"
@@ -202,7 +202,7 @@ Public Class ExactDoppler
                 Using bmp = New Bitmap(strW, strH)
                     Using gr = Graphics.FromImage(bmp)
                         Dim timeStr = timestamp.ToString("yyyy-MM-dd HH:mm:ss zzz")
-                        gr.DrawString(timeStr, New System.Drawing.Font("Microsoft Sans Serif", 12.0F), Brushes.AntiqueWhite, New PointF(0, 0))
+                        gr.DrawString(timeStr, New System.Drawing.Font("Microsoft Sans Serif", 12.0F), Brushes.LightSlateGray, New PointF(0, 0))
                     End Using
                     stringImg = BitmapConverter.BitmapToRGBMatrix(bmp)
                     'bmp.Save(Now.Ticks.ToString() + ".bmp", System.Drawing.Imaging.ImageFormat.Bmp)

@@ -32,7 +32,7 @@ Public Class MotionExplorer
     Public Sub New(frameWidth As Integer, frameStep As Integer, sampleRate As Integer, nBits As Integer, stereo As Boolean)
         MyBase.New(frameWidth, frameStep, sampleRate, nBits, stereo)
         _targetNRG = Math.Pow(2, nBits - 1)
-        _paletteProcessor = New PaletteProcessor()        
+        _paletteProcessor = New PaletteProcessor()
     End Sub
 
     ''' <summary>
@@ -78,8 +78,7 @@ Public Class MotionExplorer
         Dim carrierNorm = ((carrierHighHarm - carrierLowHarm) - 1)
 
         Dim lowDoppler = ExactPlotter.SubBand(mag, lowDopplerLowHarm, lowDopplerHighHarm)
-        Dim highDoppler = ExactPlotter.SubBand(mag, highDopplerLowHarm, highDopplerHighHarm)
-        Dim sideWidth = mag(0).Length \ _sideFormDivider
+        Dim highDoppler = ExactPlotter.SubBand(mag, highDopplerLowHarm, highDopplerHighHarm)        
         Dim lowDopplerImage = HarmSlicesSumImageInDb(lowDoppler, 1)
         Dim highDopplerImage = HarmSlicesSumImageInDb(highDoppler, 1)
 
@@ -107,11 +106,32 @@ Public Class MotionExplorer
             result.CarrierLevel.AddLast(carrierLevel)
         Next
 
-        'Bitmap-вывод
-        Dim rightSideOffset = magRGB.Width - sideWidth
+        'Bitmap-вывод        
         Parallel.For(0, 3, Sub(channel As Integer)
                                Dim image = magRGB.Matrix(channel)
                                For i = 0 To magRGB.Height - 1
+
+                                   'Линии-ограничители
+                                   Dim color = Drawing.Color.LightSlateGray
+                                   If channel = _redChannel Then
+                                       image(0, i) = color.R * 0.75
+                                       image(1, i) = color.R
+                                       image(magRGB.Width - 1, i) = color.R * 0.75
+                                       image(magRGB.Width - 2, i) = color.R
+                                   End If
+                                   If channel = _greenChannel Then
+                                       image(0, i) = color.G * 0.75
+                                       image(1, i) = color.G
+                                       image(magRGB.Width - 1, i) = color.G * 0.75
+                                       image(magRGB.Width - 2, i) = color.G
+                                   End If
+                                   If channel = _blueChannel Then
+                                       image(0, i) = color.B * 0.75
+                                       image(1, i) = color.B
+                                       image(magRGB.Width - 1, i) = color.B * 0.75
+                                       image(magRGB.Width - 2, i) = color.B
+                                   End If
+
                                    'Левая часть "индикатора"
                                    For j = lowDopplerHighHarm To centerHarm - _carrierRadius
                                        If channel = _redChannel Then

@@ -1,0 +1,6 @@
+30.10.2016 17:15:38 ROOT [Msg] Application startup
+30.10.2016 17:15:38 ROOT [Inf] Application executable path: D:\Cleverflow.home\me.storage\ExactDoppler\release\DopplerGuard\bin\DopplerGuard.exe
+30.10.2016 17:15:38 ROOT [Inf] Application executable date: 30.10.2016 17:15:07
+30.10.2016 17:15:50 ROOT [Msg] Application startup
+30.10.2016 17:15:50 ROOT [Inf] Application executable path: D:\Cleverflow.home\me.storage\ExactDoppler\release\DopplerGuard\bin\DopplerGuard.exe
+30.10.2016 17:15:50 ROOT [Inf] Application executable date: 30.10.2016 17:15:07

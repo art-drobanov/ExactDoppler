@@ -84,7 +84,7 @@
   <ItemGroup>
     <Compile Include="Audio\Utils\DTMFGenerator.vb" />
     <Compile Include="Audio\SineGenerator\SineTaskBlock.vb" />
-    <Compile Include="Audio\SineGenerator\SineWaveProgramProvider32.vb" />
+    <Compile Include="Audio\SineGenerator\ProgrammedSineWaveProvider32.vb" />
     <Compile Include="Imaging\ImageUtils.vb" />
     <Compile Include="FFT\FFTExplorer.vb" />
     <Compile Include="Audio\WaveInSource.vb" />

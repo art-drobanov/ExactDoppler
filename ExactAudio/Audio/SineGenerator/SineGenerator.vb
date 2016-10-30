@@ -66,13 +66,13 @@ Public Class SineGenerator
 
     Public Sub Play(program As Queue(Of SineTaskBlock))
         SyncLock SyncRoot
-            PlayWith(New SineWaveProgramProvider32(program))
+            PlayWith(New ProgrammedSineWaveProvider32(program))
         End SyncLock
     End Sub
 
     Public Sub SwitchOn(frequency As Single())
         SyncLock SyncRoot
-            PlayWith(New SineWaveProgramProvider32(frequency))
+            PlayWith(New ProgrammedSineWaveProvider32(frequency))
         End SyncLock
     End Sub
 
@@ -88,7 +88,7 @@ Public Class SineGenerator
         End SyncLock
     End Sub
 
-    Private Sub PlayWith(sineWaveProvider As SineWaveProgramProvider32)
+    Private Sub PlayWith(sineWaveProvider As ProgrammedSineWaveProvider32)
         SyncLock SyncRoot
             If _waveOut Is Nothing Then
                 sineWaveProvider.SetWaveFormat(_sampleRate, 2)

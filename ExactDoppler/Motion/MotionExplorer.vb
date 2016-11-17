@@ -46,7 +46,7 @@ Public Class MotionExplorer
     ''' <returns>"Результат анализа движения".</returns>
     Public Function Process(pcmSamples As Single(), pcmSamplesCount As Integer, lowFreq As Double, highFreq As Double, blindZone As Integer) As MotionExplorerResult
         'FFT + DSP
-        Dim mag = MyBase.Explore(pcmSamples, pcmSamplesCount, lowFreq, highFreq).MagL
+        Dim mag = MyBase.ExploreMag(pcmSamples, pcmSamplesCount, lowFreq, highFreq).MagL
         Dim result As New MotionExplorerResult With {.Duration = mag(0).Length * MyBase.SonogramRowDuration}
 
         'DbScale + Filtering

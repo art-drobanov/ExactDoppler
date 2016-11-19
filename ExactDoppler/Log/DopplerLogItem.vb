@@ -1,6 +1,5 @@
 ﻿Public Class DopplerLogItem
-    Public Shared ReadOnly DateTimeFormat As String = "yyyy-MM-dd HH:mm:ss zzz"
-    Private Const _diffThr = 15
+    Public Shared ReadOnly DateTimeFormat As String = "yyyy-MM-dd HH:mm:ss.ffff zzz"
     Public Property Time As DateTime
     Public Property LowDoppler As Single
     Public Property HighDoppler As Single
@@ -9,25 +8,6 @@
     Public ReadOnly Property Carrier As String
         Get
             Return If(CarrierIsOK, "OK", "ERR")
-        End Get
-    End Property
-
-    Public ReadOnly Property Type As String
-        Get
-            If CarrierIsOK Then
-                If (HighDoppler - LowDoppler) > _diffThr Then
-                    Return "Motion++"
-                End If
-                If (LowDoppler - HighDoppler) > _diffThr Then
-                    Return "Motion--"
-                End If
-                If (LowDoppler + HighDoppler) > _diffThr Then
-                    Return "Motion+-"
-                End If
-                Return "NoMotion"
-            Else
-                Return "Carrier!"
-            End If
         End Get
     End Property
 
@@ -44,11 +24,10 @@
     End Sub
 
     Public Overrides Function ToString() As String
-        Return String.Format("{0}, L:{1}%, H:{2}%, Type:{3}, Carrier:{4};",
+        Return String.Format("{0}, L:{1}%, H:{2}%, Carrier:{3};",
                              Time.ToString(DateTimeFormat),
                              LowDoppler.ToString("00.00").Replace(",", "."),
                              HighDoppler.ToString("00.00").Replace(",", "."),
-                             Type,
                              Carrier)
     End Function
 End Class

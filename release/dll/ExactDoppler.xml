@@ -54,7 +54,6 @@ ExactDoppler
 	<param name="mag">Магнитудная сонограмма ("водопад").</param>
 	<param name="zeroDbLevel">"Нулевой" уровень логарифмической шкалы.</param>
 	<param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
-	<returns>"Результат анализа движения".</returns>
 </member><member name="M:ExactAudio.MotionExplorer.HarmSlicesSumImageInDb(System.Double[][],System.Int32)">
 	<summary>
  Получение изображения, каждая строка которого содержит "размноженную" сумму гармоник исходной строки
@@ -117,6 +116,11 @@ ExactDoppler
 	<summary>
  Включение генератора
  </summary>
+</member><member name="M:ExactAudio.ExactDoppler.SwitchOnGen(System.Collections.Generic.IEnumerable{System.Single})">
+	<summary>
+ Включение генератора
+ </summary>
+	<param name="frequencies">Частоты синусов.</param>
 </member><member name="M:ExactAudio.ExactDoppler.SwitchOnGen(System.Single)">
 	<summary>
  Включение генератора
@@ -133,6 +137,22 @@ ExactDoppler
 </member><member name="M:ExactAudio.ExactDoppler.Stop">
 	<summary>
  Останов
+ </summary>
+</member><member name="M:ExactAudio.ExactDoppler.MotionExplorerResultsIntersect(ExactAudio.MotionExplorerResult[])">
+	<summary>
+ Пересечение результатов доплеровского анализа на разных частотах (с выделением существенной части)
+ </summary>
+</member><member name="M:ExactAudio.ExactDoppler.IntersectImagesByMin(System.Collections.Generic.IEnumerable{Bwl.Imaging.RGBMatrix})">
+	<summary>
+ Попиксельное "пересечение" набора изображений
+ </summary>
+</member><member name="M:ExactAudio.ExactDoppler.IntersectListsByMin(System.Collections.Generic.IEnumerable{System.Collections.Generic.LinkedList{System.Single}})">
+	<summary>
+ Поэлементное пересечение набора списков по критерию "минимальное значение"
+ </summary>
+</member><member name="M:ExactAudio.ExactDoppler.InitMotionExplorers">
+	<summary>
+ Инициализация анализаторов движения (выделенно для каждой частоты)
  </summary>
 </member><member name="M:ExactAudio.ExactDoppler.SampleProcessor(System.Single[],System.Int32,System.DateTime)">
 	<summary>

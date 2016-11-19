@@ -70,9 +70,9 @@ Public Class SineGenerator
         End SyncLock
     End Sub
 
-    Public Sub SwitchOn(frequency As Single())
+    Public Sub SwitchOn(frequencies As IEnumerable(Of Single))
         SyncLock SyncRoot
-            PlayWith(New ProgrammedSineWaveProvider32(frequency))
+            PlayWith(New ProgrammedSineWaveProvider32(frequencies))
         End SyncLock
     End Sub
 

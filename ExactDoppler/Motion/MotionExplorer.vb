@@ -55,7 +55,9 @@ Public Class MotionExplorer
         DopplerFilterDb(mag, _rowFilterMemorySize, _NZeroes)
 
         'Detection
-        Return WaterfallDetector(result, mag, _zeroDbLevel, blindZone)
+        WaterfallDetector(result, mag, _zeroDbLevel, blindZone)
+
+        Return result
     End Function
 
     ''' <summary>
@@ -65,8 +67,7 @@ Public Class MotionExplorer
     ''' <param name="mag">Магнитудная сонограмма ("водопад").</param>
     ''' <param name="zeroDbLevel">"Нулевой" уровень логарифмической шкалы.</param>
     ''' <param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
-    ''' <returns>"Результат анализа движения".</returns>
-    Private Function WaterfallDetector(result As MotionExplorerResult, mag As Double()(), zeroDbLevel As Double, blindZone As Integer) As MotionExplorerResult
+    Private Sub WaterfallDetector(result As MotionExplorerResult, mag As Double()(), zeroDbLevel As Double, blindZone As Integer)
         Dim dopplerWindowWidth = (mag(0).Length - blindZone) \ 2
         Dim lowDopplerLowHarm = 0
         Dim lowDopplerHighHarm = dopplerWindowWidth - 1
@@ -78,7 +79,7 @@ Public Class MotionExplorer
         Dim carrierNorm = ((carrierHighHarm - carrierLowHarm) - 1)
 
         Dim lowDoppler = ExactPlotter.SubBand(mag, lowDopplerLowHarm, lowDopplerHighHarm)
-        Dim highDoppler = ExactPlotter.SubBand(mag, highDopplerLowHarm, highDopplerHighHarm)        
+        Dim highDoppler = ExactPlotter.SubBand(mag, highDopplerLowHarm, highDopplerHighHarm)
         Dim lowDopplerImage = HarmSlicesSumImageInDb(lowDoppler, 1)
         Dim highDopplerImage = HarmSlicesSumImageInDb(highDoppler, 1)
 
@@ -161,9 +162,7 @@ Public Class MotionExplorer
 
         'Сохраняем графический результат - есть он или нет...
         result.Image = magRGB
-
-        Return result
-    End Function
+    End Sub
 
     ''' <summary>
     ''' Получение изображения, каждая строка которого содержит "размноженную" сумму гармоник исходной строки

@@ -25,7 +25,7 @@ Public Class ExactDoppler
     'Объекты
     Private _capture As WaveInSource
     Private _sineGenerator As SineGenerator
-    Private _motionExplorer As MotionExplorer
+    Private _motionExplorers As List(Of MotionExplorer)
 
     Public ReadOnly SyncRoot As New Object
 
@@ -157,7 +157,9 @@ Public Class ExactDoppler
         End If
         _sineGenerator = New SineGenerator(_outputDeviceIdx, _sampleRate)
         _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallSeconds)
-        _motionExplorer = New MotionExplorer(_windowSize, _windowStep, _sampleRate, _nBitsPalette, False)
+
+        InitMotionExplorers()
+
         InputDeviceIdx = _config.InputDeviceIdx
         OutputDeviceIdx = _config.OutputDeviceIdx
         Volume = _config.Volume
@@ -171,113 +173,124 @@ Public Class ExactDoppler
     ''' <param name="timestamp">Штамп даты/времени.</param>
     ''' <returns>"Результат анализа движения".</returns>
     Public Function Process(pcmSamples As Single(), pcmSamplesCount As Integer, timestamp As DateTime) As MotionExplorerResult
-        SyncLock SyncRoot
-            'Параметры
-            Dim lowFreq As Double = 0
-            Dim highFreq As Double = 0
-            Dim play As Boolean = False
+        Dim motionExplorerResults As New List(Of MotionExplorerResult)()
 
-            If _config.CenterFreq = 0 Then
-                lowFreq = 0
-                highFreq = _topFreq
-            Else
-                lowFreq = _config.CenterFreq - _dopplerSize
-                highFreq = _config.CenterFreq + _dopplerSize
-                lowFreq = If(lowFreq < 0, 0, lowFreq)
-                highFreq = If(highFreq > _topFreq, _topFreq, highFreq)
+        SyncLock SyncRoot
+            If _config.CenterFreqs.Length <> _motionExplorers.Count Then
+                Throw New Exception("ExactDoppler: _config.CenterFreqs.Count <> _motionExplorers.Count")
             End If
 
-            'Обработка
-            Dim motionExplorerResult = _motionExplorer.Process(pcmSamples, pcmSamplesCount, lowFreq, highFreq, _config.BlindZone)
-            motionExplorerResult.Timestamp = timestamp
+            'Цикл по всем заданным несущим
+            For f = 0 To _config.CenterFreqs.Length - 1
+                Dim centerFreq = _config.CenterFreqs(f)
+                Dim motionExplorer = _motionExplorers(f)
 
-            'Штамп даты и времени
-            Dim strW = 220
-            Dim strH = 20
-            If motionExplorerResult.Image.Height >= strH Then
+                'Параметры
+                Dim lowFreq As Double = 0
+                Dim highFreq As Double = 0
+                If centerFreq = 0 Then
+                    lowFreq = 0
+                    highFreq = _topFreq
+                Else
+                    lowFreq = centerFreq - _dopplerSize
+                    highFreq = centerFreq + _dopplerSize
+                    lowFreq = If(lowFreq < 0, 0, lowFreq)
+                    highFreq = If(highFreq > _topFreq, _topFreq, highFreq)
+                End If
+
+                'Обработка
+                Dim motionExplorerResult = motionExplorer.Process(pcmSamples, pcmSamplesCount, lowFreq, highFreq, _config.BlindZone)
+                motionExplorerResult.Timestamp = timestamp
+
+                'Штамп даты и времени
+                Dim strW = 208
+                Dim strH = 20
                 Dim resW = strW + motionExplorerResult.Image.Width
                 Dim resH = motionExplorerResult.Image.Height
                 Dim result = New RGBMatrix(resW, resH)
-                Dim stringImg As RGBMatrix
-                Using bmp = New Bitmap(strW, strH)
-                    Using gr = Graphics.FromImage(bmp)
-                        Dim timeStr = timestamp.ToString("yyyy-MM-dd HH:mm:ss zzz")
-                        gr.DrawString(timeStr, New System.Drawing.Font("Microsoft Sans Serif", 12.0F), Brushes.LightSlateGray, New PointF(0, 0))
+                If motionExplorerResult.Image.Height >= strH Then
+                    Dim stringImg As RGBMatrix
+                    Using bmp = New Bitmap(strW, strH)
+                        Using gr = Graphics.FromImage(bmp)
+                            Dim timeStr = timestamp.ToString("yyyy-MM-dd HH:mm:ss zzz")
+                            gr.DrawString(timeStr, New System.Drawing.Font("Microsoft Sans Serif", 12.0F), Brushes.LightSlateGray, New PointF(0, 0))
+                        End Using
+                        stringImg = BitmapConverter.BitmapToRGBMatrix(bmp)
                     End Using
-                    stringImg = BitmapConverter.BitmapToRGBMatrix(bmp)
-                    'bmp.Save(Now.Ticks.ToString() + ".bmp", System.Drawing.Imaging.ImageFormat.Bmp)
-                End Using
-                Parallel.For(0, 3, Sub(channel As Integer)
-                                       For i = 0 To stringImg.Height - 1
-                                           For j = 0 To stringImg.Width - 1
-                                               result.Matrix(channel)(j, i) = stringImg.Matrix(channel)(j, i)
+                    Parallel.For(0, 3, Sub(channel As Integer)
+                                           For i = 0 To stringImg.Height - 1
+                                               For j = 0 To stringImg.Width - 1
+                                                   result.Matrix(channel)(j, i) = stringImg.Matrix(channel)(j, i)
+                                               Next
                                            Next
-                                       Next
-                                   End Sub)
-                Parallel.For(0, 3, Sub(channel As Integer)
-                                       For i = 0 To motionExplorerResult.Image.Height - 1
-                                           For j = 0 To motionExplorerResult.Image.Width - 1
-                                               result.Matrix(channel)(strW + j, i) = motionExplorerResult.Image.Matrix(channel)(j, i)
+                                       End Sub)
+                    Parallel.For(0, 3, Sub(channel As Integer)
+                                           For i = 0 To motionExplorerResult.Image.Height - 1
+                                               For j = 0 To motionExplorerResult.Image.Width - 1
+                                                   result.Matrix(channel)(strW + j, i) = motionExplorerResult.Image.Matrix(channel)(j, i)
+                                               Next
                                            Next
-                                       Next
-                                   End Sub)
+                                       End Sub)
+                End If
                 motionExplorerResult.Image = result
-            Else
-                Return Nothing
-            End If
 
-            'Доплер-лог
-            Static Dim lowDopplerAvgSum As Single
-            Static Dim highDopplerAvgSum As Single
+                'Доплер-лог
+                With motionExplorerResult
+                    Dim lowDopplerAvg = .LowDoppler.Average() 'Накопление по нижней полосе
+                    Dim highDopplerAvg = .HighDoppler.Average() 'Накопление по верхней полосе
+                    Dim carrierIsOK = .CarrierLevel.Min() >= _config.CarrierWarningLevel 'Несущая не должна иметь слишком низкий уровень
+                    Dim logItem = New DopplerLogItem(timestamp, lowDopplerAvg, highDopplerAvg, carrierIsOK) 'Элемент лога
+                    motionExplorerResult.DopplerLogItem = logItem
+                    If lowDopplerAvg <> 0 OrElse highDopplerAvg <> 0 OrElse Not carrierIsOK Then 'Если несущей нет - это тоже событие!
+                        motionExplorerResult.IsWarning = True
+                    End If
+                End With
 
-            With motionExplorerResult
-                lowDopplerAvgSum += .LowDoppler.Average() 'Накопление по нижней полосе
-                highDopplerAvgSum += .HighDoppler.Average() 'Накопление по верхней полосе
-
-                Dim lowDopplerAvg As Single = 0
-                Dim highDopplerAvg As Single = 0
-
-                'Если в конце фрагмента сонограммы нет энергии - всплеск "закрыт"
-                If .LowDoppler.Last.Value = 0 Then
-                    lowDopplerAvg = lowDopplerAvgSum
-                    lowDopplerAvgSum = 0
+                'Проверка на нормализацию L/H
+                If motionExplorerResult.DopplerLogItem.LowDoppler > 99.99 Then
+                    Throw New Exception("ExactDoppler: motionExplorerResult.DopplerLogItem.LowDoppler > 99.99")
+                End If
+                If motionExplorerResult.DopplerLogItem.HighDoppler > 99.99 Then
+                    Throw New Exception("ExactDoppler: motionExplorerResult.DopplerLogItem.HighDoppler > 99.99")
                 End If
 
-                'Если в конце фрагмента сонограммы нет энергии - всплеск "закрыт"
-                If .HighDoppler.Last.Value = 0 Then
-                    highDopplerAvg = highDopplerAvgSum
-                    highDopplerAvgSum = 0
-                End If
-
-                'Несущая не должна иметь слишком низкий уровень
-                Dim carrierIsOK = .CarrierLevel.Min() >= _config.CarrierWarningLevel
-
-                'Элемент лога
-                Dim logItem = New DopplerLogItem(timestamp, lowDopplerAvg, highDopplerAvg, carrierIsOK)
-                motionExplorerResult.DopplerLogItem = logItem
-                If lowDopplerAvg <> 0 OrElse highDopplerAvg <> 0 OrElse Not carrierIsOK Then 'Если несущей нет - это тоже событие!
-                    motionExplorerResult.IsWarning = True
-                    _dopplerLog.Add(logItem) 'Пишем в лог - если есть данные!
-                End If
-            End With
-
-            'Проверка на нормализацию L/H
-            If motionExplorerResult.DopplerLogItem.LowDoppler > 99.99 Then
-                Throw New Exception("ExactDoppler: motionExplorerResult.DopplerLogItem.LowDoppler > 99.99")
-            End If
-            If motionExplorerResult.DopplerLogItem.HighDoppler > 99.99 Then
-                Throw New Exception("ExactDoppler: motionExplorerResult.DopplerLogItem.HighDoppler > 99.99")
-            End If
-
-            Return motionExplorerResult
+                'Результат по текущей центральной частоте
+                motionExplorerResults.Add(motionExplorerResult)
+            Next
         End SyncLock
+
+        'Если в результатах анализа более одного элемента...
+        If motionExplorerResults.Count > 1 Then
+            '...получение объединенного результата анализа (помещаем по нулевому индексу)
+            Dim resIntersection = MotionExplorerResultsIntersect(motionExplorerResults.ToArray())
+            _dopplerLog.Add(resIntersection.DopplerLogItem)
+            Return resIntersection
+        Else
+            _dopplerLog.Add(motionExplorerResults.First.DopplerLogItem)
+            Return motionExplorerResults.First
+        End If
     End Function
 
     ''' <summary>
     ''' Включение генератора
     ''' </summary>
     Public Sub SwitchOnGen()
-        SwitchOnGen(_config.CenterFreq)
+        SyncLock SyncRoot
+            InitMotionExplorers()
+            SwitchOnGen(_config.CenterFreqs.Select(Function(item) CSng(item)))
+        End SyncLock
+    End Sub
+
+    ''' <summary>
+    ''' Включение генератора
+    ''' </summary>
+    ''' <param name="frequencies">Частоты синусов.</param>
+    Public Sub SwitchOnGen(frequencies As IEnumerable(Of Single))
+        SyncLock SyncRoot
+            _config.CenterFreqs = frequencies.Select(Function(item) CDbl(item)).ToArray()
+            InitMotionExplorers()
+            _sineGenerator.SwitchOn(frequencies)
+        End SyncLock
     End Sub
 
     ''' <summary>
@@ -286,6 +299,7 @@ Public Class ExactDoppler
     ''' <param name="frequency">Частота синуса.</param>
     Public Sub SwitchOnGen(frequency As Single)
         SyncLock SyncRoot
+            _config.CenterFreqs = {frequency}
             _sineGenerator.SwitchOn({frequency})
         End SyncLock
     End Sub
@@ -317,6 +331,81 @@ Public Class ExactDoppler
     Public Sub [Stop]()
         SyncLock SyncRoot
             _capture.Stop()
+        End SyncLock
+    End Sub
+
+    ''' <summary>
+    ''' Пересечение результатов доплеровского анализа на разных частотах (с выделением существенной части)
+    ''' </summary>
+    Private Function MotionExplorerResultsIntersect(motionExplorerResults As MotionExplorerResult()) As MotionExplorerResult
+        Dim result As New MotionExplorerResult()
+        result.Duration = motionExplorerResults.First.Duration
+        result.Timestamp = motionExplorerResults.First.Timestamp
+        result.DopplerLogItem = New DopplerLogItem(result.Timestamp,
+                                                   motionExplorerResults.Select(Function(item) item.DopplerLogItem.LowDoppler).Min(),
+                                                   motionExplorerResults.Select(Function(item) item.DopplerLogItem.HighDoppler).Min(),
+                                                   motionExplorerResults.All(Function(item) item.DopplerLogItem.CarrierIsOK))
+        result.IsWarning = motionExplorerResults.Any(Function(item) item.IsWarning)
+        result.CarrierLevel = IntersectListsByMin(motionExplorerResults.Select(Function(item) item.CarrierLevel))
+        result.LowDoppler = IntersectListsByMin(motionExplorerResults.Select(Function(item) item.LowDoppler))
+        result.HighDoppler = IntersectListsByMin(motionExplorerResults.Select(Function(item) item.HighDoppler))
+        result.Image = IntersectImagesByMin(motionExplorerResults.Select(Function(item) item.Image))
+        Return result
+    End Function
+
+    ''' <summary>
+    ''' Попиксельное "пересечение" набора изображений
+    ''' </summary>
+    Private Function IntersectImagesByMin(sources As IEnumerable(Of RGBMatrix)) As RGBMatrix
+        Dim W = sources.First.Width
+        Dim H = sources.First.Height
+        Dim N = sources.Count
+        Dim result As New RGBMatrix(W, H)
+        Parallel.For(0, 3, Sub(channel As Integer)
+                               For i = 0 To H - 1
+                                   For j = 0 To W - 1
+                                       Dim minVal = sources(0).Matrix(channel)(j, i)
+                                       For k = 1 To N - 1
+                                           Dim currVal = sources(k).Matrix(channel)(j, i)
+                                           minVal = If(currVal < minVal, currVal, minVal)
+                                       Next
+                                       result.Matrix(channel)(j, i) = minVal 'Минимум - как аналог пересечения через AND
+                                   Next
+                               Next
+                           End Sub)
+        Return result
+    End Function
+
+    ''' <summary>
+    ''' Поэлементное пересечение набора списков по критерию "минимальное значение"
+    ''' </summary>
+    Private Function IntersectListsByMin(sourceLists As IEnumerable(Of LinkedList(Of Single))) As LinkedList(Of Single)
+        Dim result As New LinkedList(Of Single)
+        Dim sourceListsArr As New List(Of Single())
+        For Each s In sourceLists
+            sourceListsArr.Add(s.ToArray())
+        Next
+        For j = 0 To sourceListsArr(0).Length - 1
+            Dim minVal = sourceListsArr(0)(j)
+            For i = 1 To sourceListsArr.Count - 1
+                Dim currVal = sourceListsArr(i)(j)
+                minVal = If(currVal < minVal, currVal, minVal)
+            Next
+            result.AddLast(minVal)
+        Next
+        Return result
+    End Function
+
+    ''' <summary>
+    ''' Инициализация анализаторов движения (выделенно для каждой частоты)
+    ''' </summary>
+    Private Sub InitMotionExplorers()
+        SyncLock SyncRoot
+            'Для каждой центральной частоты нужен свой MotionExplorer
+            _motionExplorers = New List(Of MotionExplorer)()
+            For Each centerFreq In _config.CenterFreqs
+                _motionExplorers.Add(New MotionExplorer(_windowSize, _windowStep, _sampleRate, _nBitsPalette, False))
+            Next
         End SyncLock
     End Sub
 

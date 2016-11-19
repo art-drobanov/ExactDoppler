@@ -26,8 +26,8 @@ Partial Class MainForm
         Me._switchOnButton = New System.Windows.Forms.Button()
         Me._switchOffButton = New System.Windows.Forms.Button()
         Me._sineFreqTrackBar = New System.Windows.Forms.TrackBar()
-        Me._frequencyGroupBox = New System.Windows.Forms.GroupBox()
-        Me._sineFreqLabel = New System.Windows.Forms.Label()
+        Me._topFrequencyGroupBox = New System.Windows.Forms.GroupBox()
+        Me._freq1Label = New System.Windows.Forms.Label()
         Me._volumeTrackBar = New System.Windows.Forms.TrackBar()
         Me._outputGroupBox = New System.Windows.Forms.GroupBox()
         Me._outTestButton = New System.Windows.Forms.Button()
@@ -44,19 +44,21 @@ Partial Class MainForm
         Me._captureOffButton = New System.Windows.Forms.Button()
         Me._blocksLabel = New System.Windows.Forms.Label()
         Me._captureOnButton = New System.Windows.Forms.Button()
-        Me._waterfallDisplayBitmapControl = New Bwl.Imaging.DisplayBitmapControl()
         Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
-        Me._dopplerLogItemLabel_ = New System.Windows.Forms.Label()
-        Me._dopplerLogItemLabel = New System.Windows.Forms.Label()
-        Me._carrierLogItemLabel_ = New System.Windows.Forms.Label()
-        Me._carrierLogItemLabel = New System.Windows.Forms.Label()
+        Me._dopplerLogGroupBox = New System.Windows.Forms.GroupBox()
+        Me._dopplerLogTextBox = New System.Windows.Forms.TextBox()
+        Me._waterfallGroupBox = New System.Windows.Forms.GroupBox()
+        Me._waterfallDisplayBitmapControl = New Bwl.Imaging.DisplayBitmapControl()
+        Me._freq2Label = New System.Windows.Forms.Label()
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me._frequencyGroupBox.SuspendLayout()
+        Me._topFrequencyGroupBox.SuspendLayout()
         CType(Me._volumeTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me._outputGroupBox.SuspendLayout()
         Me._inputGroupBox.SuspendLayout()
         Me._centralBlindZoneGroupBox.SuspendLayout()
         CType(Me._blindZoneTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me._dopplerLogGroupBox.SuspendLayout()
+        Me._waterfallGroupBox.SuspendLayout()
         Me.SuspendLayout()
         '
         '_switchOnButton
@@ -89,25 +91,26 @@ Partial Class MainForm
         Me._sineFreqTrackBar.TickStyle = System.Windows.Forms.TickStyle.TopLeft
         Me._sineFreqTrackBar.Value = 42
         '
-        '_frequencyGroupBox
+        '_topFrequencyGroupBox
         '
-        Me._frequencyGroupBox.Controls.Add(Me._sineFreqLabel)
-        Me._frequencyGroupBox.Controls.Add(Me._sineFreqTrackBar)
-        Me._frequencyGroupBox.Location = New System.Drawing.Point(6, 201)
-        Me._frequencyGroupBox.Name = "_frequencyGroupBox"
-        Me._frequencyGroupBox.Size = New System.Drawing.Size(214, 82)
-        Me._frequencyGroupBox.TabIndex = 3
-        Me._frequencyGroupBox.TabStop = False
-        Me._frequencyGroupBox.Text = "Frequency"
+        Me._topFrequencyGroupBox.Controls.Add(Me._freq2Label)
+        Me._topFrequencyGroupBox.Controls.Add(Me._freq1Label)
+        Me._topFrequencyGroupBox.Controls.Add(Me._sineFreqTrackBar)
+        Me._topFrequencyGroupBox.Location = New System.Drawing.Point(6, 201)
+        Me._topFrequencyGroupBox.Name = "_topFrequencyGroupBox"
+        Me._topFrequencyGroupBox.Size = New System.Drawing.Size(214, 82)
+        Me._topFrequencyGroupBox.TabIndex = 3
+        Me._topFrequencyGroupBox.TabStop = False
+        Me._topFrequencyGroupBox.Text = "Frequencies"
         '
-        '_sineFreqLabel
+        '_freq1Label
         '
-        Me._sineFreqLabel.AutoSize = True
-        Me._sineFreqLabel.Location = New System.Drawing.Point(6, 20)
-        Me._sineFreqLabel.Name = "_sineFreqLabel"
-        Me._sineFreqLabel.Size = New System.Drawing.Size(13, 13)
-        Me._sineFreqLabel.TabIndex = 4
-        Me._sineFreqLabel.Text = "0"
+        Me._freq1Label.AutoSize = True
+        Me._freq1Label.Location = New System.Drawing.Point(6, 20)
+        Me._freq1Label.Name = "_freq1Label"
+        Me._freq1Label.Size = New System.Drawing.Size(13, 13)
+        Me._freq1Label.TabIndex = 4
+        Me._freq1Label.Text = "0"
         '
         '_volumeTrackBar
         '
@@ -127,7 +130,7 @@ Partial Class MainForm
         Me._outputGroupBox.Controls.Add(Me._switchOnButton)
         Me._outputGroupBox.Controls.Add(Me._outputAudioDevicesListBox)
         Me._outputGroupBox.Controls.Add(Me._switchOffButton)
-        Me._outputGroupBox.Controls.Add(Me._frequencyGroupBox)
+        Me._outputGroupBox.Controls.Add(Me._topFrequencyGroupBox)
         Me._outputGroupBox.Controls.Add(Me._volumeTrackBar)
         Me._outputGroupBox.Location = New System.Drawing.Point(12, 12)
         Me._outputGroupBox.Name = "_outputGroupBox"
@@ -172,9 +175,9 @@ Partial Class MainForm
         Me._inputGroupBox.Controls.Add(Me._captureOffButton)
         Me._inputGroupBox.Controls.Add(Me._blocksLabel)
         Me._inputGroupBox.Controls.Add(Me._captureOnButton)
-        Me._inputGroupBox.Location = New System.Drawing.Point(287, 12)
+        Me._inputGroupBox.Location = New System.Drawing.Point(292, 12)
         Me._inputGroupBox.Name = "_inputGroupBox"
-        Me._inputGroupBox.Size = New System.Drawing.Size(267, 365)
+        Me._inputGroupBox.Size = New System.Drawing.Size(268, 365)
         Me._inputGroupBox.TabIndex = 10
         Me._inputGroupBox.TabStop = False
         Me._inputGroupBox.Text = "Input [ OFF ]"
@@ -239,7 +242,7 @@ Partial Class MainForm
         '_blocksLabel_
         '
         Me._blocksLabel_.AutoSize = True
-        Me._blocksLabel_.Location = New System.Drawing.Point(6, 297)
+        Me._blocksLabel_.Location = New System.Drawing.Point(6, 299)
         Me._blocksLabel_.Name = "_blocksLabel_"
         Me._blocksLabel_.Size = New System.Drawing.Size(42, 13)
         Me._blocksLabel_.TabIndex = 16
@@ -258,7 +261,7 @@ Partial Class MainForm
         '_blocksLabel
         '
         Me._blocksLabel.AutoSize = True
-        Me._blocksLabel.Location = New System.Drawing.Point(48, 298)
+        Me._blocksLabel.Location = New System.Drawing.Point(54, 299)
         Me._blocksLabel.Name = "_blocksLabel"
         Me._blocksLabel.Size = New System.Drawing.Size(13, 13)
         Me._blocksLabel.TabIndex = 17
@@ -274,76 +277,71 @@ Partial Class MainForm
         Me._captureOnButton.Text = "Capture On"
         Me._captureOnButton.UseVisualStyleBackColor = False
         '
-        '_waterfallDisplayBitmapControl
-        '
-        Me._waterfallDisplayBitmapControl.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me._waterfallDisplayBitmapControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me._waterfallDisplayBitmapControl.Location = New System.Drawing.Point(12, 383)
-        Me._waterfallDisplayBitmapControl.Name = "_waterfallDisplayBitmapControl"
-        Me._waterfallDisplayBitmapControl.Size = New System.Drawing.Size(542, 260)
-        Me._waterfallDisplayBitmapControl.TabIndex = 20
-        '
         'LinkLabel1
         '
         Me.LinkLabel1.AutoSize = True
-        Me.LinkLabel1.Location = New System.Drawing.Point(12, 654)
+        Me.LinkLabel1.Location = New System.Drawing.Point(12, 719)
         Me.LinkLabel1.Name = "LinkLabel1"
         Me.LinkLabel1.Size = New System.Drawing.Size(106, 13)
         Me.LinkLabel1.TabIndex = 21
         Me.LinkLabel1.TabStop = True
         Me.LinkLabel1.Text = "http://iconleak.com/"
         '
-        '_dopplerLogItemLabel_
+        '_dopplerLogGroupBox
         '
-        Me._dopplerLogItemLabel_.AutoSize = True
-        Me._dopplerLogItemLabel_.Font = New System.Drawing.Font("Arial Narrow", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me._dopplerLogItemLabel_.Location = New System.Drawing.Point(359, 647)
-        Me._dopplerLogItemLabel_.Name = "_dopplerLogItemLabel_"
-        Me._dopplerLogItemLabel_.Size = New System.Drawing.Size(109, 25)
-        Me._dopplerLogItemLabel_.TabIndex = 22
-        Me._dopplerLogItemLabel_.Text = "DopplerLog:"
+        Me._dopplerLogGroupBox.Controls.Add(Me._dopplerLogTextBox)
+        Me._dopplerLogGroupBox.Location = New System.Drawing.Point(12, 657)
+        Me._dopplerLogGroupBox.Name = "_dopplerLogGroupBox"
+        Me._dopplerLogGroupBox.Size = New System.Drawing.Size(548, 59)
+        Me._dopplerLogGroupBox.TabIndex = 32
+        Me._dopplerLogGroupBox.TabStop = False
+        Me._dopplerLogGroupBox.Text = "DopplerLog"
         '
-        '_dopplerLogItemLabel
+        '_dopplerLogTextBox
         '
-        Me._dopplerLogItemLabel.AutoSize = True
-        Me._dopplerLogItemLabel.Font = New System.Drawing.Font("Arial Narrow", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me._dopplerLogItemLabel.Location = New System.Drawing.Point(466, 647)
-        Me._dopplerLogItemLabel.Name = "_dopplerLogItemLabel"
-        Me._dopplerLogItemLabel.Size = New System.Drawing.Size(88, 25)
-        Me._dopplerLogItemLabel.TabIndex = 23
-        Me._dopplerLogItemLabel.Text = "NoMotion"
+        Me._dopplerLogTextBox.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me._dopplerLogTextBox.Location = New System.Drawing.Point(6, 19)
+        Me._dopplerLogTextBox.Multiline = True
+        Me._dopplerLogTextBox.Name = "_dopplerLogTextBox"
+        Me._dopplerLogTextBox.Size = New System.Drawing.Size(536, 32)
+        Me._dopplerLogTextBox.TabIndex = 32
         '
-        '_carrierLogItemLabel_
+        '_waterfallGroupBox
         '
-        Me._carrierLogItemLabel_.AutoSize = True
-        Me._carrierLogItemLabel_.Font = New System.Drawing.Font("Arial Narrow", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me._carrierLogItemLabel_.Location = New System.Drawing.Point(233, 647)
-        Me._carrierLogItemLabel_.Name = "_carrierLogItemLabel_"
-        Me._carrierLogItemLabel_.Size = New System.Drawing.Size(76, 25)
-        Me._carrierLogItemLabel_.TabIndex = 24
-        Me._carrierLogItemLabel_.Text = "Carrier: "
+        Me._waterfallGroupBox.Controls.Add(Me._waterfallDisplayBitmapControl)
+        Me._waterfallGroupBox.Location = New System.Drawing.Point(12, 383)
+        Me._waterfallGroupBox.Name = "_waterfallGroupBox"
+        Me._waterfallGroupBox.Size = New System.Drawing.Size(548, 268)
+        Me._waterfallGroupBox.TabIndex = 33
+        Me._waterfallGroupBox.TabStop = False
+        Me._waterfallGroupBox.Text = "Waterfall"
         '
-        '_carrierLogItemLabel
+        '_waterfallDisplayBitmapControl
         '
-        Me._carrierLogItemLabel.AutoSize = True
-        Me._carrierLogItemLabel.Font = New System.Drawing.Font("Arial Narrow", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me._carrierLogItemLabel.Location = New System.Drawing.Point(299, 648)
-        Me._carrierLogItemLabel.Name = "_carrierLogItemLabel"
-        Me._carrierLogItemLabel.Size = New System.Drawing.Size(18, 25)
-        Me._carrierLogItemLabel.TabIndex = 25
-        Me._carrierLogItemLabel.Text = "-"
+        Me._waterfallDisplayBitmapControl.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me._waterfallDisplayBitmapControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me._waterfallDisplayBitmapControl.Location = New System.Drawing.Point(6, 19)
+        Me._waterfallDisplayBitmapControl.Name = "_waterfallDisplayBitmapControl"
+        Me._waterfallDisplayBitmapControl.Size = New System.Drawing.Size(536, 243)
+        Me._waterfallDisplayBitmapControl.TabIndex = 27
+        '
+        '_freq2Label
+        '
+        Me._freq2Label.AutoSize = True
+        Me._freq2Label.Location = New System.Drawing.Point(56, 20)
+        Me._freq2Label.Name = "_freq2Label"
+        Me._freq2Label.Size = New System.Drawing.Size(13, 13)
+        Me._freq2Label.TabIndex = 6
+        Me._freq2Label.Text = "0"
         '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(566, 676)
-        Me.Controls.Add(Me._carrierLogItemLabel)
-        Me.Controls.Add(Me._carrierLogItemLabel_)
-        Me.Controls.Add(Me._dopplerLogItemLabel)
-        Me.Controls.Add(Me._dopplerLogItemLabel_)
+        Me.ClientSize = New System.Drawing.Size(572, 736)
+        Me.Controls.Add(Me._waterfallGroupBox)
         Me.Controls.Add(Me.LinkLabel1)
-        Me.Controls.Add(Me._waterfallDisplayBitmapControl)
+        Me.Controls.Add(Me._dopplerLogGroupBox)
         Me.Controls.Add(Me._inputGroupBox)
         Me.Controls.Add(Me._outputGroupBox)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
@@ -351,10 +349,10 @@ Partial Class MainForm
         Me.MaximizeBox = False
         Me.Name = "MainForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "ExactDopplerTest v0.1"
+        Me.Text = "ExactDopplerTest v.0.2"
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
-        Me._frequencyGroupBox.ResumeLayout(False)
-        Me._frequencyGroupBox.PerformLayout()
+        Me._topFrequencyGroupBox.ResumeLayout(False)
+        Me._topFrequencyGroupBox.PerformLayout()
         CType(Me._volumeTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me._outputGroupBox.ResumeLayout(False)
         Me._outputGroupBox.PerformLayout()
@@ -363,6 +361,9 @@ Partial Class MainForm
         Me._centralBlindZoneGroupBox.ResumeLayout(False)
         Me._centralBlindZoneGroupBox.PerformLayout()
         CType(Me._blindZoneTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
+        Me._dopplerLogGroupBox.ResumeLayout(False)
+        Me._dopplerLogGroupBox.PerformLayout()
+        Me._waterfallGroupBox.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -371,8 +372,8 @@ Partial Class MainForm
     Friend WithEvents _switchOnButton As Button
     Friend WithEvents _switchOffButton As Button
     Friend WithEvents _sineFreqTrackBar As TrackBar
-    Friend WithEvents _frequencyGroupBox As GroupBox
-    Friend WithEvents _sineFreqLabel As Label
+    Friend WithEvents _topFrequencyGroupBox As GroupBox
+    Friend WithEvents _freq1Label As Label
     Friend WithEvents _volumeTrackBar As TrackBar
     Friend WithEvents _outputGroupBox As GroupBox
     Friend WithEvents _outputAudioDevicesRefreshButton As Button
@@ -384,15 +385,15 @@ Partial Class MainForm
     Friend WithEvents _blocksLabel As Label
     Friend WithEvents _blocksLabel_ As Label
     Friend WithEvents _captureOnButton As Button
-    Friend WithEvents _waterfallDisplayBitmapControl As Bwl.Imaging.DisplayBitmapControl
     Friend WithEvents _centralBlindZoneGroupBox As GroupBox
     Friend WithEvents _blindZoneLabel As Label
     Friend WithEvents _blindZoneTrackBar As TrackBar
     Friend WithEvents _outTestButton As Button
     Friend WithEvents LinkLabel1 As LinkLabel
-    Friend WithEvents _dopplerLogItemLabel_ As Label
-    Friend WithEvents _dopplerLogItemLabel As Label
-    Friend WithEvents _carrierLogItemLabel_ As System.Windows.Forms.Label
-    Friend WithEvents _carrierLogItemLabel As System.Windows.Forms.Label
     Friend WithEvents _scrButton As System.Windows.Forms.Button
+    Friend WithEvents _dopplerLogGroupBox As GroupBox
+    Friend WithEvents _dopplerLogTextBox As TextBox
+    Friend WithEvents _waterfallGroupBox As GroupBox
+    Friend WithEvents _waterfallDisplayBitmapControl As Bwl.Imaging.DisplayBitmapControl
+    Friend WithEvents _freq2Label As Label
 End Class

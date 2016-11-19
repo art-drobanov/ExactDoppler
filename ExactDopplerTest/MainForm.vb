@@ -47,10 +47,8 @@ Public Class MainForm
         _blocksCounter += 1
         Me.Invoke(Sub()
                       _blocksLabel.Text = _blocksCounter.ToString()
-                      With motionExplorerResult.DopplerLogItem
-                          _carrierLogItemLabel.Text = .Carrier
-                          _dopplerLogItemLabel.Text = .Type
-                      End With
+                      Dim dopplerLogItem = motionExplorerResult.DopplerLogItem.ToString()
+                      _dopplerLogTextBox.Lines = {dopplerLogItem}
                   End Sub)
     End Sub
 
@@ -81,6 +79,7 @@ Public Class MainForm
         If waterfall IsNot Nothing Then
             waterfall.Save("dopplerImg__" + snapshotFilename + ".png")
         End If
+        _waterfallFull.Clear()
         _waterfallShort.Clear()
 
         'GUI
@@ -91,9 +90,9 @@ Public Class MainForm
     Private Sub _scrButton_Click(sender As Object, e As EventArgs) Handles _scrButton.Click
         Dim snapshotFilename = DateTime.Now.ToString("yyyy-MM-dd__HH.mm.ss.ffff")
         'WaterFall
-        Dim waterfall = _waterfallShort.ToBitmap()
-        If waterfall IsNot Nothing Then
-            waterfall.Save("dopplerScr__" + snapshotFilename + ".png")
+        Dim waterfall1 = _waterfallShort.ToBitmap()
+        If waterfall1 IsNot Nothing Then
+            waterfall1.Save("dopplerScr1__" + snapshotFilename + ".png")
         End If
     End Sub
 
@@ -108,22 +107,32 @@ Public Class MainForm
         If Not Me.Visible Then
             Return
         End If
-
-        Dim centerFreq As Double
+        Dim topCenterFreq As Double
         Dim blindZone As Integer
         Me.Invoke(Sub()
-                      centerFreq = Convert.ToDouble(_sineFreqLabel.Text)
+                      topCenterFreq = Convert.ToDouble(_freq2Label.Text)
                       blindZone = _blindZoneTrackBar.Value
                   End Sub)
-
         Dim pcmOutput = True
         Dim imageOutput = True
-        _exactDoppler.Config = New ExactDopplerConfig(0, 0, 1.0, centerFreq, blindZone, 10)
+        Dim freq2 = topCenterFreq
+        Dim freq1 = freq2 - 700
+        If freq1 < 1000 Then
+            Throw New Exception("freq1 < 1000")
+        End If
+        _exactDoppler.Config = New ExactDopplerConfig(0, 0, 1.0, {freq1, freq2}, blindZone, 10)
+        _freq1Label.Text = freq1
+        _freq2Label.Text = freq2
     End Sub
 
     Private Sub _sineGenButton_Click(sender As Object, e As EventArgs) Handles _switchOnButton.Click
         _exactDoppler.Volume = _volumeTrackBar.Value / 100.0F
-        _exactDoppler.SwitchOnGen(_sineFreqLabel.Text)
+        Dim freq2 = Convert.ToInt32(_freq2Label.Text)
+        Dim freq1 = freq2 - 700
+        If freq1 < 1000 Then
+            Throw New Exception("freq1 < 1000")
+        End If
+        _exactDoppler.SwitchOnGen({freq1, freq2})
         _outputGroupBox.Text = "Output [ ON AIR! ]"
         _switchOnButton.BackColor = Me.BackColor
     End Sub
@@ -142,7 +151,7 @@ Public Class MainForm
     End Sub
 
     Private Sub _sineFreqTrackBar_Scroll(sender As Object, e As EventArgs) Handles _sineFreqTrackBar.Scroll
-        _sineFreqLabel.Text = _sineFreqTrackBar.Value * _exactDoppler.DopplerSize
+        _freq2Label.Text = _sineFreqTrackBar.Value * _exactDoppler.DopplerSize
         _volumeTrackBar_Scroll(sender, e)
         UpdateExactDopplerConfig()
     End Sub

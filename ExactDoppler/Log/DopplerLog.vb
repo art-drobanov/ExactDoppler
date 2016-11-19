@@ -48,11 +48,6 @@ Public Class DopplerLog
             Dim logItemStrings = logItemString.ToUpper().Replace("L:", String.Empty) _
                                                         .Replace("H:", String.Empty) _
                                                         .Replace("%", String.Empty) _
-                                                        .Replace("TYPE:MOTION++", String.Empty) _
-                                                        .Replace("TYPE:MOTION--", String.Empty) _
-                                                        .Replace("TYPE:MOTION+-", String.Empty) _
-                                                        .Replace("TYPE:NOMOTION", String.Empty) _
-                                                        .Replace("CARRIER!", String.Empty) _                                                        
                                                         .Replace(";", String.Empty) _
                                                         .Split(",")
             Dim T As DateTime
@@ -78,7 +73,7 @@ Public Class DopplerLog
                 End If
             End If
 
-            If logItemStrings(4).Contains("OK") AndAlso Not logItemStrings(3).Contains("ERR") Then
+            If logItemStrings(3).Contains("CARRIER") AndAlso logItemStrings(3).Contains("OK") AndAlso Not logItemStrings(3).Contains("ERR") Then
                 C = True
             Else
                 C = False

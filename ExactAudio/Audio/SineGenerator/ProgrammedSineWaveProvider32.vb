@@ -13,8 +13,8 @@ Public Class ProgrammedSineWaveProvider32
         _Program = New Queue(Of SineTaskBlock)(program)
     End Sub
 
-    Public Sub New(frequency As IEnumerable(Of Single))
-        _Program = New Queue(Of SineTaskBlock)({New SineTaskBlock(frequency, frequency.Select(Function(item) 1.0F).ToArray())})
+    Public Sub New(frequencies As IEnumerable(Of Single))
+        _Program = New Queue(Of SineTaskBlock)({New SineTaskBlock(frequencies, frequencies.Select(Function(item) 1.0F).ToArray())})
     End Sub
 
     Public Overrides Function Read(buffer As Single(), offset As Integer, sampleCount As Integer) As Integer
@@ -24,10 +24,10 @@ Public Class ProgrammedSineWaveProvider32
         For sampleIdx = 0 To sampleCount - 1
             Dim program = _Program.FirstOrDefault()
             If program IsNot Nothing Then
-                Dim ampSum = program.Amplitude.Sum()
+                Dim ampSum = program.Amplitudes.Sum()
                 Dim sample As Single = 0
-                For sineIdx = 0 To program.Frequency.Count - 1
-                    sample += CSng((program.Amplitude(sineIdx) / ampSum) * Math.Sin((2 * Math.PI * _sampleIdx * program.Frequency(sineIdx)) / sampleRate))
+                For sineIdx = 0 To program.Frequencies.Count - 1
+                    sample += CSng((program.Amplitudes(sineIdx) / ampSum) * Math.Sin((2 * Math.PI * _sampleIdx * program.Frequencies(sineIdx)) / sampleRate))
                 Next
                 For channel = 0 To nChannels - 1
                     buffer(((nChannels * sampleIdx) + channel) + offset) = sample

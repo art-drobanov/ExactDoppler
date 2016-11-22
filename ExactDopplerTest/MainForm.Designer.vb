@@ -27,6 +27,7 @@ Partial Class MainForm
         Me._switchOffButton = New System.Windows.Forms.Button()
         Me._sineFreqTrackBar = New System.Windows.Forms.TrackBar()
         Me._topFrequencyGroupBox = New System.Windows.Forms.GroupBox()
+        Me._freq2Label = New System.Windows.Forms.Label()
         Me._freq1Label = New System.Windows.Forms.Label()
         Me._volumeTrackBar = New System.Windows.Forms.TrackBar()
         Me._outputGroupBox = New System.Windows.Forms.GroupBox()
@@ -49,7 +50,7 @@ Partial Class MainForm
         Me._dopplerLogTextBox = New System.Windows.Forms.TextBox()
         Me._waterfallGroupBox = New System.Windows.Forms.GroupBox()
         Me._waterfallDisplayBitmapControl = New Bwl.Imaging.DisplayBitmapControl()
-        Me._freq2Label = New System.Windows.Forms.Label()
+        Me.Label1 = New System.Windows.Forms.Label()
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me._topFrequencyGroupBox.SuspendLayout()
         CType(Me._volumeTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -93,6 +94,7 @@ Partial Class MainForm
         '
         '_topFrequencyGroupBox
         '
+        Me._topFrequencyGroupBox.Controls.Add(Me.Label1)
         Me._topFrequencyGroupBox.Controls.Add(Me._freq2Label)
         Me._topFrequencyGroupBox.Controls.Add(Me._freq1Label)
         Me._topFrequencyGroupBox.Controls.Add(Me._sineFreqTrackBar)
@@ -102,6 +104,15 @@ Partial Class MainForm
         Me._topFrequencyGroupBox.TabIndex = 3
         Me._topFrequencyGroupBox.TabStop = False
         Me._topFrequencyGroupBox.Text = "Frequencies"
+        '
+        '_freq2Label
+        '
+        Me._freq2Label.AutoSize = True
+        Me._freq2Label.Location = New System.Drawing.Point(87, 20)
+        Me._freq2Label.Name = "_freq2Label"
+        Me._freq2Label.Size = New System.Drawing.Size(13, 13)
+        Me._freq2Label.TabIndex = 6
+        Me._freq2Label.Text = "0"
         '
         '_freq1Label
         '
@@ -325,14 +336,14 @@ Partial Class MainForm
         Me._waterfallDisplayBitmapControl.Size = New System.Drawing.Size(536, 243)
         Me._waterfallDisplayBitmapControl.TabIndex = 27
         '
-        '_freq2Label
+        'Label1
         '
-        Me._freq2Label.AutoSize = True
-        Me._freq2Label.Location = New System.Drawing.Point(56, 20)
-        Me._freq2Label.Name = "_freq2Label"
-        Me._freq2Label.Size = New System.Drawing.Size(13, 13)
-        Me._freq2Label.TabIndex = 6
-        Me._freq2Label.Text = "0"
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(68, 20)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(13, 13)
+        Me.Label1.TabIndex = 7
+        Me.Label1.Text = "+"
         '
         'MainForm
         '
@@ -349,7 +360,7 @@ Partial Class MainForm
         Me.MaximizeBox = False
         Me.Name = "MainForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "ExactDopplerTest v.0.2"
+        Me.Text = "ExactDopplerTest v.0.21"
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me._topFrequencyGroupBox.ResumeLayout(False)
         Me._topFrequencyGroupBox.PerformLayout()
@@ -396,4 +407,5 @@ Partial Class MainForm
     Friend WithEvents _waterfallGroupBox As GroupBox
     Friend WithEvents _waterfallDisplayBitmapControl As Bwl.Imaging.DisplayBitmapControl
     Friend WithEvents _freq2Label As Label
+    Friend WithEvents Label1 As Label
 End Class

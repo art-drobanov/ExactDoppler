@@ -138,7 +138,7 @@ ExactDoppler
 	<summary>
  Останов
  </summary>
-</member><member name="M:ExactAudio.ExactDoppler.MotionExplorerResultsIntersect(ExactAudio.MotionExplorerResult[])">
+</member><member name="M:ExactAudio.ExactDoppler.MotionExplorerResultsIntersection(ExactAudio.MotionExplorerResult[])">
 	<summary>
  Пересечение результатов доплеровского анализа на разных частотах (с выделением существенной части)
  </summary>
@@ -150,7 +150,7 @@ ExactDoppler
 	<summary>
  Поэлементное пересечение набора списков по критерию "минимальное значение"
  </summary>
-</member><member name="M:ExactAudio.ExactDoppler.InitMotionExplorers">
+</member><member name="M:ExactAudio.ExactDoppler.MotionExplorersInit">
 	<summary>
  Инициализация анализаторов движения (выделенно для каждой частоты)
  </summary>

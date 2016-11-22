@@ -92,7 +92,7 @@ Public Class MainForm
         'WaterFall
         Dim waterfall1 = _waterfallShort.ToBitmap()
         If waterfall1 IsNot Nothing Then
-            waterfall1.Save("dopplerScr1__" + snapshotFilename + ".png")
+            waterfall1.Save("dopplerScr__" + snapshotFilename + ".png")
         End If
     End Sub
 
@@ -110,7 +110,7 @@ Public Class MainForm
         Dim topCenterFreq As Double
         Dim blindZone As Integer
         Me.Invoke(Sub()
-                      topCenterFreq = Convert.ToDouble(_freq2Label.Text)
+                      topCenterFreq = Convert.ToDouble(_freq2Label.Text.Replace("Hz", String.Empty))
                       blindZone = _blindZoneTrackBar.Value
                   End Sub)
         Dim pcmOutput = True
@@ -118,21 +118,23 @@ Public Class MainForm
         Dim freq2 = topCenterFreq
         Dim freq1 = freq2 - 700
         If freq1 < 1000 Then
-            Throw New Exception("freq1 < 1000")
+            Return
         End If
         _exactDoppler.Config = New ExactDopplerConfig(0, 0, 1.0, {freq1, freq2}, blindZone, 10)
-        _freq1Label.Text = freq1
-        _freq2Label.Text = freq2
+        '_exactDoppler.Config = New ExactDopplerConfig(0, 0, 1.0, {freq2}, blindZone, 10)
+        _freq1Label.Text = String.Format("{0} Hz", freq1)
+        _freq2Label.Text = String.Format("{0} Hz", freq2)
     End Sub
 
     Private Sub _sineGenButton_Click(sender As Object, e As EventArgs) Handles _switchOnButton.Click
         _exactDoppler.Volume = _volumeTrackBar.Value / 100.0F
-        Dim freq2 = Convert.ToInt32(_freq2Label.Text)
+        Dim freq2 = Convert.ToInt32(_freq2Label.Text.Replace("Hz", String.Empty))
         Dim freq1 = freq2 - 700
         If freq1 < 1000 Then
             Throw New Exception("freq1 < 1000")
         End If
         _exactDoppler.SwitchOnGen({freq1, freq2})
+        '_exactDoppler.SwitchOnGen({freq2})
         _outputGroupBox.Text = "Output [ ON AIR! ]"
         _switchOnButton.BackColor = Me.BackColor
     End Sub

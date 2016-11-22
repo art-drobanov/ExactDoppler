@@ -158,7 +158,7 @@ Public Class ExactDoppler
         _sineGenerator = New SineGenerator(_outputDeviceIdx, _sampleRate)
         _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallSeconds)
 
-        InitMotionExplorers()
+        MotionExplorersInit()
 
         InputDeviceIdx = _config.InputDeviceIdx
         OutputDeviceIdx = _config.OutputDeviceIdx
@@ -181,9 +181,9 @@ Public Class ExactDoppler
             End If
 
             'Цикл по всем заданным несущим
-            For f = 0 To _config.CenterFreqs.Length - 1
-                Dim centerFreq = _config.CenterFreqs(f)
-                Dim motionExplorer = _motionExplorers(f)
+            For freqIdx = 0 To _config.CenterFreqs.Length - 1
+                Dim centerFreq = _config.CenterFreqs(freqIdx)
+                Dim motionExplorer = _motionExplorers(freqIdx)
 
                 'Параметры
                 Dim lowFreq As Double = 0
@@ -262,7 +262,7 @@ Public Class ExactDoppler
         'Если в результатах анализа более одного элемента...
         If motionExplorerResults.Count > 1 Then
             '...получение объединенного результата анализа (помещаем по нулевому индексу)
-            Dim resIntersection = MotionExplorerResultsIntersect(motionExplorerResults.ToArray())
+            Dim resIntersection = MotionExplorerResultsIntersection(motionExplorerResults.ToArray())
             _dopplerLog.Add(resIntersection.DopplerLogItem)
             Return resIntersection
         Else
@@ -276,7 +276,7 @@ Public Class ExactDoppler
     ''' </summary>
     Public Sub SwitchOnGen()
         SyncLock SyncRoot
-            InitMotionExplorers()
+            MotionExplorersInit()
             SwitchOnGen(_config.CenterFreqs.Select(Function(item) CSng(item)))
         End SyncLock
     End Sub
@@ -288,7 +288,7 @@ Public Class ExactDoppler
     Public Sub SwitchOnGen(frequencies As IEnumerable(Of Single))
         SyncLock SyncRoot
             _config.CenterFreqs = frequencies.Select(Function(item) CDbl(item)).ToArray()
-            InitMotionExplorers()
+            MotionExplorersInit()
             _sineGenerator.SwitchOn(frequencies)
         End SyncLock
     End Sub
@@ -337,7 +337,7 @@ Public Class ExactDoppler
     ''' <summary>
     ''' Пересечение результатов доплеровского анализа на разных частотах (с выделением существенной части)
     ''' </summary>
-    Private Function MotionExplorerResultsIntersect(motionExplorerResults As MotionExplorerResult()) As MotionExplorerResult
+    Private Function MotionExplorerResultsIntersection(motionExplorerResults As MotionExplorerResult()) As MotionExplorerResult
         Dim result As New MotionExplorerResult()
         result.Duration = motionExplorerResults.First.Duration
         result.Timestamp = motionExplorerResults.First.Timestamp
@@ -399,7 +399,7 @@ Public Class ExactDoppler
     ''' <summary>
     ''' Инициализация анализаторов движения (выделенно для каждой частоты)
     ''' </summary>
-    Private Sub InitMotionExplorers()
+    Private Sub MotionExplorersInit()
         SyncLock SyncRoot
             'Для каждой центральной частоты нужен свой MotionExplorer
             _motionExplorers = New List(Of MotionExplorer)()

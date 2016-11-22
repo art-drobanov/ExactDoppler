@@ -35,6 +35,28 @@ ExactAudio
 	<summary>
   A strongly-typed resource class, for looking up localized strings, etc.
 </summary>
+</member><member name="M:ExactAudio.FFTExplorer.ExploreMagPhase(System.Single[],System.Int32,System.Double,System.Double)">
+	<summary>
+ Прямое преобразование Фурье с выделением поддиапазона магнитуд и относительных фаз
+ </summary>
+	<param name="pcmSamples">Входные PCM-семплы.</param>
+	<param name="pcmSamplesCount">Количество семплов под обработку.</param>
+	<param name="lowFreq">Нижняя частота поддиапазона.</param>
+	<param name="highFreq">Верхняя частота поддиапазона.</param>
+</member><member name="M:ExactAudio.FFTExplorer.ExploreMag(System.Single[],System.Int32,System.Double,System.Double)">
+	<summary>
+ Прямое преобразование Фурье с выделением поддиапазона магнитуд
+ </summary>
+	<param name="pcmSamples">Входные PCM-семплы.</param>
+	<param name="pcmSamplesCount">Количество семплов под обработку.</param>
+	<param name="lowFreq">Нижняя частота поддиапазона.</param>
+	<param name="highFreq">Верхняя частота поддиапазона.</param>
+</member><member name="M:ExactAudio.FFTExplorer.CFFT(System.Single[],System.Int32)">
+	<summary>
+ Прямое преобразование Фурье с выделением набора параметров (магнитуды, относительные фазы...)
+ </summary>
+	<param name="pcmSamples">Входные PCM-семплы.</param>
+	<param name="pcmSamplesCount">Количество семплов под обработку.</param>
 </member><member name="T:ExactAudio.FFTExplorer">
 	<summary>
  FFT-анализатор

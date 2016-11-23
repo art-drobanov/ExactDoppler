@@ -1,4 +1,7 @@
-﻿Public Class DopplerLogItem
+﻿''' <summary>
+''' Элемент доплеровского лога
+''' </summary>
+Public Class DopplerLogItem
     Public Shared ReadOnly DateTimeFormat As String = "yyyy-MM-dd HH:mm:ss.ffff zzz"
     Public Property Time As DateTime
     Public Property LowDoppler As Single

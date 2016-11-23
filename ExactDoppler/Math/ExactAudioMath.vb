@@ -1,4 +1,7 @@
-﻿Module ExactAudioMath
+﻿''' <summary>
+''' Вспомогательная "математика"
+''' </summary>
+Module ExactAudioMath
     Public Sub DbScale(data As Double()(), zeroDbLevel As Double, squelchInDb As Double)
         Parallel.For(0, data.Length, Sub(i As Integer)
                                          DbScale(data(i), zeroDbLevel, squelchInDb)

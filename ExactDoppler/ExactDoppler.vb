@@ -25,6 +25,7 @@ Public Class ExactDoppler
     'Объекты
     Private _capture As WaveInSource
     Private _sineGenerator As SineGenerator
+    Private _fftExplorer As FFTExplorer
     Private _motionExplorers As List(Of MotionExplorer)
 
     Public ReadOnly SyncRoot As New Object
@@ -158,6 +159,7 @@ Public Class ExactDoppler
         _sineGenerator = New SineGenerator(_outputDeviceIdx, _sampleRate)
         _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallSeconds)
 
+        _fftExplorer = New FFTExplorer(_windowSize, _windowStep, _sampleRate, _nBitsPalette, False)
         MotionExplorersInit()
 
         InputDeviceIdx = _config.InputDeviceIdx
@@ -180,12 +182,16 @@ Public Class ExactDoppler
                 Throw New Exception("ExactDoppler: _config.CenterFreqs.Count <> _motionExplorers.Count")
             End If
 
+            'FFT
+            Dim magnitudesOnly = True
+            Dim fftResultFull = _fftExplorer.Explore(pcmSamples, pcmSamplesCount, magnitudesOnly) 'БПФ без выделения диапазона
+
             'Цикл по всем заданным несущим
             For freqIdx = 0 To _config.CenterFreqs.Length - 1
                 Dim centerFreq = _config.CenterFreqs(freqIdx)
                 Dim motionExplorer = _motionExplorers(freqIdx)
 
-                'Параметры
+                'Установка параметров частот
                 Dim lowFreq As Double = 0
                 Dim highFreq As Double = 0
                 If centerFreq = 0 Then
@@ -199,45 +205,13 @@ Public Class ExactDoppler
                 End If
 
                 'Обработка
-                Dim motionExplorerResult = motionExplorer.Process(pcmSamples, pcmSamplesCount, lowFreq, highFreq, _config.BlindZone)
-                motionExplorerResult.Timestamp = timestamp
-
-                'Штамп даты и времени
-                Dim strW = 208
-                Dim strH = 20
-                Dim resW = strW + motionExplorerResult.Image.Width
-                Dim resH = motionExplorerResult.Image.Height
-                Dim result = New RGBMatrix(resW, resH)
-                If motionExplorerResult.Image.Height >= strH Then
-                    Dim stringImg As RGBMatrix
-                    Using bmp = New Bitmap(strW, strH)
-                        Using gr = Graphics.FromImage(bmp)
-                            Dim timeStr = timestamp.ToString("yyyy-MM-dd HH:mm:ss zzz")
-                            gr.DrawString(timeStr, New System.Drawing.Font("Microsoft Sans Serif", 12.0F), Brushes.LightSlateGray, New PointF(0, 0))
-                        End Using
-                        stringImg = BitmapConverter.BitmapToRGBMatrix(bmp)
-                    End Using
-                    Parallel.For(0, 3, Sub(channel As Integer)
-                                           For i = 0 To stringImg.Height - 1
-                                               For j = 0 To stringImg.Width - 1
-                                                   result.Matrix(channel)(j, i) = stringImg.Matrix(channel)(j, i)
-                                               Next
-                                           Next
-                                       End Sub)
-                    Parallel.For(0, 3, Sub(channel As Integer)
-                                           For i = 0 To motionExplorerResult.Image.Height - 1
-                                               For j = 0 To motionExplorerResult.Image.Width - 1
-                                                   result.Matrix(channel)(strW + j, i) = motionExplorerResult.Image.Matrix(channel)(j, i)
-                                               Next
-                                           Next
-                                       End Sub)
-                End If
-                motionExplorerResult.Image = result
+                Dim fftResultSubBand = _fftExplorer.SubBand(fftResultFull, lowFreq, highFreq, magnitudesOnly) 'Выделяем необходимый поддиапазон гармоник...
+                Dim motionExplorerResult = motionExplorer.Process(fftResultSubBand.MagL, _config.BlindZone) '...и находим доплеровские всплески
 
                 'Доплер-лог
                 With motionExplorerResult
-                    Dim lowDopplerAvg = .LowDoppler.Average() 'Накопление по нижней полосе
-                    Dim highDopplerAvg = .HighDoppler.Average() 'Накопление по верхней полосе
+                    Dim lowDopplerAvg = .LowDoppler.Average()
+                    Dim highDopplerAvg = .HighDoppler.Average()
                     Dim carrierIsOK = .CarrierLevel.Min() >= _config.CarrierWarningLevel 'Несущая не должна иметь слишком низкий уровень
                     Dim logItem = New DopplerLogItem(timestamp, lowDopplerAvg, highDopplerAvg, carrierIsOK) 'Элемент лога
                     motionExplorerResult.DopplerLogItem = logItem
@@ -263,9 +237,11 @@ Public Class ExactDoppler
         If motionExplorerResults.Count > 1 Then
             '...получение объединенного результата анализа (помещаем по нулевому индексу)
             Dim resIntersection = MotionExplorerResultsIntersection(motionExplorerResults.ToArray())
+            SetTimeStamp(resIntersection, timestamp) 'Штамп даты и времени!
             _dopplerLog.Add(resIntersection.DopplerLogItem)
             Return resIntersection
         Else
+            SetTimeStamp(motionExplorerResults.First, timestamp) 'Штамп даты и времени!
             _dopplerLog.Add(motionExplorerResults.First.DopplerLogItem)
             Return motionExplorerResults.First
         End If
@@ -332,6 +308,43 @@ Public Class ExactDoppler
         SyncLock SyncRoot
             _capture.Stop()
         End SyncLock
+    End Sub
+
+    ''' <summary>
+    ''' Установка штампа даты и времени в результате обработки
+    ''' </summary>
+    Private Sub SetTimeStamp(motionExplorerResult As MotionExplorerResult, timestamp As DateTime)
+        motionExplorerResult.Timestamp = timestamp
+        Dim strW = 208
+        Dim strH = 20
+        Dim resW = strW + motionExplorerResult.Image.Width
+        Dim resH = motionExplorerResult.Image.Height
+        Dim result = New RGBMatrix(resW, resH)
+        If motionExplorerResult.Image.Height >= strH Then
+            Dim stringImg As RGBMatrix
+            Using bmp = New Bitmap(strW, strH)
+                Using gr = Graphics.FromImage(bmp)
+                    Dim timeStr = timestamp.ToString("yyyy-MM-dd HH:mm:ss zzz")
+                    gr.DrawString(timeStr, New System.Drawing.Font("Microsoft Sans Serif", 12.0F), Brushes.LightSlateGray, New PointF(0, 0))
+                End Using
+                stringImg = BitmapConverter.BitmapToRGBMatrix(bmp)
+            End Using
+            Parallel.For(0, 3, Sub(channel As Integer)
+                                   For i = 0 To stringImg.Height - 1
+                                       For j = 0 To stringImg.Width - 1
+                                           result.Matrix(channel)(j, i) = stringImg.Matrix(channel)(j, i)
+                                       Next
+                                   Next
+                               End Sub)
+            Parallel.For(0, 3, Sub(channel As Integer)
+                                   For i = 0 To motionExplorerResult.Image.Height - 1
+                                       For j = 0 To motionExplorerResult.Image.Width - 1
+                                           result.Matrix(channel)(strW + j, i) = motionExplorerResult.Image.Matrix(channel)(j, i)
+                                       Next
+                                   Next
+                               End Sub)
+        End If
+        motionExplorerResult.Image = result
     End Sub
 
     ''' <summary>
@@ -404,7 +417,7 @@ Public Class ExactDoppler
             'Для каждой центральной частоты нужен свой MotionExplorer
             _motionExplorers = New List(Of MotionExplorer)()
             For Each centerFreq In _config.CenterFreqs
-                _motionExplorers.Add(New MotionExplorer(_windowSize, _windowStep, _sampleRate, _nBitsPalette, False))
+                _motionExplorers.Add(New MotionExplorer(_nBitsPalette, _fftExplorer))
             Next
         End SyncLock
     End Sub

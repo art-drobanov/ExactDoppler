@@ -1,5 +1,8 @@
 ﻿Imports Bwl.Framework
 
+''' <summary>
+''' Конфигурация ExactDoppler "из конфига"
+''' </summary>
 Public Class ExactDopplerConfigFromStorage
     Inherits ExactDopplerConfig
 

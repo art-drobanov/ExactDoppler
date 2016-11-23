@@ -1,4 +1,7 @@
-﻿Public Class SineTaskBlock
+﻿''' <summary>
+''' Блок программы для генератора синуса
+''' </summary>
+Public Class SineTaskBlock
     Private _samplesTotal As ULong
     Private _samplesGenerated As ULong
     Public Property Frequencies As List(Of Single)

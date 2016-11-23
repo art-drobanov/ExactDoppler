@@ -27,6 +27,7 @@ Partial Class MainForm
         Me._switchOffButton = New System.Windows.Forms.Button()
         Me._sineFreqTrackBar = New System.Windows.Forms.TrackBar()
         Me._topFrequencyGroupBox = New System.Windows.Forms.GroupBox()
+        Me.Label1 = New System.Windows.Forms.Label()
         Me._freq2Label = New System.Windows.Forms.Label()
         Me._freq1Label = New System.Windows.Forms.Label()
         Me._volumeTrackBar = New System.Windows.Forms.TrackBar()
@@ -50,7 +51,6 @@ Partial Class MainForm
         Me._dopplerLogTextBox = New System.Windows.Forms.TextBox()
         Me._waterfallGroupBox = New System.Windows.Forms.GroupBox()
         Me._waterfallDisplayBitmapControl = New Bwl.Imaging.DisplayBitmapControl()
-        Me.Label1 = New System.Windows.Forms.Label()
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me._topFrequencyGroupBox.SuspendLayout()
         CType(Me._volumeTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -104,6 +104,15 @@ Partial Class MainForm
         Me._topFrequencyGroupBox.TabIndex = 3
         Me._topFrequencyGroupBox.TabStop = False
         Me._topFrequencyGroupBox.Text = "Frequencies"
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(68, 20)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(13, 13)
+        Me.Label1.TabIndex = 7
+        Me.Label1.Text = "+"
         '
         '_freq2Label
         '
@@ -336,15 +345,6 @@ Partial Class MainForm
         Me._waterfallDisplayBitmapControl.Size = New System.Drawing.Size(536, 243)
         Me._waterfallDisplayBitmapControl.TabIndex = 27
         '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(68, 20)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(13, 13)
-        Me.Label1.TabIndex = 7
-        Me.Label1.Text = "+"
-        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -360,7 +360,7 @@ Partial Class MainForm
         Me.MaximizeBox = False
         Me.Name = "MainForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "ExactDopplerTest v.0.21"
+        Me.Text = "ExactDopplerTest v.0.22"
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me._topFrequencyGroupBox.ResumeLayout(False)
         Me._topFrequencyGroupBox.PerformLayout()

@@ -2,6 +2,9 @@
 
 Public Delegate Sub SampleProcessorDelegate(samples As Single(), samplesCount As Integer, timestamp As DateTime)
 
+''' <summary>
+''' Аудиоисточник
+''' </summary>
 Public Class WaveInSource
     Private _started As Boolean
     Private _waveFormat As WaveFormat

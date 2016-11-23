@@ -1,4 +1,7 @@
-﻿Public Class RowNZeroesFilter
+﻿''' <summary>
+''' Доплеровский фильтр для применения на строке "водопада"
+''' </summary>
+Public Class RowNZeroesFilter
     Private _NZeroes As Integer 'Максимальное допустимое кол-во "настоящих нулей" строки
     Private _zeroCount As Integer 'Количество зафиксированных "настоящих нулей" строки
     Private _memoryWindowSize As Integer 'Размер "окна памяти"

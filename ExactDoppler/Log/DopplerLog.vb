@@ -1,6 +1,9 @@
 ﻿Imports System.IO
 Imports System.Globalization
 
+''' <summary>
+''' Доплеровский лог
+''' </summary>
 Public Class DopplerLog
 
     Private _items As New LinkedList(Of DopplerLogItem)

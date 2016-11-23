@@ -188,7 +188,9 @@ Public Class MainForm
     Private Sub _inputAudioDevicesListBox_SelectedIndexChanged(sender As Object, e As EventArgs) Handles _inputAudioDevicesListBox.SelectedIndexChanged
         _captureOffButton_Click(sender, e)
         _exactDoppler.InputDeviceIdx = _inputAudioDevicesListBox.SelectedIndex
-        _inputAudioDevicesRefreshButton.Text = _inputAudioDevicesListBox.Items(_exactDoppler.InputDeviceIdx) + " / Refresh"
+        If _exactDoppler.InputDeviceIdx <> -1 Then
+            _inputAudioDevicesRefreshButton.Text = _inputAudioDevicesListBox.Items(_exactDoppler.InputDeviceIdx) + " / Refresh"
+        End If
     End Sub
 
     Private Sub _blindZoneTrackBar_Scroll(sender As Object, e As EventArgs) Handles _blindZoneTrackBar.Scroll

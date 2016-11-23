@@ -2,6 +2,9 @@
 Imports System.Runtime.CompilerServices
 Imports Bwl.Imaging
 
+''' <summary>
+''' Графические утилиты
+''' </summary>
 Public Module ImageUtils
     <Extension>
     Public Function ToBitmap(rgbMatrix As RGBMatrix, scale As Single) As Bitmap

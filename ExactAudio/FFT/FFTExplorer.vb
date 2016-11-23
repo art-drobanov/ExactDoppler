@@ -1,7 +1,7 @@
 ﻿Imports DrAF.DSP
 
 ''' <summary>
-''' FFT-анализатор
+''' Анализатор результатов работы FFT
 ''' </summary>
 Public Class FFTExplorer
     Protected _sampleRate As Integer
@@ -9,6 +9,12 @@ Public Class FFTExplorer
     Protected _stereo As Boolean
     Protected _timeSliceDuration As Double
     Protected _fftObj As ExactFFT.CFFT_Object
+
+    Public ReadOnly Property ZeroDbLevel As Double
+        Get
+            Return _zeroDbLevel
+        End Get
+    End Property
 
     Public ReadOnly Property SonogramRowDuration As Double
         Get
@@ -35,69 +41,12 @@ Public Class FFTExplorer
     End Sub
 
     ''' <summary>
-    ''' Прямое преобразование Фурье с выделением поддиапазона магнитуд и относительных фаз
-    ''' </summary>
-    ''' <param name="pcmSamples">Входные PCM-семплы.</param>
-    ''' <param name="pcmSamplesCount">Количество семплов под обработку.</param>
-    ''' <param name="lowFreq">Нижняя частота поддиапазона.</param>
-    ''' <param name="highFreq">Верхняя частота поддиапазона.</param>
-    Public Function ExploreMagPhase(pcmSamples As Single(), pcmSamplesCount As Integer, lowFreq As Double, highFreq As Double) As ExactPlotter.CFFT_ExploreResult
-        'FFT
-        Dim res = CFFT(pcmSamples, pcmSamplesCount)
-
-        'Выделение поддиапазона гармоник
-        Dim lowHarmIdx As Integer = 0
-        Dim highHarmIdx As Integer = 0
-        Dim harmReverse As Boolean = False
-        With res
-            .MagL = ExactPlotter.SubBand(res.MagL, lowFreq, highFreq, lowHarmIdx, highHarmIdx, _fftObj, _sampleRate, harmReverse)
-            .MagR = ExactPlotter.SubBand(res.MagR, lowFreq, highFreq, lowHarmIdx, highHarmIdx, _fftObj, _sampleRate, harmReverse)
-            .PhaseLR = ExactPlotter.SubBand(res.PhaseLR, lowFreq, highFreq, lowHarmIdx, highHarmIdx, _fftObj, _sampleRate, harmReverse)
-            .ACH = Nothing
-            .ArgL = Nothing
-            .ArgR = Nothing
-            .Mag = Nothing
-            .Arg = Nothing
-        End With
-
-        Return res
-    End Function
-
-    ''' <summary>
-    ''' Прямое преобразование Фурье с выделением поддиапазона магнитуд
-    ''' </summary>
-    ''' <param name="pcmSamples">Входные PCM-семплы.</param>
-    ''' <param name="pcmSamplesCount">Количество семплов под обработку.</param>
-    ''' <param name="lowFreq">Нижняя частота поддиапазона.</param>
-    ''' <param name="highFreq">Верхняя частота поддиапазона.</param>
-    Public Function ExploreMag(pcmSamples As Single(), pcmSamplesCount As Integer, lowFreq As Double, highFreq As Double) As ExactPlotter.CFFT_ExploreResult
-        'FFT
-        Dim res = CFFT(pcmSamples, pcmSamplesCount)
-
-        'Выделение поддиапазона гармоник
-        Dim lowHarmIdx As Integer = 0
-        Dim highHarmIdx As Integer = 0
-        Dim harmReverse As Boolean = False
-        With res
-            .MagL = ExactPlotter.SubBand(res.MagL, lowFreq, highFreq, lowHarmIdx, highHarmIdx, _fftObj, _sampleRate, harmReverse)
-            .MagR = ExactPlotter.SubBand(res.MagR, lowFreq, highFreq, lowHarmIdx, highHarmIdx, _fftObj, _sampleRate, harmReverse)
-            .PhaseLR = Nothing
-            .ACH = Nothing
-            .ArgL = Nothing
-            .ArgR = Nothing
-            .Mag = Nothing
-            .Arg = Nothing
-        End With
-
-        Return res
-    End Function
-
-    ''' <summary>
     ''' Прямое преобразование Фурье с выделением набора параметров (магнитуды, относительные фазы...)
     ''' </summary>
     ''' <param name="pcmSamples">Входные PCM-семплы.</param>
-    ''' <param name="pcmSamplesCount">Количество семплов под обработку.</param>    
-    Public Function CFFT(pcmSamples As Single(), pcmSamplesCount As Integer) As ExactPlotter.CFFT_ExploreResult
+    ''' <param name="pcmSamplesCount">Количество семплов под обработку.</param>
+    ''' <param name="magnitudesOnly">Вычислять только магнитуды?</param>
+    Public Function Explore(pcmSamples As Single(), pcmSamplesCount As Integer, Optional magnitudesOnly As Boolean = False) As ExactPlotter.CFFT_ExploreResult
         'Конфигурация: прямой проход FFT с нормализацией и использованием взвешивающего окна...
         Dim useTaperWindow As Boolean = True
         Dim recoverAfterTaperWindow As Boolean = False
@@ -119,8 +68,39 @@ Public Class FFTExplorer
                                          useNorm, direction, usePolyphase, remainArrayItemsLRCount,
                                          _fftObj)
 
-        'Разбор данных после преобразования Фурье (только магнитуды)
-        Dim res = ExactPlotter.ExploreMag(FFT_T, usePolyphase, _fftObj)
+        'Разбор данных после преобразования Фурье
+        Dim res = If(magnitudesOnly, ExactPlotter.ExploreMag(FFT_T, usePolyphase, _fftObj), ExactPlotter.Explore(FFT_T, usePolyphase, _fftObj))
+
+        Return res
+    End Function
+
+    ''' <summary>
+    ''' Выделение поддиапазона гармоник
+    ''' </summary>
+    ''' <param name="cfft"></param>
+    ''' <param name="lowFreq">Нижняя частота поддиапазона.</param>
+    ''' <param name="highFreq">Верхняя частота поддиапазона.</param>
+    Public Function SubBand(cfft As ExactPlotter.CFFT_ExploreResult, lowFreq As Double, highFreq As Double, Optional magnitudesOnly As Boolean = False) As ExactPlotter.CFFT_ExploreResult
+        Dim res = New ExactPlotter.CFFT_ExploreResult
+
+        Dim lowHarmIdx As Integer = 0
+        Dim highHarmIdx As Integer = 0
+        Dim harmReverse As Boolean = False
+        If magnitudesOnly Then
+            With res
+                .MagL = ExactPlotter.SubBand(cfft.MagL, lowFreq, highFreq, lowHarmIdx, highHarmIdx, _fftObj, _sampleRate, harmReverse)
+                .MagR = ExactPlotter.SubBand(cfft.MagR, lowFreq, highFreq, lowHarmIdx, highHarmIdx, _fftObj, _sampleRate, harmReverse)
+            End With
+        Else
+            With res
+                .MagL = ExactPlotter.SubBand(cfft.MagL, lowFreq, highFreq, lowHarmIdx, highHarmIdx, _fftObj, _sampleRate, harmReverse)
+                .MagR = ExactPlotter.SubBand(cfft.MagR, lowFreq, highFreq, lowHarmIdx, highHarmIdx, _fftObj, _sampleRate, harmReverse)
+                .ACH = ExactPlotter.SubBand(cfft.ACH, lowFreq, highFreq, lowHarmIdx, highHarmIdx, _fftObj, _sampleRate, harmReverse)
+                .ArgL = ExactPlotter.SubBand(cfft.ArgL, lowFreq, highFreq, lowHarmIdx, highHarmIdx, _fftObj, _sampleRate, harmReverse)
+                .ArgR = ExactPlotter.SubBand(cfft.ArgR, lowFreq, highFreq, lowHarmIdx, highHarmIdx, _fftObj, _sampleRate, harmReverse)
+                .PhaseLR = ExactPlotter.SubBand(cfft.PhaseLR, lowFreq, highFreq, lowHarmIdx, highHarmIdx, _fftObj, _sampleRate, harmReverse)
+            End With
+        End If
 
         Return res
     End Function

@@ -1,9 +1,14 @@
 ﻿Imports NAudio.Wave
 
+''' <summary>
+''' Поставщик семплов для аудиовывода генератора
+''' </summary>
 Public Class ProgrammedSineWaveProvider32
     Inherits WaveProvider32
 
     Private _sampleIdx As Integer
+
+    ''' <summary>'Программа', управляющая генератором.</summary>
     Public Property Program As Queue(Of SineTaskBlock)
 
     Public Sub New()
@@ -18,8 +23,8 @@ Public Class ProgrammedSineWaveProvider32
     End Sub
 
     Public Overrides Function Read(buffer As Single(), offset As Integer, sampleCount As Integer) As Integer
-        Dim sampleRate = WaveFormat.SampleRate
-        Dim nChannels = WaveFormat.Channels
+        Dim sampleRate = MyBase.WaveFormat.SampleRate
+        Dim nChannels = MyBase.WaveFormat.Channels
         sampleCount \= nChannels
         For sampleIdx = 0 To sampleCount - 1
             Dim program = _Program.FirstOrDefault()

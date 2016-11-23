@@ -1,8 +1,9 @@
 ﻿Imports DrAF.DSP
 
+''' <summary>
+''' Анализатор доплеровских всплесков
+''' </summary>
 Public Class MotionExplorer
-    Inherits FFTExplorer
-
     Private Const _redChannel = 0 '0
     Private Const _greenChannel = 1 '1
     Private Const _blueChannel = 2 '2
@@ -20,42 +21,36 @@ Public Class MotionExplorer
     Private _gain As Double = 1.0 '1.0
 
     Private _paletteProcessor As PaletteProcessor 'Объект для работы с палитрой
+    Private _fftExplorer As FFTExplorer 'Класс для обработки результатов FFT
 
     ''' <summary>
-    ''' Конструктор.
+    ''' Конструктор
     ''' </summary>
-    ''' <param name="frameWidth">Размер кадра.</param>
-    ''' <param name="frameStep">Шаг окна БПФ.</param>
-    ''' <param name="sampleRate">Частота семплирования.</param>
     ''' <param name="nBits">Разрядность.</param>
-    ''' <param name="stereo">Стереорежим?</param>
-    Public Sub New(frameWidth As Integer, frameStep As Integer, sampleRate As Integer, nBits As Integer, stereo As Boolean)
-        MyBase.New(frameWidth, frameStep, sampleRate, nBits, stereo)
+    ''' <param name="fftExplorer">Класс для обработки результатов FFT.</param>
+    Public Sub New(nBits As Integer, fftExplorer As FFTExplorer)
         _targetNRG = Math.Pow(2, nBits - 1)
         _paletteProcessor = New PaletteProcessor()
+        _fftExplorer = fftExplorer
     End Sub
 
     ''' <summary>
-    ''' Основной метод обработки.
+    ''' Основной метод обработки
     ''' </summary>
-    ''' <param name="pcmSamples">Pcm-семплы.</param>
-    ''' <param name="pcmSamplesCount">Количество семплов (для учета режима моно/стерео).</param>
-    ''' <param name="lowFreq">Нижняя частота области интереса.</param>
-    ''' <param name="highFreq">Верхняя частота области интереса.</param>
-    ''' <param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>    
+    ''' <param name="mag">Магнитуды (фрагмент "водопада").</param>
+    ''' <param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
     ''' <returns>"Результат анализа движения".</returns>
-    Public Function Process(pcmSamples As Single(), pcmSamplesCount As Integer, lowFreq As Double, highFreq As Double, blindZone As Integer) As MotionExplorerResult
+    Public Function Process(mag As Double()(), blindZone As Integer) As MotionExplorerResult
         'FFT + DSP
-        Dim mag = MyBase.ExploreMag(pcmSamples, pcmSamplesCount, lowFreq, highFreq).MagL
-        Dim result As New MotionExplorerResult With {.Duration = mag(0).Length * MyBase.SonogramRowDuration}
+        Dim result As New MotionExplorerResult With {.Duration = mag(0).Length * _fftExplorer.SonogramRowDuration}
 
         'DbScale + Filtering
-        Dim squelchInDb = ExactAudioMath.Db(AutoGainAndGetSquelch(mag, _brightness), _zeroDbLevel)
-        ExactAudioMath.DbScale(mag, _zeroDbLevel, squelchInDb)
+        Dim squelchInDb = ExactAudioMath.Db(AutoGainAndGetSquelch(mag, _brightness), _fftExplorer.ZeroDbLevel)
+        ExactAudioMath.DbScale(mag, _fftExplorer.ZeroDbLevel, squelchInDb)
         DopplerFilterDb(mag, _rowFilterMemorySize, _NZeroes)
 
         'Detection
-        WaterfallDetector(result, mag, _zeroDbLevel, blindZone)
+        WaterfallDetector(result, mag, _fftExplorer.ZeroDbLevel, blindZone)
 
         Return result
     End Function
@@ -179,11 +174,11 @@ Public Class MotionExplorer
                                         Dim sum As Double = 0
                                         For j = 0 To row.Length - 1
                                             If row(j) > Double.MinValue Then
-                                                sum += ExactAudioMath.DbInv(row(j), _zeroDbLevel) '[1] Re-Exp
+                                                sum += ExactAudioMath.DbInv(row(j), _fftExplorer.ZeroDbLevel) '[1] Re-Exp
                                             End If
                                         Next
                                         sum /= CDbl(row.Length)
-                                        sum = ExactAudioMath.Db(sum, _zeroDbLevel) '[2] Re-Log
+                                        sum = ExactAudioMath.Db(sum, _fftExplorer.ZeroDbLevel) '[2] Re-Log
 
                                         Dim target = result(i)
                                         For col = 0 To target.Length - 1

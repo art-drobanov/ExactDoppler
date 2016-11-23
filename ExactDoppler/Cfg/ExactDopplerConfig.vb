@@ -1,4 +1,7 @@
-﻿Public Class ExactDopplerConfig
+﻿''' <summary>
+''' Конфигурация ExactDoppler
+''' </summary>
+Public Class ExactDopplerConfig
     Public Property InputDeviceIdx As Integer
     Public Property OutputDeviceIdx As Integer
     Public Property Volume As Single

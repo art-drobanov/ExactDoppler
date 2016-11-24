@@ -41,12 +41,15 @@ Public Class MotionExplorer
     ''' <param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
     ''' <returns>"Результат анализа движения".</returns>
     Public Function Process(mag As Double()(), blindZone As Integer) As MotionExplorerResult
-        'FFT + DSP
         Dim result As New MotionExplorerResult With {.Duration = mag(0).Length * _fftExplorer.SonogramRowDuration}
 
-        'DbScale + Filtering
+        'DbScale
         Dim squelchInDb = ExactAudioMath.Db(AutoGainAndGetSquelch(mag, _brightness), _fftExplorer.ZeroDbLevel)
-        ExactAudioMath.DbScale(mag, _fftExplorer.ZeroDbLevel, squelchInDb)
+        ExactAudioMath.DbScale(mag, _fftExplorer.ZeroDbLevel)
+        result.RawImage = _paletteProcessor.Process(mag) 'Необработанное изображение
+
+        'Doppler Filtering
+        ExactAudioMath.DbSquelch(mag, squelchInDb)
         DopplerFilterDb(mag, _rowFilterMemorySize, _NZeroes)
 
         'Detection
@@ -128,7 +131,7 @@ Public Class MotionExplorer
                                        image(magRGB.Width - 2, i) = color.B
                                    End If
 
-                                   'Левая часть "индикатора"
+                                   'Левая и правая часть "индикатора"
                                    For j = lowDopplerHighHarm To centerHarm - _carrierRadius
                                        If channel = _redChannel Then
                                            image(j, i) = MaxRGB(sideR.Red(0, i), sideR.Green(0, i), sideR.Blue(0, i))
@@ -140,7 +143,6 @@ Public Class MotionExplorer
                                            image(j, i) = MaxRGB(sideL.Red(0, i), sideL.Green(0, i), sideL.Blue(0, i))
                                        End If
                                    Next
-                                   'Правая часть "индикатора"
                                    For j = centerHarm + _carrierRadius To highDopplerLowHarm
                                        If channel = _redChannel Then
                                            image(j, i) = MaxRGB(sideR.Red(0, i), sideR.Green(0, i), sideR.Blue(0, i))
@@ -156,7 +158,7 @@ Public Class MotionExplorer
                            End Sub)
 
         'Сохраняем графический результат - есть он или нет...
-        result.Image = magRGB
+        result.DopplerImage = magRGB
     End Sub
 
     ''' <summary>

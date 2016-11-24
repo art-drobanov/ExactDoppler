@@ -10,6 +10,7 @@ Public Class MotionExplorerResult
     Public Property HighDoppler As New LinkedList(Of Single)
     Public Property DopplerLogItem As DopplerLogItem
     Public Property Duration As Double
-    Public Property Image As RGBMatrix
+    Public Property RawImage As RGBMatrix
+    Public Property DopplerImage As RGBMatrix
     Public Property IsWarning As Boolean
 End Class

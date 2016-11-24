@@ -1,7 +1,7 @@
 ﻿Imports Bwl.Framework
 
 ''' <summary>
-''' Конфигурация ExactDoppler "из конфига"
+''' Конфигурация ExactDoppler из конфигурационного файла
 ''' </summary>
 Public Class ExactDopplerConfigFromStorage
     Inherits ExactDopplerConfig
@@ -18,7 +18,7 @@ Public Class ExactDopplerConfigFromStorage
         _outputDeviceIdx = New IntegerSetting(storage, "OutputDeviceIdx", 0)
         _volume = New DoubleSetting(storage, "Volume", 0.5)
         _centerFreqs = New StringSetting(storage, "CenterFreqs", "20300,21000")
-        _blindZone = New IntegerSetting(storage, "BlindZone", 80)
+        _blindZone = New IntegerSetting(storage, "BlindZone", 60)
         _carrierWarningLevel = New IntegerSetting(storage, "CarrierWarningLevel", 10)
     End Sub
 

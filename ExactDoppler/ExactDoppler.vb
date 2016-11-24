@@ -237,11 +237,15 @@ Public Class ExactDoppler
         If motionExplorerResults.Count > 1 Then
             '...получение объединенного результата анализа (помещаем по нулевому индексу)
             Dim resIntersection = MotionExplorerResultsIntersection(motionExplorerResults.ToArray())
-            SetTimeStamp(resIntersection, timestamp) 'Штамп даты и времени!
+            resIntersection.Timestamp = timestamp 'Штамп даты и времени (1/3)
+            resIntersection.RawImage = SetTimeStampOnImage(resIntersection.RawImage, timestamp) 'Штамп даты и времени (2/3)
+            resIntersection.DopplerImage = SetTimeStampOnImage(resIntersection.DopplerImage, timestamp) 'Штамп даты и времени (3/3)
             _dopplerLog.Add(resIntersection.DopplerLogItem)
             Return resIntersection
         Else
-            SetTimeStamp(motionExplorerResults.First, timestamp) 'Штамп даты и времени!
+            motionExplorerResults.First.Timestamp = timestamp 'Штамп даты и времени (1/3)
+            motionExplorerResults.First.RawImage = SetTimeStampOnImage(motionExplorerResults.First.RawImage, timestamp) 'Штамп даты и времени (2/3)
+            motionExplorerResults.First.DopplerImage = SetTimeStampOnImage(motionExplorerResults.First.DopplerImage, timestamp) 'Штамп даты и времени (3/3)
             _dopplerLog.Add(motionExplorerResults.First.DopplerLogItem)
             Return motionExplorerResults.First
         End If
@@ -313,14 +317,13 @@ Public Class ExactDoppler
     ''' <summary>
     ''' Установка штампа даты и времени в результате обработки
     ''' </summary>
-    Private Sub SetTimeStamp(motionExplorerResult As MotionExplorerResult, timestamp As DateTime)
-        motionExplorerResult.Timestamp = timestamp
+    Private Function SetTimeStampOnImage(image As RGBMatrix, timestamp As DateTime) As RGBMatrix
         Dim strW = 208
         Dim strH = 20
-        Dim resW = strW + motionExplorerResult.Image.Width
-        Dim resH = motionExplorerResult.Image.Height
+        Dim resW = strW + image.Width
+        Dim resH = image.Height
         Dim result = New RGBMatrix(resW, resH)
-        If motionExplorerResult.Image.Height >= strH Then
+        If image.Height >= strH Then
             Dim stringImg As RGBMatrix
             Using bmp = New Bitmap(strW, strH)
                 Using gr = Graphics.FromImage(bmp)
@@ -337,15 +340,16 @@ Public Class ExactDoppler
                                    Next
                                End Sub)
             Parallel.For(0, 3, Sub(channel As Integer)
-                                   For i = 0 To motionExplorerResult.Image.Height - 1
-                                       For j = 0 To motionExplorerResult.Image.Width - 1
-                                           result.Matrix(channel)(strW + j, i) = motionExplorerResult.Image.Matrix(channel)(j, i)
+                                   For i = 0 To image.Height - 1
+                                       For j = 0 To image.Width - 1
+                                           result.Matrix(channel)(strW + j, i) = image.Matrix(channel)(j, i)
                                        Next
                                    Next
                                End Sub)
         End If
-        motionExplorerResult.Image = result
-    End Sub
+
+        Return result
+    End Function
 
     ''' <summary>
     ''' Пересечение результатов доплеровского анализа на разных частотах (с выделением существенной части)
@@ -362,7 +366,8 @@ Public Class ExactDoppler
         result.CarrierLevel = IntersectListsByMin(motionExplorerResults.Select(Function(item) item.CarrierLevel))
         result.LowDoppler = IntersectListsByMin(motionExplorerResults.Select(Function(item) item.LowDoppler))
         result.HighDoppler = IntersectListsByMin(motionExplorerResults.Select(Function(item) item.HighDoppler))
-        result.Image = IntersectImagesByMin(motionExplorerResults.Select(Function(item) item.Image))
+        result.RawImage = IntersectImagesByMin(motionExplorerResults.Select(Function(item) item.RawImage))
+        result.DopplerImage = IntersectImagesByMin(motionExplorerResults.Select(Function(item) item.DopplerImage))
         Return result
     End Function
 

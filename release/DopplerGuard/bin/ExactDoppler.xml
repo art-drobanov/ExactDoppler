@@ -152,7 +152,7 @@ ExactDoppler
 	<summary>
  Останов
  </summary>
-</member><member name="M:ExactAudio.ExactDoppler.SetTimeStamp(ExactAudio.MotionExplorerResult,System.DateTime)">
+</member><member name="M:ExactAudio.ExactDoppler.SetTimeStampOnImage(Bwl.Imaging.RGBMatrix,System.DateTime)">
 	<summary>
  Установка штампа даты и времени в результате обработки
  </summary>
@@ -185,7 +185,7 @@ ExactDoppler
  </summary>
 </member><member name="T:ExactAudio.ExactDopplerConfigFromStorage">
 	<summary>
- Конфигурация ExactDoppler "из конфига"
+ Конфигурация ExactDoppler из конфигурационного файла
  </summary>
 </member><member name="T:ExactAudio.ExactDopplerConfig">
 	<summary>

@@ -51,6 +51,7 @@ Partial Class MainForm
         Me._dopplerLogTextBox = New System.Windows.Forms.TextBox()
         Me._waterfallGroupBox = New System.Windows.Forms.GroupBox()
         Me._waterfallDisplayBitmapControl = New Bwl.Imaging.DisplayBitmapControl()
+        Me._rawImageCheckBox = New System.Windows.Forms.CheckBox()
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me._topFrequencyGroupBox.SuspendLayout()
         CType(Me._volumeTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -241,7 +242,7 @@ Partial Class MainForm
         Me._blindZoneTrackBar.Size = New System.Drawing.Size(240, 45)
         Me._blindZoneTrackBar.TabIndex = 15
         Me._blindZoneTrackBar.TickStyle = System.Windows.Forms.TickStyle.TopLeft
-        Me._blindZoneTrackBar.Value = 80
+        Me._blindZoneTrackBar.Value = 60
         '
         '_inputAudioDevicesRefreshButton
         '
@@ -313,7 +314,7 @@ Partial Class MainForm
         Me._dopplerLogGroupBox.Location = New System.Drawing.Point(12, 657)
         Me._dopplerLogGroupBox.Name = "_dopplerLogGroupBox"
         Me._dopplerLogGroupBox.Size = New System.Drawing.Size(548, 59)
-        Me._dopplerLogGroupBox.TabIndex = 32
+        Me._dopplerLogGroupBox.TabIndex = 30
         Me._dopplerLogGroupBox.TabStop = False
         Me._dopplerLogGroupBox.Text = "DopplerLog"
         '
@@ -324,15 +325,16 @@ Partial Class MainForm
         Me._dopplerLogTextBox.Multiline = True
         Me._dopplerLogTextBox.Name = "_dopplerLogTextBox"
         Me._dopplerLogTextBox.Size = New System.Drawing.Size(536, 32)
-        Me._dopplerLogTextBox.TabIndex = 32
+        Me._dopplerLogTextBox.TabIndex = 31
         '
         '_waterfallGroupBox
         '
+        Me._waterfallGroupBox.Controls.Add(Me._rawImageCheckBox)
         Me._waterfallGroupBox.Controls.Add(Me._waterfallDisplayBitmapControl)
         Me._waterfallGroupBox.Location = New System.Drawing.Point(12, 383)
         Me._waterfallGroupBox.Name = "_waterfallGroupBox"
         Me._waterfallGroupBox.Size = New System.Drawing.Size(548, 268)
-        Me._waterfallGroupBox.TabIndex = 33
+        Me._waterfallGroupBox.TabIndex = 27
         Me._waterfallGroupBox.TabStop = False
         Me._waterfallGroupBox.Text = "Waterfall"
         '
@@ -343,13 +345,23 @@ Partial Class MainForm
         Me._waterfallDisplayBitmapControl.Location = New System.Drawing.Point(6, 19)
         Me._waterfallDisplayBitmapControl.Name = "_waterfallDisplayBitmapControl"
         Me._waterfallDisplayBitmapControl.Size = New System.Drawing.Size(536, 243)
-        Me._waterfallDisplayBitmapControl.TabIndex = 27
+        Me._waterfallDisplayBitmapControl.TabIndex = 29
+        '
+        '_rawImageCheckBox
+        '
+        Me._rawImageCheckBox.AutoSize = True
+        Me._rawImageCheckBox.Location = New System.Drawing.Point(59, -1)
+        Me._rawImageCheckBox.Name = "_rawImageCheckBox"
+        Me._rawImageCheckBox.Size = New System.Drawing.Size(79, 17)
+        Me._rawImageCheckBox.TabIndex = 28
+        Me._rawImageCheckBox.Text = "Raw image"
+        Me._rawImageCheckBox.UseVisualStyleBackColor = True
         '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(572, 736)
+        Me.ClientSize = New System.Drawing.Size(572, 741)
         Me.Controls.Add(Me._waterfallGroupBox)
         Me.Controls.Add(Me.LinkLabel1)
         Me.Controls.Add(Me._dopplerLogGroupBox)
@@ -360,7 +372,7 @@ Partial Class MainForm
         Me.MaximizeBox = False
         Me.Name = "MainForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "ExactDopplerTest v.0.22"
+        Me.Text = "ExactDopplerTest v.0.23"
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me._topFrequencyGroupBox.ResumeLayout(False)
         Me._topFrequencyGroupBox.PerformLayout()
@@ -375,6 +387,7 @@ Partial Class MainForm
         Me._dopplerLogGroupBox.ResumeLayout(False)
         Me._dopplerLogGroupBox.PerformLayout()
         Me._waterfallGroupBox.ResumeLayout(False)
+        Me._waterfallGroupBox.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -408,4 +421,5 @@ Partial Class MainForm
     Friend WithEvents _waterfallDisplayBitmapControl As Bwl.Imaging.DisplayBitmapControl
     Friend WithEvents _freq2Label As Label
     Friend WithEvents Label1 As Label
+    Friend WithEvents _rawImageCheckBox As CheckBox
 End Class

@@ -36,19 +36,20 @@ Public Class PaletteProcessor
 
     Public Function Process(data As Double()) As RGBMatrix
         CheckPalette()
+        Dim dataNorm As Double() = data.Clone()
         With _normalizer
             .Init(_minDbLevel, 0, 0, _maxPaletteIdx)
-            .Normalize(data)
+            .Normalize(dataNorm)
         End With
-        Dim rgb = New RGBMatrix(data.Length, 1)
-        Parallel.For(0, data.Length(), Sub(i As Integer)
-                                           Dim val = If(Double.IsNaN(data(i)), 0, data(i))
-                                           val = If(val < 0, 0, val)
-                                           val = If(val > _maxPaletteIdx, _maxPaletteIdx, val)
-                                           rgb.Red(i, 0) = _red(val)
-                                           rgb.Green(i, 0) = _green(val)
-                                           rgb.Blue(i, 0) = _blue(val)
-                                       End Sub)
+        Dim rgb = New RGBMatrix(dataNorm.Length, 1)
+        Parallel.For(0, dataNorm.Length(), Sub(i As Integer)
+                                               Dim val = If(Double.IsNaN(dataNorm(i)), 0, dataNorm(i))
+                                               val = If(val < 0, 0, val)
+                                               val = If(val > _maxPaletteIdx, _maxPaletteIdx, val)
+                                               rgb.Red(i, 0) = _red(val)
+                                               rgb.Green(i, 0) = _green(val)
+                                               rgb.Blue(i, 0) = _blue(val)
+                                           End Sub)
         Return rgb
     End Function
 

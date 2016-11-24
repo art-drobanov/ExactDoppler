@@ -10,7 +10,7 @@ Public Class ExactDopplerConfig
     Public Property CarrierWarningLevel As Integer
 
     Public Sub New()
-        Me.New(0, 0, 0.5, {20300, 21000}, 70, 10)
+        Me.New(0, 0, 0.5, {20300, 21000}, 60, 10)
     End Sub
 
     Public Sub New(inputDeviceIdx As Integer, outputDeviceIdx As Integer, volume As Single,

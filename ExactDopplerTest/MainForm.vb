@@ -29,23 +29,25 @@ Public Class MainForm
     End Sub
 
     Private Sub SamplesProcessedHandler(motionExplorerResult As MotionExplorerResult) Handles _exactDoppler.PcmSamplesProcessed
-        'Waterfall
-        Dim waterfallBlock = motionExplorerResult.Image
-        _waterfallShort.Add(waterfallBlock)
-        _waterfallFull.Add(waterfallBlock)
-        _waterfallDisplayBitmapControl.Invoke(Sub()
-                                                  Dim wfBmp = _waterfallShort.ToBitmap(1.0)
-                                                  If wfBmp IsNot Nothing Then
-                                                      Dim bmp = New Bitmap(wfBmp, _waterfallDisplayBitmapControl.Width, _waterfallDisplayBitmapControl.Height)
-                                                      With _waterfallDisplayBitmapControl
-                                                          .DisplayBitmap.DrawBitmap(bmp)
-                                                          .Refresh()
-                                                      End With
-                                                  End If
-                                              End Sub)
-        'GUI
-        _blocksCounter += 1
         Me.Invoke(Sub()
+                      'Waterfall
+                      Dim waterfallBlock = If(_rawImageCheckBox.Checked, motionExplorerResult.RawImage, motionExplorerResult.DopplerImage)
+                      _waterfallShort.Add(waterfallBlock)
+                      _waterfallFull.Add(waterfallBlock)
+
+                      '_waterfallDisplayBitmapControl
+                      Dim wfBmp = _waterfallShort.ToBitmap(1.0)
+                      If wfBmp IsNot Nothing Then
+                          Dim bmp = New Bitmap(wfBmp, _waterfallDisplayBitmapControl.Width, _waterfallDisplayBitmapControl.Height)
+                          With _waterfallDisplayBitmapControl
+                              .DisplayBitmap.DrawBitmap(bmp)
+                              .Refresh()
+                          End With
+                      End If
+
+                      'GUI
+                      _blocksCounter += 1
+
                       _blocksLabel.Text = _blocksCounter.ToString()
                       Dim dopplerLogItem = motionExplorerResult.DopplerLogItem.ToString()
                       _dopplerLogTextBox.Lines = {dopplerLogItem}

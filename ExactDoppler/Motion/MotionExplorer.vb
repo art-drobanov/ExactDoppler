@@ -1,12 +1,10 @@
-﻿Imports DrAF.DSP
+﻿Imports Bwl.Imaging
+Imports DrAF.DSP
 
 ''' <summary>
 ''' Анализатор доплеровских всплесков
 ''' </summary>
 Public Class MotionExplorer
-    Private Const _redChannel = 0 '0
-    Private Const _greenChannel = 1 '1
-    Private Const _blueChannel = 2 '2
     Private Const _blankerLevel = 32 '32
     Private Const _sideFormDivider = 20 '20
     Private Const _gainHarmRadius = 2 '2
@@ -45,8 +43,12 @@ Public Class MotionExplorer
 
         'DbScale
         Dim squelchInDb = ExactAudioMath.Db(AutoGainAndGetSquelch(mag, _brightness), _fftExplorer.ZeroDbLevel)
-        ExactAudioMath.DbScale(mag, _fftExplorer.ZeroDbLevel)
-        result.RawImage = _paletteProcessor.Process(mag) 'Необработанное изображение
+        Dim magRaw = ImageUtils.FullClone(mag)
+        ExactAudioMath.DbScale(mag, _fftExplorer.ZeroDbLevel, 10)
+        ExactAudioMath.DbScale(magRaw, _fftExplorer.ZeroDbLevel, 20)
+
+        'Raw Image
+        result.RawImage = _paletteProcessor.Process(magRaw, -120) 'Необработанное изображение (включая несущую)
 
         'Doppler Filtering
         ExactAudioMath.DbSquelch(mag, squelchInDb)
@@ -66,24 +68,23 @@ Public Class MotionExplorer
     ''' <param name="zeroDbLevel">"Нулевой" уровень логарифмической шкалы.</param>
     ''' <param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
     Private Sub WaterfallDetector(result As MotionExplorerResult, mag As Double()(), zeroDbLevel As Double, blindZone As Integer)
-        Dim dopplerWindowWidth = (mag(0).Length - blindZone) \ 2
-        Dim lowDopplerLowHarm = 0
-        Dim lowDopplerHighHarm = dopplerWindowWidth - 1
-        Dim highDopplerLowHarm = mag(0).Length - dopplerWindowWidth
-        Dim highDopplerHighHarm = mag(0).Length - 1
-        Dim centerHarm = (lowDopplerHighHarm + highDopplerLowHarm) \ 2
-        Dim carrierLowHarm = (centerHarm - _carrierRadius)
-        Dim carrierHighHarm = (centerHarm + _carrierRadius)
-        Dim carrierNorm = ((carrierHighHarm - carrierLowHarm) - 1)
+        Dim dopplerWindowWidth = CInt(Math.Round((mag(0).Length - blindZone) / 2.0)) 'Ширина доплеровского окна
+        Dim lowDopplerLowHarm = 0 'Нижняя гармоника нижнего доплеровского окна
+        Dim lowDopplerHighHarm = dopplerWindowWidth - 1 'Верхняя гармоника нижнего доплеровского окна
+        Dim highDopplerLowHarm = mag(0).Length - dopplerWindowWidth 'Нижняя гармоника верхнего доплеровского окна
+        Dim highDopplerHighHarm = mag(0).Length - 1 'Верхняя гармоника верхнего доплеровского окна
+        Dim carrierCenterHarm = CInt(Math.Round((lowDopplerHighHarm + highDopplerLowHarm) / 2.0)) 'Центральная гармоника сигнала
+        Dim carrierLowHarm = (carrierCenterHarm - _carrierRadius) 'Нижняя граница несущей
+        Dim carrierHighHarm = (carrierCenterHarm + _carrierRadius) 'Верхняя граница несущей
+        Dim carrierNrgNormDivider = ((carrierHighHarm - carrierLowHarm) - 1) 'Нормализующий коэффициент для энергии несущей
+        Dim lowDoppler = ExactPlotter.SubBand(mag, lowDopplerLowHarm, lowDopplerHighHarm) 'Выделение поддиапазона нижней доплеровской полосы
+        Dim highDoppler = ExactPlotter.SubBand(mag, highDopplerLowHarm, highDopplerHighHarm) 'Выделение поддиапазона верхней доплеровской полосы
+        Dim lowDopplerImage = HarmSlicesSumImageInDb(lowDoppler, 1) 'Суммирование энергии по нижней доплеровской полосе
+        Dim highDopplerImage = HarmSlicesSumImageInDb(highDoppler, 1) 'Суммирование энергии по верхней доплеровской полосе
 
-        Dim lowDoppler = ExactPlotter.SubBand(mag, lowDopplerLowHarm, lowDopplerHighHarm)
-        Dim highDoppler = ExactPlotter.SubBand(mag, highDopplerLowHarm, highDopplerHighHarm)
-        Dim lowDopplerImage = HarmSlicesSumImageInDb(lowDoppler, 1)
-        Dim highDopplerImage = HarmSlicesSumImageInDb(highDoppler, 1)
-
-        Dim magRGB = _paletteProcessor.Process(mag)
-        Dim sideL = _paletteProcessor.Process(lowDopplerImage)
-        Dim sideR = _paletteProcessor.Process(highDopplerImage)
+        Dim magRGB = _paletteProcessor.Process(mag) 'Получение изображения с участием палитры под дальнейшую разметку
+        Dim sideL = _paletteProcessor.Process(lowDopplerImage) 'Изображение нижней доплеровской полосы
+        Dim sideR = _paletteProcessor.Process(highDopplerImage) 'Изображение верхней доплеровской полосы
 
         'Наполнение векторов данными о доплеровских всплесках
         For i = 0 To mag.Length - 1
@@ -97,10 +98,10 @@ Public Class MotionExplorer
             End With
             '...и рассчитываем уровень несущей
             Dim carrierLevel = 0
-            For j = carrierLowHarm + 1 To carrierHighHarm - 1
-                carrierLevel += MaxRGB(magRGB.Red(j, i), magRGB.Green(j, i), magRGB.Blue(j, i))
+            For j = carrierLowHarm + 1 To carrierHighHarm - 1 'Применяем защитные границы при суммировании
+                carrierLevel += MaxRGB(magRGB.Red(j, i), magRGB.Green(j, i), magRGB.Blue(j, i)) 'Палитра может быть любая (но линейная)!
             Next
-            carrierLevel /= carrierNorm
+            carrierLevel /= carrierNrgNormDivider
             carrierLevel *= (100.0 / Byte.MaxValue)
             result.CarrierLevel.AddLast(carrierLevel)
         Next
@@ -109,48 +110,26 @@ Public Class MotionExplorer
         Parallel.For(0, 3, Sub(channel As Integer)
                                Dim image = magRGB.Matrix(channel)
                                For i = 0 To magRGB.Height - 1
-
-                                   'Линии-ограничители
-                                   Dim color = Drawing.Color.LightSlateGray
-                                   If channel = _redChannel Then
-                                       image(0, i) = color.R * 0.75
-                                       image(1, i) = color.R
-                                       image(magRGB.Width - 1, i) = color.R * 0.75
-                                       image(magRGB.Width - 2, i) = color.R
-                                   End If
-                                   If channel = _greenChannel Then
-                                       image(0, i) = color.G * 0.75
-                                       image(1, i) = color.G
-                                       image(magRGB.Width - 1, i) = color.G * 0.75
-                                       image(magRGB.Width - 2, i) = color.G
-                                   End If
-                                   If channel = _blueChannel Then
-                                       image(0, i) = color.B * 0.75
-                                       image(1, i) = color.B
-                                       image(magRGB.Width - 1, i) = color.B * 0.75
-                                       image(magRGB.Width - 2, i) = color.B
-                                   End If
-
                                    'Левая и правая часть "индикатора"
-                                   For j = lowDopplerHighHarm To centerHarm - _carrierRadius
-                                       If channel = _redChannel Then
+                                   For j = lowDopplerHighHarm To carrierCenterHarm - _carrierRadius
+                                       If channel = SharedConsts.RedChannel Then
                                            image(j, i) = MaxRGB(sideR.Red(0, i), sideR.Green(0, i), sideR.Blue(0, i))
                                        End If
-                                       If channel = _greenChannel Then
+                                       If channel = SharedConsts.GreenChannel Then
                                            image(j, i) = _blankerLevel
                                        End If
-                                       If channel = _blueChannel Then
+                                       If channel = SharedConsts.BlueChannel Then
                                            image(j, i) = MaxRGB(sideL.Red(0, i), sideL.Green(0, i), sideL.Blue(0, i))
                                        End If
                                    Next
-                                   For j = centerHarm + _carrierRadius To highDopplerLowHarm
-                                       If channel = _redChannel Then
+                                   For j = carrierCenterHarm + _carrierRadius To highDopplerLowHarm
+                                       If channel = SharedConsts.RedChannel Then
                                            image(j, i) = MaxRGB(sideR.Red(0, i), sideR.Green(0, i), sideR.Blue(0, i))
                                        End If
-                                       If channel = _greenChannel Then
+                                       If channel = SharedConsts.GreenChannel Then
                                            image(j, i) = _blankerLevel
                                        End If
-                                       If channel = _blueChannel Then
+                                       If channel = SharedConsts.BlueChannel Then
                                            image(j, i) = MaxRGB(sideL.Red(0, i), sideL.Green(0, i), sideL.Blue(0, i))
                                        End If
                                    Next
@@ -202,15 +181,15 @@ Public Class MotionExplorer
                                         Dim row = mag(i)
 
                                         'Нижняя доплеровская полоса
-                                        Dim rowNZeroesFilter As New RowNZeroesFilter(rowFilterMemorySize, NZeroes)
+                                        Dim rowDopplerFilter As New RowDopplerFilter(rowFilterMemorySize, NZeroes)
                                         For j = center To 0 Step -1
-                                            row(j) = rowNZeroesFilter.Process(row(j))
+                                            row(j) = rowDopplerFilter.Process(row(j))
                                         Next
 
                                         'Верхняя доплеровская полоса
-                                        rowNZeroesFilter.Reset(rowFilterMemorySize, NZeroes)
+                                        rowDopplerFilter.Reset(rowFilterMemorySize, NZeroes)
                                         For j = center To row.Length - 1
-                                            row(j) = rowNZeroesFilter.Process(row(j))
+                                            row(j) = rowDopplerFilter.Process(row(j))
                                         Next
                                     End Sub)
     End Sub

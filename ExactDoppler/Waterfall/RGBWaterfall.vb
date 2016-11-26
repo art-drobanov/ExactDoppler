@@ -6,9 +6,19 @@ Imports ExactAudio
 ''' "Водопад" в формате RGB
 ''' </summary>
 Public Class RGBWaterfall
+    Private Const _defaultWidth = 892
+
     Private _waterfallRowBlocks As New Queue(Of RGBMatrix)
     Private _maxBlocksCount As Integer = 1500
     Private _droppedBlocksCount As Long = 0
+    Private _width As Integer = -1
+
+    Public Sub New()
+    End Sub
+
+    Public Sub New(width As Integer)
+        _width = width
+    End Sub
 
     Public Property MaxBlocksCount As Integer
         Get
@@ -48,19 +58,29 @@ Public Class RGBWaterfall
 
     Public Sub Add(waterfallRowBlock As RGBMatrix)
         SyncLock SyncRoot
+            If _width = -1 Then
+                _width = _defaultWidth
+            End If
             If waterfallRowBlock IsNot Nothing Then
-                If _waterfallRowBlocks.Any() Then
-                    If _waterfallRowBlocks.Peek().Width <> waterfallRowBlock.Width Then
-                        Throw New Exception("RGBWaterfall: _waterfallBlocks.Peek().Width <> waterfallBlock.Width")
+                If waterfallRowBlock.Width > _width Then 'Если поступающий на вход блок слишком большой - ошибка!
+                    Throw New Exception("RGBWaterfall: waterfallRowBlock.Width > _width")
+                Else
+                    Dim widthAddition = _width - waterfallRowBlock.Width 'Рассчитываем "добавку" к ширине...
+                    If widthAddition = 0 Then
+                        _waterfallRowBlocks.Enqueue(waterfallRowBlock)
+                    Else
+                        Dim waterfallRowBlockAligned = ImageUtils.ExtendWidth(waterfallRowBlock, widthAddition) '...и обеспечиваем её
+                        _waterfallRowBlocks.Enqueue(waterfallRowBlockAligned)
                     End If
                 End If
-                _waterfallRowBlocks.Enqueue(waterfallRowBlock)
-                Dim blocksToRemove = _waterfallRowBlocks.Count - MaxBlocksCount
-                For i = 1 To blocksToRemove
-                    _waterfallRowBlocks.Dequeue()
-                    _droppedBlocksCount += 1
-                Next
             End If
+
+            'Удаление блоков, выходящих за допустимые границы
+            Dim blocksToRemove = _waterfallRowBlocks.Count - MaxBlocksCount
+            For i = 1 To blocksToRemove
+                _waterfallRowBlocks.Dequeue()
+                _droppedBlocksCount += 1
+            Next
         End SyncLock
     End Sub
 

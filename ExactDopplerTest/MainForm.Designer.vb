@@ -50,8 +50,8 @@ Partial Class MainForm
         Me._dopplerLogGroupBox = New System.Windows.Forms.GroupBox()
         Me._dopplerLogTextBox = New System.Windows.Forms.TextBox()
         Me._waterfallGroupBox = New System.Windows.Forms.GroupBox()
-        Me._waterfallDisplayBitmapControl = New Bwl.Imaging.DisplayBitmapControl()
         Me._rawImageCheckBox = New System.Windows.Forms.CheckBox()
+        Me._waterfallDisplayBitmapControl = New Bwl.Imaging.DisplayBitmapControl()
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me._topFrequencyGroupBox.SuspendLayout()
         CType(Me._volumeTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -338,6 +338,16 @@ Partial Class MainForm
         Me._waterfallGroupBox.TabStop = False
         Me._waterfallGroupBox.Text = "Waterfall"
         '
+        '_rawImageCheckBox
+        '
+        Me._rawImageCheckBox.AutoSize = True
+        Me._rawImageCheckBox.Location = New System.Drawing.Point(59, -1)
+        Me._rawImageCheckBox.Name = "_rawImageCheckBox"
+        Me._rawImageCheckBox.Size = New System.Drawing.Size(80, 17)
+        Me._rawImageCheckBox.TabIndex = 28
+        Me._rawImageCheckBox.Text = "Raw Image"
+        Me._rawImageCheckBox.UseVisualStyleBackColor = True
+        '
         '_waterfallDisplayBitmapControl
         '
         Me._waterfallDisplayBitmapControl.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
@@ -346,16 +356,6 @@ Partial Class MainForm
         Me._waterfallDisplayBitmapControl.Name = "_waterfallDisplayBitmapControl"
         Me._waterfallDisplayBitmapControl.Size = New System.Drawing.Size(536, 243)
         Me._waterfallDisplayBitmapControl.TabIndex = 29
-        '
-        '_rawImageCheckBox
-        '
-        Me._rawImageCheckBox.AutoSize = True
-        Me._rawImageCheckBox.Location = New System.Drawing.Point(59, -1)
-        Me._rawImageCheckBox.Name = "_rawImageCheckBox"
-        Me._rawImageCheckBox.Size = New System.Drawing.Size(79, 17)
-        Me._rawImageCheckBox.TabIndex = 28
-        Me._rawImageCheckBox.Text = "Raw image"
-        Me._rawImageCheckBox.UseVisualStyleBackColor = True
         '
         'MainForm
         '
@@ -372,7 +372,7 @@ Partial Class MainForm
         Me.MaximizeBox = False
         Me.Name = "MainForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "ExactDopplerTest v.0.23"
+        Me.Text = "ExactDopplerTest"
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me._topFrequencyGroupBox.ResumeLayout(False)
         Me._topFrequencyGroupBox.PerformLayout()

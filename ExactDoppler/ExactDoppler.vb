@@ -1,6 +1,5 @@
 ﻿Imports System.Drawing
 Imports Bwl.Imaging
-Imports ExactAudio.MotionExplorer
 
 ''' <summary>
 ''' Доплеровский акустический детектор
@@ -158,10 +157,8 @@ Public Class ExactDoppler
         End If
         _sineGenerator = New SineGenerator(_outputDeviceIdx, _sampleRate)
         _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallSeconds)
-
         _fftExplorer = New FFTExplorer(_windowSize, _windowStep, _sampleRate, _nBitsPalette, False)
         MotionExplorersInit()
-
         InputDeviceIdx = _config.InputDeviceIdx
         OutputDeviceIdx = _config.OutputDeviceIdx
         Volume = _config.Volume
@@ -234,21 +231,23 @@ Public Class ExactDoppler
         End SyncLock
 
         'Если в результатах анализа более одного элемента...
+        Dim result As MotionExplorerResult
         If motionExplorerResults.Count > 1 Then
-            '...получение объединенного результата анализа (помещаем по нулевому индексу)
-            Dim resIntersection = MotionExplorerResultsIntersection(motionExplorerResults.ToArray())
-            resIntersection.Timestamp = timestamp 'Штамп даты и времени (1/3)
-            resIntersection.RawImage = SetTimeStampOnImage(resIntersection.RawImage, timestamp) 'Штамп даты и времени (2/3)
-            resIntersection.DopplerImage = SetTimeStampOnImage(resIntersection.DopplerImage, timestamp) 'Штамп даты и времени (3/3)
-            _dopplerLog.Add(resIntersection.DopplerLogItem)
-            Return resIntersection
+            '...получение объединенного результата анализа (помещаем по нулевому индексу)...
+            result = MotionExplorerResultsIntersection(motionExplorerResults.ToArray())
         Else
-            motionExplorerResults.First.Timestamp = timestamp 'Штамп даты и времени (1/3)
-            motionExplorerResults.First.RawImage = SetTimeStampOnImage(motionExplorerResults.First.RawImage, timestamp) 'Штамп даты и времени (2/3)
-            motionExplorerResults.First.DopplerImage = SetTimeStampOnImage(motionExplorerResults.First.DopplerImage, timestamp) 'Штамп даты и времени (3/3)
-            _dopplerLog.Add(motionExplorerResults.First.DopplerLogItem)
-            Return motionExplorerResults.First
+            '...иначе результатом является единственный и первый элемент последовательности
+            result = motionExplorerResults.First
         End If
+
+        With result
+            .Timestamp = timestamp 'Штамп даты и времени
+            .RawImage = SetTimeStampOnImage(.RawImage, timestamp) 'Штамп даты и времени (1/3)
+            .DopplerImage = SetTimeStampOnImage(.DopplerImage, timestamp) 'Штамп даты и времени (3/3)
+        End With
+        _dopplerLog.Add(result.DopplerLogItem)
+
+        Return result
     End Function
 
     ''' <summary>
@@ -328,11 +327,12 @@ Public Class ExactDoppler
             Using bmp = New Bitmap(strW, strH)
                 Using gr = Graphics.FromImage(bmp)
                     Dim timeStr = timestamp.ToString("yyyy-MM-dd HH:mm:ss zzz")
-                    gr.DrawString(timeStr, New System.Drawing.Font("Microsoft Sans Serif", 12.0F), Brushes.LightSlateGray, New PointF(0, 0))
+                    gr.DrawString(timeStr, New Font("Microsoft Sans Serif", 12.0F), Brushes.LightSlateGray, New PointF(0, 0))
                 End Using
                 stringImg = BitmapConverter.BitmapToRGBMatrix(bmp)
             End Using
             Parallel.For(0, 3, Sub(channel As Integer)
+                                   'Текст с датой и временем...
                                    For i = 0 To stringImg.Height - 1
                                        For j = 0 To stringImg.Width - 1
                                            result.Matrix(channel)(j, i) = stringImg.Matrix(channel)(j, i)
@@ -341,9 +341,30 @@ Public Class ExactDoppler
                                End Sub)
             Parallel.For(0, 3, Sub(channel As Integer)
                                    For i = 0 To image.Height - 1
+                                       'Строка изображения...
                                        For j = 0 To image.Width - 1
                                            result.Matrix(channel)(strW + j, i) = image.Matrix(channel)(j, i)
                                        Next
+                                       '...и линии-ограничители
+                                       Dim color = Drawing.Color.LightSlateGray
+                                       If channel = SharedConsts.RedChannel Then
+                                           result.Matrix(channel)(strW + 0, i) = color.R * 0.75
+                                           result.Matrix(channel)(strW + 1, i) = color.R
+                                           result.Matrix(channel)(strW + image.Width - 1, i) = color.R * 0.75
+                                           result.Matrix(channel)(strW + image.Width - 2, i) = color.R
+                                       End If
+                                       If channel = SharedConsts.GreenChannel Then
+                                           result.Matrix(channel)(strW + 0, i) = color.G * 0.75
+                                           result.Matrix(channel)(strW + 1, i) = color.G
+                                           result.Matrix(channel)(strW + image.Width - 1, i) = color.G * 0.75
+                                           result.Matrix(channel)(strW + image.Width - 2, i) = color.G
+                                       End If
+                                       If channel = SharedConsts.BlueChannel Then
+                                           result.Matrix(channel)(strW + 0, i) = color.B * 0.75
+                                           result.Matrix(channel)(strW + 1, i) = color.B
+                                           result.Matrix(channel)(strW + image.Width - 1, i) = color.B * 0.75
+                                           result.Matrix(channel)(strW + image.Width - 2, i) = color.B
+                                       End If
                                    Next
                                End Sub)
         End If
@@ -356,61 +377,22 @@ Public Class ExactDoppler
     ''' </summary>
     Private Function MotionExplorerResultsIntersection(motionExplorerResults As MotionExplorerResult()) As MotionExplorerResult
         Dim result As New MotionExplorerResult()
-        result.Duration = motionExplorerResults.First.Duration
-        result.Timestamp = motionExplorerResults.First.Timestamp
-        result.DopplerLogItem = New DopplerLogItem(result.Timestamp,
+
+        With result
+            .Duration = motionExplorerResults.First.Duration
+            .Timestamp = motionExplorerResults.First.Timestamp
+            .DopplerLogItem = New DopplerLogItem(result.Timestamp,
                                                    motionExplorerResults.Select(Function(item) item.DopplerLogItem.LowDoppler).Min(),
                                                    motionExplorerResults.Select(Function(item) item.DopplerLogItem.HighDoppler).Min(),
                                                    motionExplorerResults.All(Function(item) item.DopplerLogItem.CarrierIsOK))
-        result.IsWarning = motionExplorerResults.Any(Function(item) item.IsWarning)
-        result.CarrierLevel = IntersectListsByMin(motionExplorerResults.Select(Function(item) item.CarrierLevel))
-        result.LowDoppler = IntersectListsByMin(motionExplorerResults.Select(Function(item) item.LowDoppler))
-        result.HighDoppler = IntersectListsByMin(motionExplorerResults.Select(Function(item) item.HighDoppler))
-        result.RawImage = IntersectImagesByMin(motionExplorerResults.Select(Function(item) item.RawImage))
-        result.DopplerImage = IntersectImagesByMin(motionExplorerResults.Select(Function(item) item.DopplerImage))
-        Return result
-    End Function
+            .IsWarning = motionExplorerResults.Any(Function(item) item.IsWarning)
+            .CarrierLevel = IntersectListsByMin(motionExplorerResults.Select(Function(item) item.CarrierLevel))
+            .LowDoppler = IntersectListsByMin(motionExplorerResults.Select(Function(item) item.LowDoppler))
+            .HighDoppler = IntersectListsByMin(motionExplorerResults.Select(Function(item) item.HighDoppler))
+            .RawImage = IntersectImagesByMin(motionExplorerResults.Select(Function(item) item.RawImage))
+            .DopplerImage = IntersectImagesByMin(motionExplorerResults.Select(Function(item) item.DopplerImage))
+        End With
 
-    ''' <summary>
-    ''' Попиксельное "пересечение" набора изображений
-    ''' </summary>
-    Private Function IntersectImagesByMin(sources As IEnumerable(Of RGBMatrix)) As RGBMatrix
-        Dim W = sources.First.Width
-        Dim H = sources.First.Height
-        Dim N = sources.Count
-        Dim result As New RGBMatrix(W, H)
-        Parallel.For(0, 3, Sub(channel As Integer)
-                               For i = 0 To H - 1
-                                   For j = 0 To W - 1
-                                       Dim minVal = sources(0).Matrix(channel)(j, i)
-                                       For k = 1 To N - 1
-                                           Dim currVal = sources(k).Matrix(channel)(j, i)
-                                           minVal = If(currVal < minVal, currVal, minVal)
-                                       Next
-                                       result.Matrix(channel)(j, i) = minVal 'Минимум - как аналог пересечения через AND
-                                   Next
-                               Next
-                           End Sub)
-        Return result
-    End Function
-
-    ''' <summary>
-    ''' Поэлементное пересечение набора списков по критерию "минимальное значение"
-    ''' </summary>
-    Private Function IntersectListsByMin(sourceLists As IEnumerable(Of LinkedList(Of Single))) As LinkedList(Of Single)
-        Dim result As New LinkedList(Of Single)
-        Dim sourceListsArr As New List(Of Single())
-        For Each s In sourceLists
-            sourceListsArr.Add(s.ToArray())
-        Next
-        For j = 0 To sourceListsArr(0).Length - 1
-            Dim minVal = sourceListsArr(0)(j)
-            For i = 1 To sourceListsArr.Count - 1
-                Dim currVal = sourceListsArr(i)(j)
-                minVal = If(currVal < minVal, currVal, minVal)
-            Next
-            result.AddLast(minVal)
-        Next
         Return result
     End Function
 
@@ -419,8 +401,7 @@ Public Class ExactDoppler
     ''' </summary>
     Private Sub MotionExplorersInit()
         SyncLock SyncRoot
-            'Для каждой центральной частоты нужен свой MotionExplorer
-            _motionExplorers = New List(Of MotionExplorer)()
+            _motionExplorers = New List(Of MotionExplorer)() 'Для каждой центральной частоты нужен свой MotionExplorer
             For Each centerFreq In _config.CenterFreqs
                 _motionExplorers.Add(New MotionExplorer(_nBitsPalette, _fftExplorer))
             Next
@@ -439,4 +420,51 @@ Public Class ExactDoppler
             RaiseEvent PcmSamplesProcessed(motionExplorerResult)
         End If
     End Sub
+
+    ''' <summary>
+    ''' Попиксельное "пересечение" набора изображений
+    ''' </summary>
+    Private Function IntersectImagesByMin(sources As IEnumerable(Of RGBMatrix)) As RGBMatrix
+        Dim W = sources.First.Width
+        Dim H = sources.First.Height
+        Dim N = sources.Count
+        Dim result As New RGBMatrix(W, H)
+
+        Parallel.For(0, 3, Sub(channel As Integer)
+                               For i = 0 To H - 1
+                                   For j = 0 To W - 1
+                                       Dim minVal = sources(0).Matrix(channel)(j, i)
+                                       For k = 1 To N - 1
+                                           Dim currVal = sources(k).Matrix(channel)(j, i)
+                                           minVal = If(currVal < minVal, currVal, minVal)
+                                       Next
+                                       result.Matrix(channel)(j, i) = minVal 'Минимум - как аналог пересечения через AND
+                                   Next
+                               Next
+                           End Sub)
+
+        Return result
+    End Function
+
+    ''' <summary>
+    ''' Поэлементное пересечение набора списков по критерию "минимальное значение"
+    ''' </summary>
+    Private Function IntersectListsByMin(sourceLists As IEnumerable(Of LinkedList(Of Single))) As LinkedList(Of Single)
+        Dim result As New LinkedList(Of Single)
+
+        Dim sourceListsArr As New List(Of Single())
+        For Each list In sourceLists
+            sourceListsArr.Add(list.ToArray())
+        Next
+        For j = 0 To sourceListsArr(0).Length - 1
+            Dim minVal = sourceListsArr(0)(j)
+            For i = 1 To sourceListsArr.Count - 1
+                Dim currVal = sourceListsArr(i)(j)
+                minVal = If(currVal < minVal, currVal, minVal)
+            Next
+            result.AddLast(minVal)
+        Next
+
+        Return result
+    End Function
 End Class

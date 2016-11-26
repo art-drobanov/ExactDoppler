@@ -10,6 +10,8 @@ Public Class MainForm
     Public Sub New()
         InitializeComponent()
 
+        Me.Text += " " + My.Application.Info.Version.ToString()
+
         _outputAudioDevicesRefreshButton_Click(Nothing, Nothing)
         _inputAudioDevicesRefreshButton_Click(Nothing, Nothing)
         Application.DoEvents()
@@ -31,7 +33,13 @@ Public Class MainForm
     Private Sub SamplesProcessedHandler(motionExplorerResult As MotionExplorerResult) Handles _exactDoppler.PcmSamplesProcessed
         Me.Invoke(Sub()
                       'Waterfall
-                      Dim waterfallBlock = If(_rawImageCheckBox.Checked, motionExplorerResult.RawImage, motionExplorerResult.DopplerImage)
+                      Dim waterfallBlock As RGBMatrix = Nothing
+                      If _rawImageCheckBox.Checked Then
+                          waterfallBlock = motionExplorerResult.RawImage
+                      Else
+                          waterfallBlock = motionExplorerResult.DopplerImage
+                      End If
+
                       _waterfallShort.Add(waterfallBlock)
                       _waterfallFull.Add(waterfallBlock)
 

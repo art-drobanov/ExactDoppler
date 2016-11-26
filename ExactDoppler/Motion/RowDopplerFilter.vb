@@ -1,7 +1,7 @@
 ﻿''' <summary>
-''' Доплеровский фильтр для применения на строке "водопада"
+''' Фильтр доплеровских всплесков
 ''' </summary>
-Public Class RowNZeroesFilter
+Public Class RowDopplerFilter
     Private _NZeroes As Integer 'Максимальное допустимое кол-во "настоящих нулей" строки
     Private _zeroCount As Integer 'Количество зафиксированных "настоящих нулей" строки
     Private _memoryWindowSize As Integer 'Размер "окна памяти"
@@ -12,6 +12,11 @@ Public Class RowNZeroesFilter
         Reset(memorySize, NZeroes)
     End Sub
 
+    ''' <summary>
+    ''' Сброс состояния фильтра доплеровских всплесков
+    ''' </summary>
+    ''' <param name="memorySize"></param>
+    ''' <param name="NZeroes"></param>
     Public Sub Reset(memorySize As Double, NZeroes As Integer)
         _memoryWindowSize = memorySize
         _NZeroes = NZeroes
@@ -23,6 +28,9 @@ Public Class RowNZeroesFilter
         Next
     End Sub
 
+    ''' <summary>
+    ''' Добавление текущего значения элемента строки в фильтр доплеровских всплесков
+    ''' </summary>
     Public Function Process(val As Double) As Double
         Dim result As Double = 0
         Dim binValue = If(val > Double.MinValue, 1, 0)

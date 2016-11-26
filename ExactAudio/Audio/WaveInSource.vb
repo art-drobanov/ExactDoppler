@@ -18,10 +18,10 @@ Public Class WaveInSource
         _waveFormat = New WaveFormat(sampleRate, bitDepth, If(stereo, 2, 1))
         _deviceNumber = deviceNumber
         _waveIn = New WaveInEvent With {
-                                          .DeviceNumber = deviceNumber,
-                                          .WaveFormat = _waveFormat,
-                                          .BufferMilliseconds = Math.Ceiling((minSamplesCountInBlock / CDbl(sampleRate)) * 1000),
-                                          .NumberOfBuffers = 3
+                                           .DeviceNumber = deviceNumber,
+                                           .WaveFormat = _waveFormat,
+                                           .BufferMilliseconds = Math.Ceiling((minSamplesCountInBlock / CDbl(sampleRate)) * 1000),
+                                           .NumberOfBuffers = 3
                                        }
     End Sub
 

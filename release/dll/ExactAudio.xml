@@ -65,6 +65,14 @@ ExactAudio
 	<summary>
  Анализатор результатов работы FFT
  </summary>
+</member><member name="M:ExactAudio.ImageUtils.ExtendWidth(Bwl.Imaging.RGBMatrix,System.Int32)">
+	<summary>
+ Расширение матрицы на указанное значение
+ </summary>
+</member><member name="M:ExactAudio.ImageUtils.FullClone(System.Double[][])">
+	<summary>
+ Полное клонирование массива массивов
+ </summary>
 </member><member name="T:ExactAudio.ImageUtils">
 	<summary>
  Графические утилиты

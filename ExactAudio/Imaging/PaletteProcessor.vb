@@ -9,19 +9,14 @@ Public Class PaletteProcessor
     Private _green As Byte()
     Private _blue As Byte()
     Private _nBits As Integer
-    Private _minDbLevel As Integer = -100
     Private _maxPaletteIdx As Integer
     Private _normalizer As New Normalizer()
 
-    Public Sub SetMinDbLevel(minDbLevel As Integer)
-        _minDbLevel = minDbLevel
-    End Sub
-
-    Public Function Process(data As Double()()) As RGBMatrix
+    Public Function Process(data As Double()(), Optional minDbLevel As Double = -100) As RGBMatrix
         CheckPalette()
         Dim rgbResult As New RGBMatrix(data(0).Length, data.Length)
         Parallel.For(0, data.Length(), Sub(i As Integer)
-                                           Dim rgbRow = Process(data(i))
+                                           Dim rgbRow = Process(data(i), minDbLevel)
                                            For j = 0 To rgbRow.Width - 1
                                                Dim R = rgbRow.Red(j, 0)
                                                Dim G = rgbRow.Green(j, 0)
@@ -34,11 +29,11 @@ Public Class PaletteProcessor
         Return rgbResult
     End Function
 
-    Public Function Process(data As Double()) As RGBMatrix
+    Public Function Process(data As Double(), Optional minDbLevel As Double = -100) As RGBMatrix
         CheckPalette()
         Dim dataNorm As Double() = data.Clone()
         With _normalizer
-            .Init(_minDbLevel, 0, 0, _maxPaletteIdx)
+            .Init(minDbLevel, 0, 0, _maxPaletteIdx)
             .Normalize(dataNorm)
         End With
         Dim rgb = New RGBMatrix(dataNorm.Length, 1)

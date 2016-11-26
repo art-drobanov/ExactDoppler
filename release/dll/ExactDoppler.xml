@@ -23,9 +23,19 @@ ExactDoppler
 	<summary>
   A strongly-typed resource class, for looking up localized strings, etc.
 </summary>
-</member><member name="T:ExactAudio.RowNZeroesFilter">
+</member><member name="M:ExactAudio.RowDopplerFilter.Reset(System.Double,System.Int32)">
 	<summary>
- Доплеровский фильтр для применения на строке "водопада"
+ Сброс состояния фильтра доплеровских всплесков
+ </summary>
+	<param name="memorySize"></param>
+	<param name="NZeroes"></param>
+</member><member name="M:ExactAudio.RowDopplerFilter.Process(System.Double)">
+	<summary>
+ Добавление текущего значения элемента строки в фильтр доплеровских всплесков
+ </summary>
+</member><member name="T:ExactAudio.RowDopplerFilter">
+	<summary>
+ Фильтр доплеровских всплесков
  </summary>
 </member><member name="T:ExactAudio.MotionExplorerResult">
 	<summary>
@@ -78,7 +88,7 @@ ExactDoppler
  </summary>
 </member><member name="T:ExactAudio.ExactAudioMath">
 	<summary>
- Вспомогательная "математика"
+ Вспомогательная "математика" для работы с аудиосигналами
  </summary>
 </member><member name="T:ExactAudio.DopplerLogItem">
 	<summary>
@@ -160,14 +170,6 @@ ExactDoppler
 	<summary>
  Пересечение результатов доплеровского анализа на разных частотах (с выделением существенной части)
  </summary>
-</member><member name="M:ExactAudio.ExactDoppler.IntersectImagesByMin(System.Collections.Generic.IEnumerable{Bwl.Imaging.RGBMatrix})">
-	<summary>
- Попиксельное "пересечение" набора изображений
- </summary>
-</member><member name="M:ExactAudio.ExactDoppler.IntersectListsByMin(System.Collections.Generic.IEnumerable{System.Collections.Generic.LinkedList{System.Single}})">
-	<summary>
- Поэлементное пересечение набора списков по критерию "минимальное значение"
- </summary>
 </member><member name="M:ExactAudio.ExactDoppler.MotionExplorersInit">
 	<summary>
  Инициализация анализаторов движения (выделенно для каждой частоты)
@@ -179,6 +181,14 @@ ExactDoppler
 	<param name="pcmSamples">Pcm-семплы.</param>
 	<param name="pcmSamplesCount">Количество семплов (для учета режима моно/стерео).</param>
 	<param name="timestamp">Штамп даты/времени.</param>
+</member><member name="M:ExactAudio.ExactDoppler.IntersectImagesByMin(System.Collections.Generic.IEnumerable{Bwl.Imaging.RGBMatrix})">
+	<summary>
+ Попиксельное "пересечение" набора изображений
+ </summary>
+</member><member name="M:ExactAudio.ExactDoppler.IntersectListsByMin(System.Collections.Generic.IEnumerable{System.Collections.Generic.LinkedList{System.Single}})">
+	<summary>
+ Поэлементное пересечение набора списков по критерию "минимальное значение"
+ </summary>
 </member><member name="T:ExactAudio.ExactDoppler">
 	<summary>
  Доплеровский акустический детектор

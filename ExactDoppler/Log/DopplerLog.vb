@@ -5,7 +5,6 @@ Imports System.Globalization
 ''' Доплеровский лог
 ''' </summary>
 Public Class DopplerLog
-
     Private _items As New LinkedList(Of DopplerLogItem)
     Public ReadOnly SyncRoot As New Object
 

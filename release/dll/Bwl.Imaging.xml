@@ -22,6 +22,29 @@ Bwl.Imaging
   обращений к ресурсу с помощью этого класса ресурса со строгой типизацией.
 </summary>
 </member>
+<member name="T:Bwl.Imaging.MoveDetector">
+ <summary>
+ Простой детектор движения (изменений в кадре). Для каждого видеоисточника должен быть свой детектор.
+ </summary>
+</member>
+<member name="P:Bwl.Imaging.MoveDetector.PointDiffThreshSetting">
+ <summary>
+ Порог разности яркости, при котором точка считается изменившейся. Для фильтрации шумов. Можно не менять.
+ </summary>
+ <returns></returns>
+</member>
+<member name="P:Bwl.Imaging.MoveDetector.MoveThresholdSetting">
+ <summary>
+ Порог изменений в кадре, после которых обнаруживается движение. Доля изменившихся точек относительно общего количества пикселей кадра.
+ </summary>
+ <returns></returns>
+</member>
+<member name="P:Bwl.Imaging.MoveDetector.AfterMoveSetting">
+ <summary>
+ В течение какого количества кадров БЕЗ движения после кадра С движением будет выдаваться результат наличия движения.
+ </summary>
+ <returns></returns>
+</member>
 <member name="M:Bwl.Imaging.ImagingMath.Bilinear(System.Double,System.Double,System.Double,System.Double)">
  <summary>
  Билинейная интерполяция между двумя значениями

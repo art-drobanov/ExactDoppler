@@ -22,6 +22,8 @@ Module App
             .Start()
             Console.WriteLine(".Start()")
         End With
+        Console.WriteLine(String.Format("Input [ ON ] at device with idx '{0}'", _exactDoppler.InputDeviceIdx))
+        Console.WriteLine(String.Format("Output [ ON AIR! ] at device with idx '{0}'", _exactDoppler.OutputDeviceIdx))
         Console.WriteLine("")
         While True
             Thread.Sleep(10)

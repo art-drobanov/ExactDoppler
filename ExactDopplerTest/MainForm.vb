@@ -19,6 +19,8 @@ Public Class MainForm
         If _exactDoppler.OutputDeviceIdx >= 0 Then
             _outputAudioDevicesListBox.SelectedIndex = _exactDoppler.OutputDeviceIdx
             _outputAudioDevicesRefreshButton.Text = _outputAudioDevicesListBox.Items(_exactDoppler.OutputDeviceIdx) + " / Refresh"
+            _inputGroupBox.Text = String.Format("Input [ OFF ] at device with zero-based index '{0}'", _exactDoppler.InputDeviceIdx)
+            _outputGroupBox.Text = String.Format("Output [ OFF ] at device with zero-based index '{0}'", _exactDoppler.OutputDeviceIdx)
         Else
             _outputAudioDevicesRefreshButton.Text = "Refresh"
         End If
@@ -93,8 +95,10 @@ Public Class MainForm
         _waterfallShort.Clear()
 
         'GUI
-        _inputGroupBox.Text = "Input [ OFF ]"
+        _inputGroupBox.Text = String.Format("Input [ OFF ] at device with zero-based index '{0}'", _exactDoppler.InputDeviceIdx)
         _captureOnButton.BackColor = Color.MediumSpringGreen
+
+        _inputAudioDevicesListBox.Enabled = True
     End Sub
 
     Private Sub _scrButton_Click(sender As Object, e As EventArgs) Handles _scrButton.Click
@@ -137,6 +141,7 @@ Public Class MainForm
     End Sub
 
     Private Sub _sineGenButton_Click(sender As Object, e As EventArgs) Handles _switchOnButton.Click
+        _outputAudioDevicesListBox.Enabled = False
         _exactDoppler.Volume = _volumeTrackBar.Value / 100.0F
         Dim freq2 = Convert.ToInt32(_freq2Label.Text.Replace("Hz", String.Empty))
         Dim freq1 = freq2 - 700
@@ -145,20 +150,22 @@ Public Class MainForm
         End If
         _exactDoppler.SwitchOnGen({freq1, freq2})
         '_exactDoppler.SwitchOnGen({freq2})
-        _outputGroupBox.Text = "Output [ ON AIR! ]"
+        _outputGroupBox.Text = String.Format("Output [ ON AIR! ] at device with zero-based index '{0}'", _exactDoppler.OutputDeviceIdx)
         _switchOnButton.BackColor = Me.BackColor
     End Sub
 
-    Private Sub _switchOffButton_Click(sender As Object, e As EventArgs) Handles _switchOffButton.Click
+    Private Sub _sineGenSwitchOffButton_Click(sender As Object, e As EventArgs) Handles _sineGenSwitchOffButton.Click
         _exactDoppler.SwitchOffGen()
-        _outputGroupBox.Text = "Output [ OFF ]"
+        _outputGroupBox.Text = String.Format("Output [ OFF ] at device with zero-based index '{0}'", _exactDoppler.OutputDeviceIdx)
         _switchOnButton.BackColor = Color.MediumSpringGreen
+        _outputAudioDevicesListBox.Enabled = True
     End Sub
 
     Private Sub _captureOnButton_Click(sender As Object, e As EventArgs) Handles _captureOnButton.Click
+        _inputAudioDevicesListBox.Enabled = False
         _waterfallShort.Clear()
         _exactDoppler.Start()
-        _inputGroupBox.Text = "Input [ ON ]"
+        _inputGroupBox.Text = String.Format("Input [ ON ] at device with zero-based index '{0}'", _exactDoppler.InputDeviceIdx)
         _captureOnButton.BackColor = Me.BackColor
     End Sub
 
@@ -192,14 +199,23 @@ Public Class MainForm
 
     Private Sub _outputAudioDevicesListBox_SelectedIndexChanged(sender As Object, e As EventArgs) Handles _outputAudioDevicesListBox.SelectedIndexChanged
         _exactDoppler.OutputDeviceIdx = _outputAudioDevicesListBox.SelectedIndex
-        _outputAudioDevicesRefreshButton.Text = _outputAudioDevicesListBox.Items(_exactDoppler.OutputDeviceIdx) + " / Refresh"
+        If _exactDoppler.OutputDeviceIdx >= 0 Then
+            _outputAudioDevicesListBox.SelectedIndex = _exactDoppler.OutputDeviceIdx
+            _outputAudioDevicesRefreshButton.Text = _outputAudioDevicesListBox.Items(_exactDoppler.OutputDeviceIdx) + " / Refresh"
+            _outputGroupBox.Text = String.Format("Output [ OFF ] at device with zero-based index '{0}'", _exactDoppler.OutputDeviceIdx)
+        Else
+            _outputAudioDevicesRefreshButton.Text = "Refresh"
+        End If
     End Sub
 
     Private Sub _inputAudioDevicesListBox_SelectedIndexChanged(sender As Object, e As EventArgs) Handles _inputAudioDevicesListBox.SelectedIndexChanged
         _captureOffButton_Click(sender, e)
         _exactDoppler.InputDeviceIdx = _inputAudioDevicesListBox.SelectedIndex
-        If _exactDoppler.InputDeviceIdx <> -1 Then
+        If _exactDoppler.InputDeviceIdx >= 0 Then
             _inputAudioDevicesRefreshButton.Text = _inputAudioDevicesListBox.Items(_exactDoppler.InputDeviceIdx) + " / Refresh"
+            _inputGroupBox.Text = String.Format("Input [ OFF ] at device with zero-based index '{0}'", _exactDoppler.InputDeviceIdx)
+        Else
+            _inputAudioDevicesRefreshButton.Text = "Refresh"
         End If
     End Sub
 

@@ -24,7 +24,7 @@ Partial Class MainForm
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainForm))
         Me._switchOnButton = New System.Windows.Forms.Button()
-        Me._switchOffButton = New System.Windows.Forms.Button()
+        Me._sineGenSwitchOffButton = New System.Windows.Forms.Button()
         Me._sineFreqTrackBar = New System.Windows.Forms.TrackBar()
         Me._topFrequencyGroupBox = New System.Windows.Forms.GroupBox()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -52,6 +52,7 @@ Partial Class MainForm
         Me._waterfallGroupBox = New System.Windows.Forms.GroupBox()
         Me._rawImageCheckBox = New System.Windows.Forms.CheckBox()
         Me._waterfallDisplayBitmapControl = New Bwl.Imaging.DisplayBitmapControl()
+        Me._alarmCheckBox = New System.Windows.Forms.CheckBox()
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me._topFrequencyGroupBox.SuspendLayout()
         CType(Me._volumeTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -73,15 +74,15 @@ Partial Class MainForm
         Me._switchOnButton.Text = "Sine Gen On"
         Me._switchOnButton.UseVisualStyleBackColor = False
         '
-        '_switchOffButton
+        '_sineGenSwitchOffButton
         '
-        Me._switchOffButton.BackColor = System.Drawing.Color.Silver
-        Me._switchOffButton.Location = New System.Drawing.Point(173, 327)
-        Me._switchOffButton.Name = "_switchOffButton"
-        Me._switchOffButton.Size = New System.Drawing.Size(47, 32)
-        Me._switchOffButton.TabIndex = 8
-        Me._switchOffButton.Text = "Off"
-        Me._switchOffButton.UseVisualStyleBackColor = False
+        Me._sineGenSwitchOffButton.BackColor = System.Drawing.Color.Silver
+        Me._sineGenSwitchOffButton.Location = New System.Drawing.Point(173, 327)
+        Me._sineGenSwitchOffButton.Name = "_sineGenSwitchOffButton"
+        Me._sineGenSwitchOffButton.Size = New System.Drawing.Size(47, 32)
+        Me._sineGenSwitchOffButton.TabIndex = 8
+        Me._sineGenSwitchOffButton.Text = "Off"
+        Me._sineGenSwitchOffButton.UseVisualStyleBackColor = False
         '
         '_sineFreqTrackBar
         '
@@ -150,7 +151,7 @@ Partial Class MainForm
         Me._outputGroupBox.Controls.Add(Me._outputAudioDevicesRefreshButton)
         Me._outputGroupBox.Controls.Add(Me._switchOnButton)
         Me._outputGroupBox.Controls.Add(Me._outputAudioDevicesListBox)
-        Me._outputGroupBox.Controls.Add(Me._switchOffButton)
+        Me._outputGroupBox.Controls.Add(Me._sineGenSwitchOffButton)
         Me._outputGroupBox.Controls.Add(Me._topFrequencyGroupBox)
         Me._outputGroupBox.Controls.Add(Me._volumeTrackBar)
         Me._outputGroupBox.Location = New System.Drawing.Point(12, 12)
@@ -188,6 +189,7 @@ Partial Class MainForm
         '
         '_inputGroupBox
         '
+        Me._inputGroupBox.Controls.Add(Me._alarmCheckBox)
         Me._inputGroupBox.Controls.Add(Me._scrButton)
         Me._inputGroupBox.Controls.Add(Me._centralBlindZoneGroupBox)
         Me._inputGroupBox.Controls.Add(Me._inputAudioDevicesRefreshButton)
@@ -357,6 +359,19 @@ Partial Class MainForm
         Me._waterfallDisplayBitmapControl.Size = New System.Drawing.Size(536, 243)
         Me._waterfallDisplayBitmapControl.TabIndex = 29
         '
+        '_alarmCheckBox
+        '
+        Me._alarmCheckBox.AutoSize = True
+        Me._alarmCheckBox.BackColor = System.Drawing.Color.DeepSkyBlue
+        Me._alarmCheckBox.Enabled = False
+        Me._alarmCheckBox.Location = New System.Drawing.Point(113, 298)
+        Me._alarmCheckBox.Name = "_alarmCheckBox"
+        Me._alarmCheckBox.Size = New System.Drawing.Size(94, 17)
+        Me._alarmCheckBox.TabIndex = 31
+        Me._alarmCheckBox.Text = "ALARM TEST"
+        Me._alarmCheckBox.UseVisualStyleBackColor = False
+        Me._alarmCheckBox.Visible = False
+        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -394,7 +409,7 @@ Partial Class MainForm
     End Sub
 
     Friend WithEvents _switchOnButton As Button
-    Friend WithEvents _switchOffButton As Button
+    Friend WithEvents _sineGenSwitchOffButton As Button
     Friend WithEvents _sineFreqTrackBar As TrackBar
     Friend WithEvents _topFrequencyGroupBox As GroupBox
     Friend WithEvents _freq1Label As Label
@@ -422,4 +437,5 @@ Partial Class MainForm
     Friend WithEvents _freq2Label As Label
     Friend WithEvents Label1 As Label
     Friend WithEvents _rawImageCheckBox As CheckBox
+    Friend WithEvents _alarmCheckBox As CheckBox
 End Class

@@ -12,7 +12,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("Audio Utilities")>
 <Assembly: AssemblyCompany("DrAF (Artem Drobanov)")>
 <Assembly: AssemblyProduct("ExactAudio")>
-<Assembly: AssemblyCopyright("Copyright © DrAF, 2008 - 2016")>
+<Assembly: AssemblyCopyright("Copyright © DrAF, 2008 - 2017")>
 <Assembly: AssemblyTrademark("ExactAudio")>
 
 <Assembly: ComVisible(False)>
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("0.2.4.0")>
-<Assembly: AssemblyFileVersion("0.2.4.0")>
+<Assembly: AssemblyVersion("0.2.5.0")>
+<Assembly: AssemblyFileVersion("0.2.5.0")>

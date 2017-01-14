@@ -36,6 +36,7 @@ Partial Class MainForm
         Me._outputAudioDevicesRefreshButton = New System.Windows.Forms.Button()
         Me._outputAudioDevicesListBox = New System.Windows.Forms.ListBox()
         Me._inputGroupBox = New System.Windows.Forms.GroupBox()
+        Me._alarmCheckBox = New System.Windows.Forms.CheckBox()
         Me._scrButton = New System.Windows.Forms.Button()
         Me._centralBlindZoneGroupBox = New System.Windows.Forms.GroupBox()
         Me._blindZoneLabel = New System.Windows.Forms.Label()
@@ -52,7 +53,6 @@ Partial Class MainForm
         Me._waterfallGroupBox = New System.Windows.Forms.GroupBox()
         Me._rawImageCheckBox = New System.Windows.Forms.CheckBox()
         Me._waterfallDisplayBitmapControl = New Bwl.Imaging.DisplayBitmapControl()
-        Me._alarmCheckBox = New System.Windows.Forms.CheckBox()
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me._topFrequencyGroupBox.SuspendLayout()
         CType(Me._volumeTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -204,6 +204,17 @@ Partial Class MainForm
         Me._inputGroupBox.TabIndex = 10
         Me._inputGroupBox.TabStop = False
         Me._inputGroupBox.Text = "Input [ OFF ]"
+        '
+        '_alarmCheckBox
+        '
+        Me._alarmCheckBox.AutoSize = True
+        Me._alarmCheckBox.BackColor = System.Drawing.Color.DeepSkyBlue
+        Me._alarmCheckBox.Location = New System.Drawing.Point(113, 298)
+        Me._alarmCheckBox.Name = "_alarmCheckBox"
+        Me._alarmCheckBox.Size = New System.Drawing.Size(94, 17)
+        Me._alarmCheckBox.TabIndex = 31
+        Me._alarmCheckBox.Text = "ALARM TEST"
+        Me._alarmCheckBox.UseVisualStyleBackColor = False
         '
         '_scrButton
         '
@@ -358,19 +369,6 @@ Partial Class MainForm
         Me._waterfallDisplayBitmapControl.Name = "_waterfallDisplayBitmapControl"
         Me._waterfallDisplayBitmapControl.Size = New System.Drawing.Size(536, 243)
         Me._waterfallDisplayBitmapControl.TabIndex = 29
-        '
-        '_alarmCheckBox
-        '
-        Me._alarmCheckBox.AutoSize = True
-        Me._alarmCheckBox.BackColor = System.Drawing.Color.DeepSkyBlue
-        Me._alarmCheckBox.Enabled = False
-        Me._alarmCheckBox.Location = New System.Drawing.Point(113, 298)
-        Me._alarmCheckBox.Name = "_alarmCheckBox"
-        Me._alarmCheckBox.Size = New System.Drawing.Size(94, 17)
-        Me._alarmCheckBox.TabIndex = 31
-        Me._alarmCheckBox.Text = "ALARM TEST"
-        Me._alarmCheckBox.UseVisualStyleBackColor = False
-        Me._alarmCheckBox.Visible = False
         '
         'MainForm
         '

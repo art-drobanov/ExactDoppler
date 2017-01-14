@@ -16,7 +16,7 @@ Public Class DTMFGenerator
     Private _generator As SineGenerator
     Private _encodeMatrix As New Dictionary(Of Char, FreqPair)
 
-    Public ReadOnly SyncRoot As New Object
+    Private _syncRoot As New Object()
 
     Public ReadOnly Property SymbolTime As Integer
         Get
@@ -34,12 +34,12 @@ Public Class DTMFGenerator
 
     Public Property Volume As Single
         Get
-            SyncLock SyncRoot
+            SyncLock _syncRoot
                 Return _generator.Volume
             End SyncLock
         End Get
         Set(value As Single)
-            SyncLock SyncRoot
+            SyncLock _syncRoot
                 _generator.Volume = value
             End SyncLock
         End Set

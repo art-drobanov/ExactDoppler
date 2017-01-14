@@ -103,7 +103,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Imaging\Normalizer.vb" />
+    <Compile Include="Audio\Utils\Normalizer.vb" />
     <Compile Include="Imaging\PaletteProcessor.vb" />
     <Compile Include="Audio\SineGenerator\SineGenerator.vb" />
     <Compile Include="Audio\Utils\AudioUtils.vb" />

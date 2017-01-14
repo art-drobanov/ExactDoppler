@@ -1,5 +1,6 @@
 ﻿Imports System.Drawing
 Imports Bwl.Imaging
+Imports NAudio.Dsp
 
 ''' <summary>
 ''' Доплеровский акустический детектор
@@ -12,7 +13,7 @@ Public Class ExactDoppler
     Private Const _dopplerSize = 500 '500
     Private Const _nBitsCapture = 16 '16
     Private Const _nBitsPalette = 8 '8
-    Private Const _waterfallSeconds = _windowSize / _sampleRate '0.6827
+    Private Const _waterfallBlockDuration = _windowSize / _sampleRate '0.6827
     Private Const _topFreq = 23000 '23000
 
     'Данные
@@ -26,8 +27,10 @@ Public Class ExactDoppler
     Private _sineGenerator As SineGenerator
     Private _fftExplorer As FFTExplorer
     Private _motionExplorers As List(Of MotionExplorer)
+    Private _pcmBlocksCounter As Long = 0
+    Private _lowpassFilter As BiQuadFilter = BiQuadFilter.LowPassFilter(_sampleRate, 16000, 2)
 
-    Public ReadOnly SyncRoot As New Object
+    Private _syncRoot As New Object()
 
     ''' <summary>Список аудиоустройств вывода.</summary>
     Public ReadOnly Property OutputAudioDevices As String()
@@ -58,24 +61,40 @@ Public Class ExactDoppler
     End Property
 
     ''' <summary>Размер доплеровской области интереса.</summary>
-    Public ReadOnly Property DopplerSize
+    Public ReadOnly Property DopplerSize As Integer
         Get
             Return _dopplerSize
+        End Get
+    End Property
+
+    ''' <summary>Длительность блока на "водопаде".</summary>
+    Public ReadOnly Property WaterfallBlockDuration As Double
+        Get
+            Return _waterfallBlockDuration
+        End Get
+    End Property
+
+    ''' <summary>Количество обработанных блоков PCM.</summary>
+    Public ReadOnly Property PcmBlocksCounter As Integer
+        Get
+            SyncLock _syncRoot
+                Return _pcmBlocksCounter
+            End SyncLock
         End Get
     End Property
 
     ''' <summary>Индекс устройства захвата аудио.</summary>
     Public Property InputDeviceIdx As Integer
         Get
-            SyncLock SyncRoot
+            SyncLock _syncRoot
                 Return _inputDeviceIdx
             End SyncLock
         End Get
         Set(value As Integer)
-            SyncLock SyncRoot
+            SyncLock _syncRoot
                 If value >= 0 AndAlso value < Me.InputAudioDevices.Count Then
                     _inputDeviceIdx = value
-                    _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallSeconds) With {.SampleProcessor = AddressOf SampleProcessor}
+                    _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallBlockDuration) With {.SampleProcessor = AddressOf SampleProcessor}
                 Else
                     _inputDeviceIdx = -1
                 End If
@@ -86,12 +105,12 @@ Public Class ExactDoppler
     ''' <summary>Индекс устройства вывода аудио.</summary>
     Public Property OutputDeviceIdx As Integer
         Get
-            SyncLock SyncRoot
+            SyncLock _syncRoot
                 Return _outputDeviceIdx
             End SyncLock
         End Get
         Set(value As Integer)
-            SyncLock SyncRoot
+            SyncLock _syncRoot
                 If value >= 0 AndAlso value < Me.OutputAudioDevices.Count Then
                     _outputDeviceIdx = value
                     _sineGenerator = New SineGenerator(_outputDeviceIdx, _sampleRate)
@@ -112,12 +131,12 @@ Public Class ExactDoppler
     ''' <summary>Громкость.</summary>
     Public Property Volume As Single
         Get
-            SyncLock SyncRoot
+            SyncLock _syncRoot
                 Return _sineGenerator.Volume
             End SyncLock
         End Get
         Set(value As Single)
-            SyncLock SyncRoot
+            SyncLock _syncRoot
                 _sineGenerator.Volume = value
             End SyncLock
         End Set
@@ -126,19 +145,19 @@ Public Class ExactDoppler
     ''' <summary>Конфигурация доплеровского анализатора.</summary>
     Public Property Config As ExactDopplerConfig
         Get
-            SyncLock SyncRoot
+            SyncLock _syncRoot
                 Return _config
             End SyncLock
         End Get
         Set(value As ExactDopplerConfig)
-            SyncLock SyncRoot
+            SyncLock _syncRoot
                 _config = value
             End SyncLock
         End Set
     End Property
 
     ''' <summary>
-    ''' Событие "Pcm-семплы обработаны"
+    ''' Событие "PCM-семплы обработаны"
     ''' </summary>
     ''' <param name="motionExplorerResult">"Результат анализа движения".</param>
     Public Event PcmSamplesProcessed(motionExplorerResult As MotionExplorerResult)
@@ -156,7 +175,7 @@ Public Class ExactDoppler
             _config = config
         End If
         _sineGenerator = New SineGenerator(_outputDeviceIdx, _sampleRate)
-        _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallSeconds)
+        _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallBlockDuration)
         _fftExplorer = New FFTExplorer(_windowSize, _windowStep, _sampleRate, _nBitsPalette, False)
         MotionExplorersInit()
         InputDeviceIdx = _config.InputDeviceIdx
@@ -167,14 +186,14 @@ Public Class ExactDoppler
     ''' <summary>
     ''' Основной метод обработки
     ''' </summary>
-    ''' <param name="pcmSamples">Pcm-семплы.</param>
+    ''' <param name="pcmSamples">PCM-семплы.</param>
     ''' <param name="pcmSamplesCount">Количество семплов (для учета режима моно/стерео).</param>
     ''' <param name="timestamp">Штамп даты/времени.</param>
     ''' <returns>"Результат анализа движения".</returns>
     Public Function Process(pcmSamples As Single(), pcmSamplesCount As Integer, timestamp As DateTime) As MotionExplorerResult
         Dim motionExplorerResults As New List(Of MotionExplorerResult)()
 
-        SyncLock SyncRoot
+        SyncLock _syncRoot
             If _config.CenterFreqs.Length <> _motionExplorers.Count Then
                 Throw New Exception("ExactDoppler: _config.CenterFreqs.Count <> _motionExplorers.Count")
             End If
@@ -240,10 +259,17 @@ Public Class ExactDoppler
             result = motionExplorerResults.First
         End If
 
+        'Фильтрация семплов аудио для отсечения ультразвука
+        Dim lowpassAudio = New Single(pcmSamples.Length - 1) {}
+        For i = 0 To pcmSamples.Length - 1
+            lowpassAudio(i) = _lowpassFilter.Transform(pcmSamples(i))
+        Next
+
         With result
             .Timestamp = timestamp 'Штамп даты и времени
-            .RawImage = SetTimeStampOnImage(.RawImage, timestamp) 'Штамп даты и времени (1/3)
+            .RawDopplerImage = SetTimeStampOnImage(.RawDopplerImage, timestamp) 'Штамп даты и времени (1/3)
             .DopplerImage = SetTimeStampOnImage(.DopplerImage, timestamp) 'Штамп даты и времени (3/3)
+            .LowpassAudio = lowpassAudio
         End With
         _dopplerLog.Add(result.DopplerLogItem)
 
@@ -254,7 +280,7 @@ Public Class ExactDoppler
     ''' Включение генератора
     ''' </summary>
     Public Sub SwitchOnGen()
-        SyncLock SyncRoot
+        SyncLock _syncRoot
             MotionExplorersInit()
             SwitchOnGen(_config.CenterFreqs.Select(Function(item) CSng(item)))
         End SyncLock
@@ -265,7 +291,7 @@ Public Class ExactDoppler
     ''' </summary>
     ''' <param name="frequencies">Частоты синусов.</param>
     Public Sub SwitchOnGen(frequencies As IEnumerable(Of Single))
-        SyncLock SyncRoot
+        SyncLock _syncRoot
             _config.CenterFreqs = frequencies.Select(Function(item) CDbl(item)).ToArray()
             MotionExplorersInit()
             _sineGenerator.SwitchOn(frequencies)
@@ -277,7 +303,7 @@ Public Class ExactDoppler
     ''' </summary>
     ''' <param name="frequency">Частота синуса.</param>
     Public Sub SwitchOnGen(frequency As Single)
-        SyncLock SyncRoot
+        SyncLock _syncRoot
             _config.CenterFreqs = {frequency}
             _sineGenerator.SwitchOn({frequency})
         End SyncLock
@@ -287,7 +313,7 @@ Public Class ExactDoppler
     ''' Выключение генератора
     ''' </summary>
     Public Sub SwitchOffGen()
-        SyncLock SyncRoot
+        SyncLock _syncRoot
             _sineGenerator.SwitchOff()
         End SyncLock
     End Sub
@@ -296,7 +322,8 @@ Public Class ExactDoppler
     ''' Запуск
     ''' </summary>
     Public Sub Start()
-        SyncLock SyncRoot
+        SyncLock _syncRoot
+            _pcmBlocksCounter = 0
             With _capture
                 .SampleProcessor = AddressOf SampleProcessor
                 .Start()
@@ -308,7 +335,7 @@ Public Class ExactDoppler
     ''' Останов
     ''' </summary>
     Public Sub [Stop]()
-        SyncLock SyncRoot
+        SyncLock _syncRoot
             _capture.Stop()
         End SyncLock
     End Sub
@@ -389,7 +416,7 @@ Public Class ExactDoppler
             .CarrierLevel = IntersectListsByMin(motionExplorerResults.Select(Function(item) item.CarrierLevel))
             .LowDoppler = IntersectListsByMin(motionExplorerResults.Select(Function(item) item.LowDoppler))
             .HighDoppler = IntersectListsByMin(motionExplorerResults.Select(Function(item) item.HighDoppler))
-            .RawImage = IntersectImagesByMin(motionExplorerResults.Select(Function(item) item.RawImage))
+            .RawDopplerImage = IntersectImagesByMin(motionExplorerResults.Select(Function(item) item.RawDopplerImage))
             .DopplerImage = IntersectImagesByMin(motionExplorerResults.Select(Function(item) item.DopplerImage))
         End With
 
@@ -400,7 +427,7 @@ Public Class ExactDoppler
     ''' Инициализация анализаторов движения (выделенно для каждой частоты)
     ''' </summary>
     Private Sub MotionExplorersInit()
-        SyncLock SyncRoot
+        SyncLock _syncRoot
             _motionExplorers = New List(Of MotionExplorer)() 'Для каждой центральной частоты нужен свой MotionExplorer
             For Each centerFreq In _config.CenterFreqs
                 _motionExplorers.Add(New MotionExplorer(_nBitsPalette, _fftExplorer))
@@ -409,15 +436,20 @@ Public Class ExactDoppler
     End Sub
 
     ''' <summary>
-    ''' Обработчик Pcm-семплов
+    ''' Обработчик PCM-семплов
     ''' </summary>
-    ''' <param name="pcmSamples">Pcm-семплы.</param>
+    ''' <param name="pcmSamples">PCM-семплы.</param>
     ''' <param name="pcmSamplesCount">Количество семплов (для учета режима моно/стерео).</param>
     ''' <param name="timestamp">Штамп даты/времени.</param>
     Private Sub SampleProcessor(pcmSamples As Single(), pcmSamplesCount As Integer, timestamp As DateTime)
         Dim motionExplorerResult = Process(pcmSamples, pcmSamplesCount, timestamp)
         If motionExplorerResult IsNot Nothing Then
-            RaiseEvent PcmSamplesProcessed(motionExplorerResult)
+            If motionExplorerResult.RawDopplerImage.Height > 1 AndAlso motionExplorerResult.DopplerImage.Height > 1 Then
+                SyncLock _syncRoot
+                    _pcmBlocksCounter += 1
+                End SyncLock
+                RaiseEvent PcmSamplesProcessed(motionExplorerResult)
+            End If
         End If
     End Sub
 

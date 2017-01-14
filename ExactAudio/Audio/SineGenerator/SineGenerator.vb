@@ -9,7 +9,7 @@ Public Class SineGenerator
     Private _waveOutVolume As Single = 1.0
     Private _waveOut As WaveOut
 
-    Public ReadOnly SyncRoot As New Object
+    Private _syncRoot As New Object()
 
     Public ReadOnly Property SampleRate As Integer
         Get
@@ -19,12 +19,12 @@ Public Class SineGenerator
 
     Public Property Volume As Single
         Get
-            SyncLock SyncRoot
+            SyncLock _syncRoot
                 Return _waveOutVolume
             End SyncLock
         End Get
         Set(value As Single)
-            SyncLock SyncRoot
+            SyncLock _syncRoot
                 If value < 0 Or value > 1 Then Throw New Exception("SineGenerator: Volume < 0 Or Volume > 1")
                 _waveOutVolume = value
                 If _waveOut IsNot Nothing Then
@@ -65,19 +65,19 @@ Public Class SineGenerator
     End Sub
 
     Public Sub Play(program As Queue(Of SineTaskBlock))
-        SyncLock SyncRoot
+        SyncLock _syncRoot
             PlayWith(New ProgrammedSineWaveProvider32(program))
         End SyncLock
     End Sub
 
     Public Sub SwitchOn(frequencies As IEnumerable(Of Single))
-        SyncLock SyncRoot
+        SyncLock _syncRoot
             PlayWith(New ProgrammedSineWaveProvider32(frequencies))
         End SyncLock
     End Sub
 
     Public Sub SwitchOff()
-        SyncLock SyncRoot
+        SyncLock _syncRoot
             If _waveOut IsNot Nothing Then
                 With _waveOut
                     .Stop()
@@ -89,7 +89,7 @@ Public Class SineGenerator
     End Sub
 
     Private Sub PlayWith(sineWaveProvider As ProgrammedSineWaveProvider32)
-        SyncLock SyncRoot
+        SyncLock _syncRoot
             If _waveOut Is Nothing Then
                 sineWaveProvider.SetWaveFormat(_sampleRate, 2)
                 _waveOut = New WaveOut() With {.DeviceNumber = _deviceNumber}

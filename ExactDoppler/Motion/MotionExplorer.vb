@@ -39,7 +39,7 @@ Public Class MotionExplorer
     ''' <param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
     ''' <returns>"Результат анализа движения".</returns>
     Public Function Process(mag As Double()(), blindZone As Integer) As MotionExplorerResult
-        Dim result As New MotionExplorerResult With {.Duration = mag(0).Length * _fftExplorer.SonogramRowDuration}
+        Dim result As New MotionExplorerResult With {.Duration = mag.Length * _fftExplorer.SonogramRowDuration}
 
         'DbScale
         Dim squelchInDb = ExactAudioMath.Db(AutoGainAndGetSquelch(mag, _brightness), _fftExplorer.ZeroDbLevel)
@@ -48,7 +48,7 @@ Public Class MotionExplorer
         ExactAudioMath.DbScale(magRaw, _fftExplorer.ZeroDbLevel, 20)
 
         'Raw Image
-        result.RawImage = _paletteProcessor.Process(magRaw, -120) 'Необработанное изображение (включая несущую)
+        result.RawDopplerImage = _paletteProcessor.Process(magRaw, -120) 'Необработанное изображение (включая несущую)
 
         'Doppler Filtering
         ExactAudioMath.DbSquelch(mag, squelchInDb)

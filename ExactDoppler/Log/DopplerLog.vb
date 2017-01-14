@@ -6,7 +6,7 @@ Imports System.Globalization
 ''' </summary>
 Public Class DopplerLog
     Private _items As New LinkedList(Of DopplerLogItem)
-    Public ReadOnly SyncRoot As New Object
+    Private _syncRoot As New Object()
 
     Public ReadOnly Property Items As LinkedList(Of DopplerLogItem)
         Get
@@ -15,20 +15,20 @@ Public Class DopplerLog
     End Property
 
     Public Sub Add(timestamp As DateTime, L As Single, H As Single, carrierIsOK As Boolean)
-        SyncLock SyncRoot
+        SyncLock _syncRoot
             Dim item = New DopplerLogItem(timestamp, L, H, carrierIsOK)
             _items.AddLast(item)
         End SyncLock
     End Sub
 
     Public Sub Add(logItem As DopplerLogItem)
-        SyncLock SyncRoot
+        SyncLock _syncRoot
             _items.AddLast(logItem)
         End SyncLock
     End Sub
 
     Public Sub Write(stream As Stream)
-        SyncLock SyncRoot
+        SyncLock _syncRoot
             If _items.Any() Then
                 Dim sw = New StreamWriter(stream, Text.Encoding.UTF8)
                 For Each logItem In _items
@@ -86,7 +86,7 @@ Public Class DopplerLog
         sr.Close()
 
         If newLog.Items.Any() Then
-            SyncLock SyncRoot
+            SyncLock _syncRoot
                 Clear()
                 For Each item In newLog.Items
                     _items.AddLast(item)
@@ -98,7 +98,7 @@ Public Class DopplerLog
     End Sub
 
     Public Sub Clear()
-        SyncLock SyncRoot
+        SyncLock _syncRoot
             _items.Clear()
         End SyncLock
     End Sub

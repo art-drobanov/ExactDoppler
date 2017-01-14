@@ -1,11 +1,12 @@
-﻿Imports Bwl.Imaging
+﻿Imports System.IO
+Imports Bwl.Imaging
 Imports ExactAudio
 
 Public Class MainForm
     Private WithEvents _exactDoppler As New ExactDoppler()
-    Private _waterfallShort As New RGBWaterfall With {.MaxBlocksCount = 12}
-    Private _waterfallFull As New RGBWaterfall
-    Private _blocksCounter As Long = 0
+    Private WithEvents _alarmManager As New AlarmManager(_exactDoppler)
+    Private _waterfallShort As New DopplerWaterfall With {.MaxBlocksCount = 12}
+    Private _waterfallFull As New DopplerWaterfall
 
     Public Sub New()
         InitializeComponent()
@@ -32,12 +33,12 @@ Public Class MainForm
         End If
     End Sub
 
-    Private Sub SamplesProcessedHandler(motionExplorerResult As MotionExplorerResult) Handles _exactDoppler.PcmSamplesProcessed
+    Private Sub SamplesProcessedHandler(motionExplorerResult As MotionExplorerResult) Handles _alarmManager.PcmSamplesProcessed
         Me.Invoke(Sub()
                       'Waterfall
                       Dim waterfallBlock As RGBMatrix = Nothing
                       If _rawImageCheckBox.Checked Then
-                          waterfallBlock = motionExplorerResult.RawImage
+                          waterfallBlock = motionExplorerResult.RawDopplerImage
                       Else
                           waterfallBlock = motionExplorerResult.DopplerImage
                       End If
@@ -45,7 +46,7 @@ Public Class MainForm
                       _waterfallShort.Add(waterfallBlock)
                       _waterfallFull.Add(waterfallBlock)
 
-                      '_waterfallDisplayBitmapControl
+                      'WaterfallDisplayBitmapControl
                       Dim wfBmp = _waterfallShort.ToBitmap(1.0)
                       If wfBmp IsNot Nothing Then
                           Dim bmp = New Bitmap(wfBmp, _waterfallDisplayBitmapControl.Width, _waterfallDisplayBitmapControl.Height)
@@ -56,40 +57,54 @@ Public Class MainForm
                       End If
 
                       'GUI
-                      _blocksCounter += 1
-
-                      _blocksLabel.Text = _blocksCounter.ToString()
+                      _blocksLabel.Text = _exactDoppler.PcmBlocksCounter.ToString()
                       Dim dopplerLogItem = motionExplorerResult.DopplerLogItem.ToString()
                       _dopplerLogTextBox.Lines = {dopplerLogItem}
                   End Sub)
     End Sub
 
+    Private Sub Alarm(rawDopplerImage As RGBMatrix, dopplerImage As RGBMatrix, lowpassAudio As Single()) Handles _alarmManager.Alarm
+        Me.Invoke(Sub()
+                      If _alarmCheckBox.Checked Then
+                          _alarmManager.SaveImages("Alarm", rawDopplerImage, dopplerImage, lowpassAudio)
+                      End If
+                  End Sub)
+    End Sub
+
+    Private Sub AlarmRecorded(rawDopplerImage As RGBMatrix, dopplerImage As RGBMatrix, lowpassAudio As Single()) Handles _alarmManager.AlarmRecorded
+        Me.Invoke(Sub()
+                      If _alarmCheckBox.Checked Then
+                          _alarmManager.SaveImages("AlarmRecord", rawDopplerImage, dopplerImage, lowpassAudio)
+                      End If
+                  End Sub)
+    End Sub
+
     Private Sub _captureOffButton_Click(sender As Object, e As EventArgs) Handles _captureOffButton.Click
         _exactDoppler.Stop()
+        _alarmManager.CheckDataDir()
 
-        'FileName
-        Dim snapshotFilename = DateTime.Now.ToString("yyyy-MM-dd__HH.mm.ss.ffff")
+        Dim snapshotFilename = DateTime.Now.ToString("yyyy-MM-dd__HH.mm.ss.ffff") 'Base FileName
 
         'DopplerLog
         If _exactDoppler.DopplerLog.Items.Any() Then
             'Log
             Dim logFilename = "dopplerLog__" + snapshotFilename + ".txt"
             With _exactDoppler.DopplerLog
-                .Write(logFilename)
+                .Write(Path.Combine(_alarmManager.DataDir, logFilename))
                 .Clear()
             End With
             'Exact Doppler Log Write/Read Test
             Dim dopplerLogTest As New DopplerLog()
             With dopplerLogTest
-                .Read(logFilename)
-                .Write(logFilename.Replace(".txt", ".copy.txt"))
+                .Read(Path.Combine(_alarmManager.DataDir, logFilename))
+                .Write(Path.Combine(_alarmManager.DataDir, logFilename.Replace(".txt", ".copy.txt")))
             End With
         End If
 
         'WaterFall
         Dim waterfall = _waterfallFull.ToBitmap()
         If waterfall IsNot Nothing Then
-            waterfall.Save("dopplerImg__" + snapshotFilename + ".png")
+            waterfall.Save(Path.Combine(_alarmManager.DataDir, "dopplerImg__" + snapshotFilename + ".png"))
         End If
         _waterfallFull.Clear()
         _waterfallShort.Clear()
@@ -106,7 +121,8 @@ Public Class MainForm
         'WaterFall
         Dim waterfall1 = _waterfallShort.ToBitmap()
         If waterfall1 IsNot Nothing Then
-            waterfall1.Save("dopplerScr__" + snapshotFilename + ".png")
+            _alarmManager.CheckDataDir()
+            waterfall1.Save(Path.Combine(_alarmManager.DataDir, "dopplerScr__" + snapshotFilename + ".png"))
         End If
     End Sub
 

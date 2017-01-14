@@ -80,6 +80,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Alarm\AlarmManager.vb" />
     <Compile Include="Cfg\ExactDopplerConfig.vb" />
     <Compile Include="Cfg\ExactDopplerConfigFromStorage.vb" />
     <Compile Include="ExactDoppler.vb" />
@@ -105,7 +106,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="SharedConsts.vb" />
-    <Compile Include="Waterfall\RGBWaterfall.vb" />
+    <Compile Include="Waterfall\DopplerWaterfall.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

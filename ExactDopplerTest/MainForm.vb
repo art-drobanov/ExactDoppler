@@ -66,20 +66,25 @@ Public Class MainForm
     Private Sub Alarm(rawDopplerImage As RGBMatrix, dopplerImage As RGBMatrix, lowpassAudio As Single()) Handles _alarmManager.Alarm
         Me.Invoke(Sub()
                       If _alarmCheckBox.Checked Then
-                          _alarmManager.SaveImages("Alarm", rawDopplerImage, dopplerImage, lowpassAudio)
+                          _alarmCheckBox.BackColor = Color.Red
+                          _alarmManager.Save("Alarm", rawDopplerImage, dopplerImage, lowpassAudio)
+                      Else
+                          _alarmCheckBox.BackColor = Color.DeepSkyBlue
                       End If
                   End Sub)
     End Sub
 
     Private Sub AlarmRecorded(rawDopplerImage As RGBMatrix, dopplerImage As RGBMatrix, lowpassAudio As Single()) Handles _alarmManager.AlarmRecorded
         Me.Invoke(Sub()
+                      _alarmCheckBox.BackColor = Color.DeepSkyBlue
                       If _alarmCheckBox.Checked Then
-                          _alarmManager.SaveImages("AlarmRecord", rawDopplerImage, dopplerImage, lowpassAudio)
+                          _alarmManager.Save("AlarmRecord", rawDopplerImage, dopplerImage, lowpassAudio)
                       End If
                   End Sub)
     End Sub
 
     Private Sub _captureOffButton_Click(sender As Object, e As EventArgs) Handles _captureOffButton.Click
+        _alarmCheckBox.BackColor = Color.DeepSkyBlue
         _exactDoppler.Stop()
         _alarmManager.CheckDataDir()
 
@@ -180,6 +185,8 @@ Public Class MainForm
     Private Sub _captureOnButton_Click(sender As Object, e As EventArgs) Handles _captureOnButton.Click
         _inputAudioDevicesListBox.Enabled = False
         _waterfallShort.Clear()
+        _alarmCheckBox.BackColor = Color.DeepSkyBlue
+        _alarmManager.Reset()
         _exactDoppler.Start()
         _inputGroupBox.Text = String.Format("Input [ ON ] at device with zero-based index '{0}'", _exactDoppler.InputDeviceIdx)
         _captureOnButton.BackColor = Me.BackColor

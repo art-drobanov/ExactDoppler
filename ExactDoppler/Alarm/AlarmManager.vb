@@ -3,17 +3,19 @@ Imports NAudio.Wave
 Imports Bwl.Imaging
 
 Public Class AlarmManager
-    Private WithEvents _exactDoppler As ExactDoppler
     Private _warningMemorySize As Integer
     Private _warningsInMemoryToAlarm As Integer
-    Private _warningMemory As New Queue(Of Integer)
+    Private _warningMemory As New Queue(Of Single)
     Private _alarmWaterfallBlocksCount As Integer
     Private _alarmRecordWaterfallBlocksCount As Integer
+    Private _pcmBlocksToSkip As Integer
+    Private _pcmBlocksToSkipRemain As Integer
+    Private _dataDir As String
     Private _alarmWaterfallRaw As DopplerWaterfall
     Private _alarmWaterfall As DopplerWaterfall
     Private _alarmRecordWaterfallRaw As DopplerWaterfall
     Private _alarmRecordWaterfall As DopplerWaterfall
-    Private _dataDir As String
+    Private WithEvents _exactDoppler As ExactDoppler
 
     Private _syncRoot As New Object()
 
@@ -63,6 +65,20 @@ Public Class AlarmManager
         End Get
     End Property
 
+    ''' <summary>Количество блоков PCM которые нужно пропустить после старта.</summary>
+    Public Property PcmBlocksToSkip As Integer
+        Get
+            SyncLock _syncRoot
+                Return _pcmBlocksToSkip
+            End SyncLock
+        End Get
+        Set(value As Integer)
+            SyncLock _syncRoot
+                _pcmBlocksToSkip = value
+            End SyncLock
+        End Set
+    End Property
+
     ''' <summary>Путь к папке с данными.</summary>
     Public Property DataDir As String
         Get
@@ -100,16 +116,23 @@ Public Class AlarmManager
     Public Event AlarmRecorded(rawDopplerImage As RGBMatrix, dopplerImage As RGBMatrix, lowpassAudio As Single())
 
     Public Sub New(exactDoppler As ExactDoppler)
-        'MyClass.New(exactDoppler, 8, 4, 10, 120) 'Рабочие настройки
-        MyClass.New(exactDoppler, 8, 4, 5, 30) 'Настройки для теста
+        '44 блока - это горизонт накопления предупреждений в 30 секунд.
+        'Требуется 1 полное предупреждение (по сумме уровней) для фиксации тревоги.
+        'Глубина обзора при фиксации тревоги - 30 секунд. 2 минуты - длительность фиксации события (1 минута до и после тревоги).
+        'Пропускается 15 блоков PCM при старте или сбросе.
+        MyClass.New(exactDoppler, 44, 1, 30, 120, 15)
     End Sub
 
-    Public Sub New(exactDoppler As ExactDoppler, warningMemorySize As Integer, warningsInMemoryToAlarm As Integer, secondsInAlarmMemory As Double, secondsInAlarmRecord As Double)
+    Public Sub New(exactDoppler As ExactDoppler, warningMemorySize As Integer, warningsInMemoryToAlarm As Integer,
+                   secondsInAlarmMemory As Double, secondsInAlarmRecord As Double, pcmBlocksToSkip As Integer)
         _exactDoppler = exactDoppler
+
         Me.WarningMemorySize = warningMemorySize
         Me.WarningsInMemoryToAlarm = warningsInMemoryToAlarm
         _alarmWaterfallBlocksCount = Math.Ceiling(secondsInAlarmMemory / _exactDoppler.WaterfallBlockDuration)
         _alarmRecordWaterfallBlocksCount = Math.Ceiling(secondsInAlarmRecord / _exactDoppler.WaterfallBlockDuration)
+        _pcmBlocksToSkip = pcmBlocksToSkip
+        _pcmBlocksToSkipRemain = _pcmBlocksToSkip
 
         _alarmWaterfallRaw = New DopplerWaterfall With {.MaxBlocksCount = _alarmWaterfallBlocksCount} 'Для первичного обнаружения тревоги - сразу полная емкость "водопада"
         _alarmWaterfall = New DopplerWaterfall With {.MaxBlocksCount = _alarmWaterfallBlocksCount} 'Для первичного обнаружения тревоги - сразу полная емкость "водопада"
@@ -120,13 +143,25 @@ Public Class AlarmManager
     End Sub
 
     ''' <summary>
+    ''' Сброс состояния
+    ''' </summary>
+    Public Sub Reset()
+        SyncLock _syncRoot
+            _pcmBlocksToSkipRemain = _pcmBlocksToSkip
+            _warningMemory.Clear()
+            _alarmRecordWaterfallRaw = New DopplerWaterfall With {.MaxBlocksCount = Math.Ceiling(_alarmRecordWaterfallBlocksCount / 2.0)} 'В ожидании события храним только 1/2 емкости
+            _alarmRecordWaterfall = New DopplerWaterfall With {.MaxBlocksCount = Math.Ceiling(_alarmRecordWaterfallBlocksCount / 2.0)} 'В ожидании события храним только 1/2 емкости
+        End SyncLock
+    End Sub
+
+    ''' <summary>
     ''' Сохранение пары изображений в папке
     ''' </summary>
     ''' <param name="prefix">Префикс папки для сохранения (например, 'Alarm' или 'AlarmRecord').</param>
     ''' <param name="rawDopplerImage">"Сырое" доплеровское изображение.</param>
     ''' <param name="dopplerImage">Доплеровское изображение.</param>
     ''' <param name="lowpassAudio">Аудиопоток без ультразвука.</param>
-    Public Sub SaveImages(prefix As String, rawDopplerImage As RGBMatrix, dopplerImage As RGBMatrix, lowpassAudio As Single())
+    Public Sub Save(prefix As String, rawDopplerImage As RGBMatrix, dopplerImage As RGBMatrix, lowpassAudio As Single())
         If rawDopplerImage IsNot Nothing AndAlso dopplerImage IsNot Nothing Then
             Dim rawDopplerImageBmp = MatrixTools.RGBMatrixAlign4(rawDopplerImage).ToBitmap()
             Dim dopplerImageBmp = MatrixTools.RGBMatrixAlign4(dopplerImage).ToBitmap()
@@ -170,6 +205,13 @@ Public Class AlarmManager
     ''' </summary>
     ''' <param name="motionExplorerResult">Результат аназиза PCM-семплов.</param>
     Private Sub SamplesProcessedHandler(motionExplorerResult As MotionExplorerResult) Handles _exactDoppler.PcmSamplesProcessed
+        'Пропуск PCM-блоков
+        If _pcmBlocksToSkipRemain >= 1 Then
+            _pcmBlocksToSkipRemain -= 1
+            RaiseEvent PcmSamplesProcessed(motionExplorerResult) 'Передаем семплы далее...
+            Return
+        End If
+
         'Добавляем блоки во все водопады...
         _alarmWaterfallRaw.Add(motionExplorerResult.RawDopplerImage, motionExplorerResult.LowpassAudio)
         _alarmWaterfall.Add(motionExplorerResult.DopplerImage)
@@ -178,9 +220,13 @@ Public Class AlarmManager
 
         'Если в данный момент не осуществляется запись события...
         If _alarmRecordWaterfallRaw.MaxBlocksCount <> _alarmRecordWaterfallBlocksCount AndAlso _alarmRecordWaterfall.MaxBlocksCount <> _alarmRecordWaterfallBlocksCount Then
-            _warningMemory.Enqueue(If(motionExplorerResult.IsWarning, 1, 0))
-            Dim blocksToRemove = _warningMemory.Count - _warningMemorySize
-            For i = 1 To blocksToRemove
+            'Максимальный уровень предупреждения связан с энергией доплеровских сдвигов или отсутствием несущей (нет несущей - 100% предупреждения!)
+            Dim warningScore = {motionExplorerResult.DopplerLogItem.LowDoppler,
+                                motionExplorerResult.DopplerLogItem.HighDoppler,
+                                100.0 - motionExplorerResult.CarrierLevel.Average()}.Max() / 100.0
+            _warningMemory.Enqueue(warningScore)
+            Dim warningElemsToRemove = _warningMemory.Count - _warningMemorySize
+            For i = 1 To warningElemsToRemove
                 _warningMemory.Dequeue()
             Next
             Dim warningsInMemory = _warningMemory.Sum() 'Количество предупреждений в памяти

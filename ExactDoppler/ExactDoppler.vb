@@ -26,9 +26,9 @@ Public Class ExactDoppler
     Private _capture As WaveInSource
     Private _sineGenerator As SineGenerator
     Private _fftExplorer As FFTExplorer
+    Private _lowpassFilter As BiQuadFilter
     Private _motionExplorers As List(Of MotionExplorer)
     Private _pcmBlocksCounter As Long = 0
-    Private _lowpassFilter As BiQuadFilter = BiQuadFilter.LowPassFilter(_sampleRate, 16000, 2)
 
     Private _syncRoot As New Object()
 
@@ -177,6 +177,7 @@ Public Class ExactDoppler
         _sineGenerator = New SineGenerator(_outputDeviceIdx, _sampleRate)
         _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallBlockDuration)
         _fftExplorer = New FFTExplorer(_windowSize, _windowStep, _sampleRate, _nBitsPalette, False)
+        _lowpassFilter = BiQuadFilter.LowPassFilter(_sampleRate, 14000, 1)
         MotionExplorersInit()
         InputDeviceIdx = _config.InputDeviceIdx
         OutputDeviceIdx = _config.OutputDeviceIdx
@@ -228,7 +229,7 @@ Public Class ExactDoppler
                 With motionExplorerResult
                     Dim lowDopplerAvg = .LowDoppler.Average()
                     Dim highDopplerAvg = .HighDoppler.Average()
-                    Dim carrierIsOK = .CarrierLevel.Min() >= _config.CarrierWarningLevel 'Несущая не должна иметь слишком низкий уровень
+                    Dim carrierIsOK = .CarrierLevel.Average() > _config.CarrierWarningLevel 'Несущая не должна иметь слишком низкий уровень
                     Dim logItem = New DopplerLogItem(timestamp, lowDopplerAvg, highDopplerAvg, carrierIsOK) 'Элемент лога
                     motionExplorerResult.DopplerLogItem = logItem
                     If lowDopplerAvg <> 0 OrElse highDopplerAvg <> 0 OrElse Not carrierIsOK Then 'Если несущей нет - это тоже событие!

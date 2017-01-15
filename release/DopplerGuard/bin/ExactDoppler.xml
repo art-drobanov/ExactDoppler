@@ -6,9 +6,9 @@ ExactDoppler
 </name>
 </assembly>
 <members>
-<member name="T:ExactAudio.RGBWaterfall">
+<member name="T:ExactAudio.DopplerWaterfall">
 	<summary>
- "Водопад" в формате RGB
+ "Водопад" в формате RGB + связанный с изображением аудиопоток
  </summary>
 </member><member name="P:ExactAudio.My.Resources.Resources.ResourceManager">
 	<summary>
@@ -108,6 +108,10 @@ ExactDoppler
 	<summary>Верхняя частота области интереса.</summary>
 </member><member name="P:ExactAudio.ExactDoppler.DopplerSize">
 	<summary>Размер доплеровской области интереса.</summary>
+</member><member name="P:ExactAudio.ExactDoppler.WaterfallBlockDuration">
+	<summary>Длительность блока на "водопаде".</summary>
+</member><member name="P:ExactAudio.ExactDoppler.PcmBlocksCounter">
+	<summary>Количество обработанных блоков PCM.</summary>
 </member><member name="P:ExactAudio.ExactDoppler.InputDeviceIdx">
 	<summary>Индекс устройства захвата аудио.</summary>
 </member><member name="P:ExactAudio.ExactDoppler.OutputDeviceIdx">
@@ -120,7 +124,7 @@ ExactDoppler
 	<summary>Конфигурация доплеровского анализатора.</summary>
 </member><member name="E:ExactAudio.ExactDoppler.PcmSamplesProcessed">
 	<summary>
- Событие "Pcm-семплы обработаны"
+ Событие "PCM-семплы обработаны"
  </summary>
 	<param name="motionExplorerResult">"Результат анализа движения".</param>
 </member><member name="M:ExactAudio.ExactDoppler.#ctor(ExactAudio.ExactDopplerConfig)">
@@ -132,7 +136,7 @@ ExactDoppler
 	<summary>
  Основной метод обработки
  </summary>
-	<param name="pcmSamples">Pcm-семплы.</param>
+	<param name="pcmSamples">PCM-семплы.</param>
 	<param name="pcmSamplesCount">Количество семплов (для учета режима моно/стерео).</param>
 	<param name="timestamp">Штамп даты/времени.</param>
 	<returns>"Результат анализа движения".</returns>
@@ -176,9 +180,9 @@ ExactDoppler
  </summary>
 </member><member name="M:ExactAudio.ExactDoppler.SampleProcessor(System.Single[],System.Int32,System.DateTime)">
 	<summary>
- Обработчик Pcm-семплов
+ Обработчик PCM-семплов
  </summary>
-	<param name="pcmSamples">Pcm-семплы.</param>
+	<param name="pcmSamples">PCM-семплы.</param>
 	<param name="pcmSamplesCount">Количество семплов (для учета режима моно/стерео).</param>
 	<param name="timestamp">Штамп даты/времени.</param>
 </member><member name="M:ExactAudio.ExactDoppler.IntersectImagesByMin(System.Collections.Generic.IEnumerable{Bwl.Imaging.RGBMatrix})">
@@ -201,6 +205,58 @@ ExactDoppler
 	<summary>
  Конфигурация ExactDoppler
  </summary>
+</member><member name="P:ExactAudio.AlarmManager.WarningMemorySize">
+	<summary>Размер памяти для хранения тревог.</summary>
+</member><member name="P:ExactAudio.AlarmManager.WarningsInMemoryToAlarm">
+	<summary>Количество предупреждений в памяти для активации тревоги.</summary>
+</member><member name="P:ExactAudio.AlarmManager.SecondsInAlarm">
+	<summary>Количество секунд в отображении тревоги.</summary>
+</member><member name="P:ExactAudio.AlarmManager.SecondsInAlarmRecord">
+	<summary>Количество секунд в записи тревоги.</summary>
+</member><member name="P:ExactAudio.AlarmManager.PcmBlocksToSkip">
+	<summary>Количество блоков PCM которые нужно пропустить после старта.</summary>
+</member><member name="P:ExactAudio.AlarmManager.DataDir">
+	<summary>Путь к папке с данными.</summary>
+</member><member name="E:ExactAudio.AlarmManager.PcmSamplesProcessed">
+	<summary>
+ Событие "PCM-семплы обработаны"
+ </summary>
+	<param name="motionExplorerResult">"Результат анализа движения".</param>
+</member><member name="E:ExactAudio.AlarmManager.Alarm">
+	<summary>
+ Событие "Тревога!"
+ </summary>
+	<param name="rawDopplerImage">"Сырое" доплеровское изображение.</param>
+	<param name="dopplerImage">Доплеровское изображение.</param>
+	<param name="lowpassAudio">Аудиопоток без ультразвука.</param>
+</member><member name="E:ExactAudio.AlarmManager.AlarmRecorded">
+	<summary>
+ Событие "Тревога зафиксирована."
+ </summary>
+	<param name="rawDopplerImage">"Сырое" доплеровское изображение.</param>
+	<param name="dopplerImage">Доплеровское изображение.</param>
+	<param name="lowpassAudio">Аудиопоток без ультразвука.</param>
+</member><member name="M:ExactAudio.AlarmManager.Reset">
+	<summary>
+ Сброс состояния
+ </summary>
+</member><member name="M:ExactAudio.AlarmManager.Save(System.String,Bwl.Imaging.RGBMatrix,Bwl.Imaging.RGBMatrix,System.Single[])">
+	<summary>
+ Сохранение пары изображений в папке
+ </summary>
+	<param name="prefix">Префикс папки для сохранения (например, 'Alarm' или 'AlarmRecord').</param>
+	<param name="rawDopplerImage">"Сырое" доплеровское изображение.</param>
+	<param name="dopplerImage">Доплеровское изображение.</param>
+	<param name="lowpassAudio">Аудиопоток без ультразвука.</param>
+</member><member name="M:ExactAudio.AlarmManager.CheckDataDir">
+	<summary>
+ Проверка наличия и создание папки под данные
+ </summary>
+</member><member name="M:ExactAudio.AlarmManager.SamplesProcessedHandler(ExactAudio.MotionExplorerResult)">
+	<summary>
+ Обработчик события - "PCM-семплы обработаны"
+ </summary>
+	<param name="motionExplorerResult">Результат аназиза PCM-семплов.</param>
 </member>
 </members>
 </doc>

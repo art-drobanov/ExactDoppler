@@ -1,9 +1,0 @@
-[Console.Application]
-Font Color=gray
-Background Color=black
-[Application]
-InputDeviceIdx=0
-OutputDeviceIdx=0
-Volume=0,5
-CenterFreqs=20300,21000
-BlindZone=60

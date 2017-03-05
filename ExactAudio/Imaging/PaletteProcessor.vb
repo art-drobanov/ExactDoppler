@@ -15,15 +15,15 @@ Public Class PaletteProcessor
     Public Function Process(data As Double()(), Optional minDbLevel As Double = -100) As RGBMatrix
         CheckPalette()
         Dim rgbResult As New RGBMatrix(data(0).Length, data.Length)
-        Parallel.For(0, data.Length(), Sub(i As Integer)
-                                           Dim rgbRow = Process(data(i), minDbLevel)
-                                           For j = 0 To rgbRow.Width - 1
-                                               Dim R = rgbRow.Red(j, 0)
-                                               Dim G = rgbRow.Green(j, 0)
-                                               Dim B = rgbRow.Blue(j, 0)
-                                               rgbResult.Red(j, i) = R
-                                               rgbResult.Green(j, i) = G
-                                               rgbResult.Blue(j, i) = B
+        Parallel.For(0, data.Length(), Sub(y As Integer)
+                                           Dim rgbRow = Process(data(y), minDbLevel)
+                                           For x = 0 To rgbRow.Width - 1
+                                               Dim R = rgbRow.RedPixel(x, 0)
+                                               Dim G = rgbRow.GreenPixel(x, 0)
+                                               Dim B = rgbRow.BluePixel(x, 0)
+                                               rgbResult.RedPixel(x, y) = R
+                                               rgbResult.GreenPixel(x, y) = G
+                                               rgbResult.BluePixel(x, y) = B
                                            Next
                                        End Sub)
         Return rgbResult
@@ -37,13 +37,13 @@ Public Class PaletteProcessor
             .Normalize(dataNorm)
         End With
         Dim rgb = New RGBMatrix(dataNorm.Length, 1)
-        Parallel.For(0, dataNorm.Length(), Sub(i As Integer)
-                                               Dim val = If(Double.IsNaN(dataNorm(i)), 0, dataNorm(i))
+        Parallel.For(0, dataNorm.Length(), Sub(x As Integer)
+                                               Dim val = If(Double.IsNaN(dataNorm(x)), 0, dataNorm(x))
                                                val = If(val < 0, 0, val)
                                                val = If(val > _maxPaletteIdx, _maxPaletteIdx, val)
-                                               rgb.Red(i, 0) = _red(val)
-                                               rgb.Green(i, 0) = _green(val)
-                                               rgb.Blue(i, 0) = _blue(val)
+                                               rgb.RedPixel(x, 0) = _red(val)
+                                               rgb.GreenPixel(x, 0) = _green(val)
+                                               rgb.BluePixel(x, 0) = _blue(val)
                                            End Sub)
         Return rgb
     End Function

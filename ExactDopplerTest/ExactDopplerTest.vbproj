@@ -57,6 +57,12 @@
     <Reference Include="Bwl.Imaging">
       <HintPath>..\refs\Bwl.Imaging.dll</HintPath>
     </Reference>
+    <Reference Include="Bwl.Imaging.Unsafe">
+      <HintPath>..\refs\Bwl.Imaging.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="Bwl.Imaging.WinForms">
+      <HintPath>..\refs\Bwl.Imaging.WinForms.dll</HintPath>
+    </Reference>
     <Reference Include="DebugHelper">
       <HintPath>..\refs\DebugHelper.dll</HintPath>
     </Reference>

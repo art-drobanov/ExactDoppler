@@ -9,11 +9,9 @@ Public Module ImageUtils
     <Extension>
     Public Function ToBitmap(rgbMatrix As RGBMatrix, scale As Single) As Bitmap
         If rgbMatrix IsNot Nothing Then
-            Dim rgbMatrix4 = MatrixTools.RGBMatrixAlign4(rgbMatrix)
-            Dim width = Math.Round(rgbMatrix4.Width * scale)
-            Dim height = Math.Round(rgbMatrix4.Height * scale)
-            width += 4 - width Mod 4
-            Return New Bitmap(rgbMatrix4.ToBitmap(), width, height)
+            Dim width = Math.Round(rgbMatrix.Width * scale)
+            Dim height = Math.Round(rgbMatrix.Height * scale)
+            Return New Bitmap(rgbMatrix.ToBitmap(), width, height)
         Else
             Return Nothing
         End If
@@ -28,9 +26,9 @@ Public Module ImageUtils
 
         Dim shift = widthAddition \ 2
         Parallel.For(0, 3, Sub(channel As Integer)
-                               For i = 0 To rgbMatrix.Height - 1
-                                   For j = 0 To rgbMatrix.Width - 1
-                                       result.Matrix(channel)(j + shift, i) = rgbMatrix.Matrix(channel)(j, i)
+                               For x = 0 To rgbMatrix.Width - 1
+                                   For y = 0 To rgbMatrix.Height - 1
+                                       result.MatrixPixel(channel, x + shift, y) = rgbMatrix.MatrixPixel(channel, x, y)
                                    Next
                                Next
                            End Sub)

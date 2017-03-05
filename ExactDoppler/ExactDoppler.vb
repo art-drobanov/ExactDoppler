@@ -361,37 +361,37 @@ Public Class ExactDoppler
             End Using
             Parallel.For(0, 3, Sub(channel As Integer)
                                    'Текст с датой и временем...
-                                   For i = 0 To stringImg.Height - 1
-                                       For j = 0 To stringImg.Width - 1
-                                           result.Matrix(channel)(j, i) = stringImg.Matrix(channel)(j, i)
+                                   For y = 0 To stringImg.Height - 1
+                                       For x = 0 To stringImg.Width - 1
+                                           result.MatrixPixel(channel, x, y) = stringImg.MatrixPixel(channel, x, y)
                                        Next
                                    Next
                                End Sub)
             Parallel.For(0, 3, Sub(channel As Integer)
-                                   For i = 0 To image.Height - 1
+                                   For y = 0 To image.Height - 1
                                        'Строка изображения...
-                                       For j = 0 To image.Width - 1
-                                           result.Matrix(channel)(strW + j, i) = image.Matrix(channel)(j, i)
+                                       For x = 0 To image.Width - 1
+                                           result.MatrixPixel(channel, strW + x, y) = image.MatrixPixel(channel, x, y)
                                        Next
                                        '...и линии-ограничители
                                        Dim color = Drawing.Color.LightSlateGray
                                        If channel = SharedConsts.RedChannel Then
-                                           result.Matrix(channel)(strW + 0, i) = color.R * 0.75
-                                           result.Matrix(channel)(strW + 1, i) = color.R
-                                           result.Matrix(channel)(strW + image.Width - 1, i) = color.R * 0.75
-                                           result.Matrix(channel)(strW + image.Width - 2, i) = color.R
+                                           result.MatrixPixel(channel, strW + 0, y) = color.R * 0.75
+                                           result.MatrixPixel(channel, strW + 1, y) = color.R
+                                           result.MatrixPixel(channel, strW + image.Width - 1, y) = color.R * 0.75
+                                           result.MatrixPixel(channel, strW + image.Width - 2, y) = color.R
                                        End If
                                        If channel = SharedConsts.GreenChannel Then
-                                           result.Matrix(channel)(strW + 0, i) = color.G * 0.75
-                                           result.Matrix(channel)(strW + 1, i) = color.G
-                                           result.Matrix(channel)(strW + image.Width - 1, i) = color.G * 0.75
-                                           result.Matrix(channel)(strW + image.Width - 2, i) = color.G
+                                           result.MatrixPixel(channel, strW + 0, y) = color.G * 0.75
+                                           result.MatrixPixel(channel, strW + 1, y) = color.G
+                                           result.MatrixPixel(channel, strW + image.Width - 1, y) = color.G * 0.75
+                                           result.MatrixPixel(channel, strW + image.Width - 2, y) = color.G
                                        End If
                                        If channel = SharedConsts.BlueChannel Then
-                                           result.Matrix(channel)(strW + 0, i) = color.B * 0.75
-                                           result.Matrix(channel)(strW + 1, i) = color.B
-                                           result.Matrix(channel)(strW + image.Width - 1, i) = color.B * 0.75
-                                           result.Matrix(channel)(strW + image.Width - 2, i) = color.B
+                                           result.MatrixPixel(channel, strW + 0, y) = color.B * 0.75
+                                           result.MatrixPixel(channel, strW + 1, y) = color.B
+                                           result.MatrixPixel(channel, strW + image.Width - 1, y) = color.B * 0.75
+                                           result.MatrixPixel(channel, strW + image.Width - 2, y) = color.B
                                        End If
                                    Next
                                End Sub)
@@ -464,14 +464,14 @@ Public Class ExactDoppler
         Dim result As New RGBMatrix(W, H)
 
         Parallel.For(0, 3, Sub(channel As Integer)
-                               For i = 0 To H - 1
-                                   For j = 0 To W - 1
-                                       Dim minVal = sources(0).Matrix(channel)(j, i)
+                               For y = 0 To H - 1
+                                   For x = 0 To W - 1
+                                       Dim minVal = sources(0).MatrixPixel(channel, x, y)
                                        For k = 1 To N - 1
-                                           Dim currVal = sources(k).Matrix(channel)(j, i)
+                                           Dim currVal = sources(k).MatrixPixel(channel, x, y)
                                            minVal = If(currVal < minVal, currVal, minVal)
                                        Next
-                                       result.Matrix(channel)(j, i) = minVal 'Минимум - как аналог пересечения через AND
+                                       result.MatrixPixel(channel, x, y) = minVal 'Минимум - как аналог пересечения через AND
                                    Next
                                Next
                            End Sub)

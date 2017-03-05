@@ -70,7 +70,7 @@ Public Class DopplerWaterfall
             End If
             If waterfallRowBlock IsNot Nothing Then
                 If waterfallRowBlock.Width > _width Then 'Если поступающий на вход блок слишком большой - ошибка!
-                    Throw New Exception("RGBWaterfall: waterfallRowBlock.Width > _width")
+                    Throw New Exception("DopplerWaterfall: waterfallRowBlock.Width > _width")
                 Else
                     Dim widthAddition = _width - waterfallRowBlock.Width 'Рассчитываем "добавку" к ширине...
                     If widthAddition = 0 Then
@@ -104,15 +104,13 @@ Public Class DopplerWaterfall
             Dim globalRowOffset As Integer = 0
             For Each rowBlock In _waterfallRowBlocks
                 Parallel.For(0, 3, Sub(channel As Integer)
-                                       Dim target = waterfall.Matrix(channel)
-                                       Dim source = rowBlock.Matrix(channel)
-                                       For i = 0 To rowBlock.Height - 1
-                                           For j = 0 To rowBlock.Width - 1
-                                               Dim scaled = CInt(source(j, i) * scale)
+                                       For y = 0 To rowBlock.Height - 1
+                                           For x = 0 To rowBlock.Width - 1
+                                               Dim scaled = CInt(rowBlock.MatrixPixel(channel, x, y) * scale)
                                                If scaled > Byte.MaxValue Then
                                                    scaled = Byte.MaxValue
                                                End If
-                                               target(j, globalRowOffset + i) = scaled
+                                               waterfall.MatrixPixel(channel, x, globalRowOffset + y) = scaled
                                            Next
                                        Next
                                    End Sub)

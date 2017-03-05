@@ -87,9 +87,9 @@ Public Class MotionExplorer
         Dim sideR = _paletteProcessor.Process(highDopplerImage) 'Изображение верхней доплеровской полосы
 
         'Наполнение векторов данными о доплеровских всплесках
-        For i = 0 To mag.Length - 1
-            Dim lowDopplerNrg = MaxRGB(sideL.Red(0, i), sideL.Green(0, i), sideL.Blue(0, i))
-            Dim highDopplerNrg = MaxRGB(sideR.Red(0, i), sideR.Green(0, i), sideR.Blue(0, i))
+        For y = 0 To mag.Length - 1
+            Dim lowDopplerNrg = MaxRGB(sideL.RedPixel(0, y), sideL.GreenPixel(0, y), sideL.BluePixel(0, y))
+            Dim highDopplerNrg = MaxRGB(sideR.RedPixel(0, y), sideR.GreenPixel(0, y), sideR.BluePixel(0, y))
             Dim lowDopplerMotionVal = (lowDopplerNrg / CSng(Byte.MaxValue)) * 100
             Dim highDopplerMotionVal = (highDopplerNrg / CSng(Byte.MaxValue)) * 100
             With result
@@ -98,8 +98,8 @@ Public Class MotionExplorer
             End With
             '...и рассчитываем уровень несущей
             Dim carrierLevel = 0
-            For j = carrierLowHarm + 1 To carrierHighHarm - 1 'Применяем защитные границы при суммировании
-                carrierLevel += MaxRGB(magRGB.Red(j, i), magRGB.Green(j, i), magRGB.Blue(j, i)) 'Палитра может быть любая (но линейная)!
+            For x = carrierLowHarm + 1 To carrierHighHarm - 1 'Применяем защитные границы при суммировании
+                carrierLevel += MaxRGB(magRGB.RedPixel(x, y), magRGB.GreenPixel(x, y), magRGB.BluePixel(x, y)) 'Палитра может быть любая (но линейная)!
             Next
             carrierLevel /= carrierNrgNormDivider
             carrierLevel *= (100.0 / Byte.MaxValue)
@@ -108,29 +108,28 @@ Public Class MotionExplorer
 
         'Bitmap-вывод        
         Parallel.For(0, 3, Sub(channel As Integer)
-                               Dim image = magRGB.Matrix(channel)
-                               For i = 0 To magRGB.Height - 1
+                               For y = 0 To magRGB.Height - 1
                                    'Левая и правая часть "индикатора"
-                                   For j = lowDopplerHighHarm To carrierCenterHarm - _carrierRadius
+                                   For x = lowDopplerHighHarm To carrierCenterHarm - _carrierRadius
                                        If channel = SharedConsts.RedChannel Then
-                                           image(j, i) = MaxRGB(sideR.Red(0, i), sideR.Green(0, i), sideR.Blue(0, i))
+                                           magRGB.MatrixPixel(channel, x, y) = MaxRGB(sideR.RedPixel(0, y), sideR.GreenPixel(0, y), sideR.BluePixel(0, y))
                                        End If
                                        If channel = SharedConsts.GreenChannel Then
-                                           image(j, i) = _blankerLevel
+                                           magRGB.MatrixPixel(channel, x, y) = _blankerLevel
                                        End If
                                        If channel = SharedConsts.BlueChannel Then
-                                           image(j, i) = MaxRGB(sideL.Red(0, i), sideL.Green(0, i), sideL.Blue(0, i))
+                                           magRGB.MatrixPixel(channel, x, y) = MaxRGB(sideL.RedPixel(0, y), sideL.GreenPixel(0, y), sideL.BluePixel(0, y))
                                        End If
                                    Next
-                                   For j = carrierCenterHarm + _carrierRadius To highDopplerLowHarm
+                                   For x = carrierCenterHarm + _carrierRadius To highDopplerLowHarm
                                        If channel = SharedConsts.RedChannel Then
-                                           image(j, i) = MaxRGB(sideR.Red(0, i), sideR.Green(0, i), sideR.Blue(0, i))
+                                           magRGB.MatrixPixel(channel, x, y) = MaxRGB(sideR.RedPixel(0, y), sideR.GreenPixel(0, y), sideR.BluePixel(0, y))
                                        End If
                                        If channel = SharedConsts.GreenChannel Then
-                                           image(j, i) = _blankerLevel
+                                           magRGB.MatrixPixel(channel, x, y) = _blankerLevel
                                        End If
                                        If channel = SharedConsts.BlueChannel Then
-                                           image(j, i) = MaxRGB(sideL.Red(0, i), sideL.Green(0, i), sideL.Blue(0, i))
+                                           magRGB.MatrixPixel(channel, x, y) = MaxRGB(sideL.RedPixel(0, y), sideL.GreenPixel(0, y), sideL.BluePixel(0, y))
                                        End If
                                    Next
                                Next
@@ -150,18 +149,18 @@ Public Class MotionExplorer
         For i = 0 To result.Length - 1
             result(i) = New Double(width - 1) {}
         Next
-        Parallel.For(0, mag.Length, Sub(i As Integer)
-                                        Dim row = mag(i)
+        Parallel.For(0, mag.Length, Sub(y As Integer)
+                                        Dim row = mag(y)
                                         Dim sum As Double = 0
-                                        For j = 0 To row.Length - 1
-                                            If row(j) > Double.MinValue Then
-                                                sum += ExactAudioMath.DbInv(row(j), _fftExplorer.ZeroDbLevel) '[1] Re-Exp
+                                        For x = 0 To row.Length - 1
+                                            If row(x) > Double.MinValue Then
+                                                sum += ExactAudioMath.DbInv(row(x), _fftExplorer.ZeroDbLevel) '[1] Re-Exp
                                             End If
                                         Next
                                         sum /= CDbl(row.Length)
                                         sum = ExactAudioMath.Db(sum, _fftExplorer.ZeroDbLevel) '[2] Re-Log
 
-                                        Dim target = result(i)
+                                        Dim target = result(y)
                                         For col = 0 To target.Length - 1
                                             target(col) = If(Double.IsNaN(sum), Double.MinValue, sum)
                                         Next
@@ -177,19 +176,19 @@ Public Class MotionExplorer
     ''' <param name="NZeroes">Допустимое количество "нулевых" уровней.</param>
     Private Sub DopplerFilterDb(mag As Double()(), rowFilterMemorySize As Integer, NZeroes As Integer)
         Dim center = mag(0).Length / 2
-        Parallel.For(0, mag.Length, Sub(i As Integer)
-                                        Dim row = mag(i)
+        Parallel.For(0, mag.Length, Sub(y As Integer)
+                                        Dim row = mag(y)
 
                                         'Нижняя доплеровская полоса
                                         Dim rowDopplerFilter As New RowDopplerFilter(rowFilterMemorySize, NZeroes)
-                                        For j = center To 0 Step -1
-                                            row(j) = rowDopplerFilter.Process(row(j))
+                                        For x = center To 0 Step -1
+                                            row(x) = rowDopplerFilter.Process(row(x))
                                         Next
 
                                         'Верхняя доплеровская полоса
                                         rowDopplerFilter.Reset(rowFilterMemorySize, NZeroes)
-                                        For j = center To row.Length - 1
-                                            row(j) = rowDopplerFilter.Process(row(j))
+                                        For x = center To row.Length - 1
+                                            row(x) = rowDopplerFilter.Process(row(x))
                                         Next
                                     End Sub)
     End Sub
@@ -208,10 +207,10 @@ Public Class MotionExplorer
         'Вычисление средней энергии по центру спектра
         Dim center = mag(0).Length / 2
         Dim currentNRG As Double = 0
-        Parallel.For(0, mag.Length, Sub(i As Integer)
-                                        Dim row = mag(i)
-                                        For j = center - _gainHarmRadius To center + _gainHarmRadius Step 1
-                                            currentNRG += row(j)
+        Parallel.For(0, mag.Length, Sub(y As Integer)
+                                        Dim row = mag(y)
+                                        For x = center - _gainHarmRadius To center + _gainHarmRadius Step 1
+                                            currentNRG += row(x)
                                         Next
                                     End Sub)
         currentNRG /= CDbl(mag.Length * (2 * _gainHarmRadius + 1))
@@ -224,11 +223,11 @@ Public Class MotionExplorer
 
         'Уровень "шумовой" энергии
         Dim noiseMaxNRG = Double.MinValue
-        Parallel.For(0, mag.Length, Sub(i As Integer)
+        Parallel.For(0, mag.Length, Sub(y As Integer)
                                         'Усиление
-                                        Dim row = mag(i)
-                                        For j = 0 To row.Length - 1
-                                            row(j) *= _gain
+                                        Dim row = mag(y)
+                                        For x = 0 To row.Length - 1
+                                            row(x) *= _gain
                                         Next
                                         'Максимальная энергия по границам слева и справа - её нужно отсечь!
                                         'Локатор сканирует боковые полосы - выбирая минимальный максимум из двух полос -

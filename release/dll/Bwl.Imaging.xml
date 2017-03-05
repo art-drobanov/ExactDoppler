@@ -45,6 +45,24 @@ Bwl.Imaging
  </summary>
  <returns></returns>
 </member>
+<member name="M:Bwl.Imaging.Filters.Sharpen5Gray(Bwl.Imaging.GrayMatrix)">
+ <summary>
+ Фильтр повышения резкости полутонового изображения разреженной маской 5*5
+ </summary>
+ <param name="img">Исходное изображение.</param>
+</member>
+<member name="M:Bwl.Imaging.Filters.MedianFilter2D(Bwl.Imaging.GrayMatrix,System.Int32)">
+ <summary>
+ 2D-медианный фильтр
+ </summary>    
+ <param name="img">Исходные данные.</param>
+ <param name="N">Размер фильтра (нечетное значение).</param>    
+</member>
+<member name="M:Bwl.Imaging.ImagingMath.GetBrightnessStats(Bwl.Imaging.GrayMatrix)">
+ <summary>
+  Статистика по яркости
+ </summary>    
+</member>
 <member name="M:Bwl.Imaging.ImagingMath.Bilinear(System.Double,System.Double,System.Double,System.Double)">
  <summary>
  Билинейная интерполяция между двумя значениями
@@ -63,14 +81,7 @@ Bwl.Imaging
  <param name="weight1">Вес для точки 1.</param>
  <param name="weight2">Вес для точки 2.</param>
 </member>
-<member name="M:Bwl.Imaging.ImagingMath.MedianFilter2D(Bwl.Imaging.GrayMatrix,System.Int32)">
- <summary>
- 2D-медианный фильтр
- </summary>    
- <param name="img">Исходные данные.</param>
- <param name="N">Размер фильтра (нечетное значение).</param>    
-</member>
-<member name="M:Bwl.Imaging.ImagingMath.MinMax2D(Bwl.Imaging.GrayMatrix,System.Byte@,System.Byte@)">
+<member name="M:Bwl.Imaging.ImagingMath.MinMax2D(Bwl.Imaging.GrayMatrix,System.Int32@,System.Int32@)">
  <summary>
  Поиск минимального/максимального значения в полутоновой матрице
  </summary>
@@ -83,14 +94,24 @@ Bwl.Imaging
  Выравнивание полутоновой матрицы до ширины кратной 4
  </summary>
 </member>
+<member name="M:Bwl.Imaging.MatrixTools.GrayMatrixAlign(Bwl.Imaging.GrayMatrix,System.Int32)">
+ <summary>
+ Выравнивание полутоновой матрицы до ширины кратной align
+ </summary>
+</member>
 <member name="M:Bwl.Imaging.MatrixTools.RGBMatrixAlign4(Bwl.Imaging.RGBMatrix)">
  <summary>
  Выравнивание цветной матрицы до ширины кратной 4
  </summary>
 </member>
+<member name="M:Bwl.Imaging.MatrixTools.RGBMatrixAlign(Bwl.Imaging.RGBMatrix,System.Int32)">
+ <summary>
+ Выравнивание цветной матрицы до ширины кратной align
+ </summary>
+</member>
 <member name="M:Bwl.Imaging.MatrixTools.RectangleAlign(System.Drawing.Rectangle,System.Int32)">
  <summary>
- Установка прямогольника по "выровненным" позициям (каждая позиция становится кратной padding)
+ Установка прямогольника по "выровненным" позициям (каждая позиция становится кратной align)
  </summary>
 </member>
 <member name="M:Bwl.Imaging.MatrixTools.GrayMatrixSubRect(Bwl.Imaging.GrayMatrix,System.Drawing.Rectangle)">

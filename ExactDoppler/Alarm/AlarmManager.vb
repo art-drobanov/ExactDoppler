@@ -163,8 +163,8 @@ Public Class AlarmManager
     ''' <param name="lowpassAudio">Аудиопоток без ультразвука.</param>
     Public Sub Save(prefix As String, rawDopplerImage As RGBMatrix, dopplerImage As RGBMatrix, lowpassAudio As Single())
         If rawDopplerImage IsNot Nothing AndAlso dopplerImage IsNot Nothing Then
-            Dim rawDopplerImageBmp = MatrixTools.RGBMatrixAlign4(rawDopplerImage).ToBitmap()
-            Dim dopplerImageBmp = MatrixTools.RGBMatrixAlign4(dopplerImage).ToBitmap()
+            Dim rawDopplerImageBmp = rawDopplerImage.ToBitmap()
+            Dim dopplerImageBmp = dopplerImage.ToBitmap()
             Dim snapshotFilename = DateTime.Now.ToString("yyyy-MM-dd__HH.mm.ss.ffff") 'Base FileName
             CheckDataDir()
             Dim alarmDir = Path.Combine(_dataDir, String.Format("{0}__{1}", prefix, snapshotFilename))

@@ -44,7 +44,7 @@ Public Class SineGenerator
             _waveOut.Init(waveProvider)
             _deviceNumber = selectedDeviceNumber
         Catch
-            For i = 0 To GetWaveOutNames().Length - 1
+            For i = 0 To AudioUtils.GetWaveOutNames().Length - 1
                 Dim exc = False
                 If i <> selectedDeviceNumber Then
                     Try

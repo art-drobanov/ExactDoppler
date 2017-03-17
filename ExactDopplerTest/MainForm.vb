@@ -264,8 +264,9 @@ Public Class MainForm
     End Sub
 
     Private Sub _outTestButton_Click(sender As Object, e As EventArgs) Handles _outTestButton.Click
+        Dim outputAudioDeviceSelectedIndex = _outputAudioDevicesListBox.SelectedIndex
         If MessageBox.Show("Play DTMF: '151 262 888 111'", "Output Test", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-            Dim dtmf = New DTMFGenerator(_outputAudioDevicesListBox.SelectedIndex, 48000) With {.Volume = _volumeTrackBar.Value / 100.0F}
+            Dim dtmf = New DTMFGenerator(outputAudioDeviceSelectedIndex, 48000) With {.Volume = _volumeTrackBar.Value / 100.0F}
             dtmf.Play("151 262 888 111")
         End If
     End Sub

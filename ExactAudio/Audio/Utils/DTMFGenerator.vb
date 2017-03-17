@@ -3,34 +3,34 @@
 ''' </summary>
 Public Class DTMFGenerator
     Private Structure FreqPair
-        Public ReadOnly LowFreq As Integer
-        Public ReadOnly HighFreq As Integer
-        Public Sub New(lowFreq As Integer, highFreq As Integer)
+        Public ReadOnly LowFreq As Single
+        Public ReadOnly HighFreq As Single
+        Public Sub New(lowFreq As Single, highFreq As Single)
             Me.LowFreq = lowFreq
             Me.HighFreq = highFreq
         End Sub
     End Structure
 
-    Private _baseSymbolTime As Integer = 160 '160
-    Private _baseSpaceTime As Integer = 40 '40
+    Private _baseSymbolTime As Double = 160.0 '160.0
+    Private _baseSpaceTime As Double = 40.0 '40.0
     Private _generator As SineGenerator
     Private _encodeMatrix As New Dictionary(Of Char, FreqPair)
 
     Private _syncRoot As New Object()
 
-    Public ReadOnly Property SymbolTime As Integer
+    Public ReadOnly Property SymbolTime As Double
         Get
-            Return _baseSymbolTime * SlowRate
+            Return _baseSymbolTime / Speed
         End Get
     End Property
 
-    Public ReadOnly Property SpaceTime As Integer
+    Public ReadOnly Property SpaceTime As Double
         Get
-            Return _baseSpaceTime * SlowRate
+            Return _baseSpaceTime / Speed
         End Get
     End Property
 
-    Public Property SlowRate As Integer = 1.0 '1.0
+    Public Property Speed As Double = 1.0 '1.0
 
     Public Property Volume As Single
         Get
@@ -45,7 +45,7 @@ Public Class DTMFGenerator
         End Set
     End Property
 
-    Public Sub New(deviceNumber As Integer, sampleRate As Integer)
+    Public Sub New(ByRef deviceNumber As Integer, sampleRate As Integer)
         _generator = New SineGenerator(deviceNumber, sampleRate)
 
         _encodeMatrix.Add("1", New FreqPair(697, 1209)) '697, 1209

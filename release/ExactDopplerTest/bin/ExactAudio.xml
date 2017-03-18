@@ -6,90 +6,109 @@ ExactAudio
 </name>
 </assembly>
 <members>
-<member name="M:ExactAudio.AudioUtils.GetWaveInNames">
-	<summary>
- Получение списка входных аудиоустройств
- </summary>
-</member><member name="M:ExactAudio.AudioUtils.GetWaveOutNames">
-	<summary>
- Получение списка выходных аудиоустройств
- </summary>
-</member><member name="T:ExactAudio.AudioUtils">
-	<summary>
- Аудиоутилиты
- </summary>
-</member><member name="T:ExactAudio.SineGenerator">
-	<summary>
- Стерео-генератор синусоидального сигнала
- </summary>
-</member><member name="T:ExactAudio.PaletteProcessor">
-	<summary>
- "Раскрашиватель" монохромных изображений
- </summary>
-</member><member name="T:ExactAudio.Normalizer">
-	<summary>
- Нормализатор набора данных double
- </summary>
-</member><member name="P:ExactAudio.My.Resources.Resources.ResourceManager">
-	<summary>
+<member name="T:ExactAudio.My.Resources.Resources">
+<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member>
+<member name="P:ExactAudio.My.Resources.Resources.ResourceManager">
+<summary>
   Returns the cached ResourceManager instance used by this class.
 </summary>
-</member><member name="P:ExactAudio.My.Resources.Resources.Culture">
-	<summary>
+</member>
+<member name="P:ExactAudio.My.Resources.Resources.Culture">
+<summary>
   Overrides the current thread's CurrentUICulture property for all
   resource lookups using this strongly typed resource class.
 </summary>
-</member><member name="T:ExactAudio.My.Resources.Resources">
-	<summary>
-  A strongly-typed resource class, for looking up localized strings, etc.
-</summary>
-</member><member name="T:ExactAudio.WaveInSource">
-	<summary>
- Аудиоисточник
+</member>
+<member name="T:ExactAudio.DTMFGenerator">
+ <summary>
+ Генератор DTMF
  </summary>
-</member><member name="M:ExactAudio.FFTExplorer.Explore(System.Single[],System.Int32,System.Boolean)">
-	<summary>
- Прямое преобразование Фурье с выделением набора параметров (магнитуды, относительные фазы...)
- </summary>
-	<param name="pcmSamples">Входные PCM-семплы.</param>
-	<param name="pcmSamplesCount">Количество семплов под обработку.</param>
-	<param name="magnitudesOnly">Вычислять только магнитуды?</param>
-</member><member name="M:ExactAudio.FFTExplorer.SubBand(DrAF.DSP.ExactPlotter.CFFT_ExploreResult,System.Double,System.Double,System.Boolean)">
-	<summary>
- Выделение поддиапазона гармоник
- </summary>
-	<param name="cfft"></param>
-	<param name="lowFreq">Нижняя частота поддиапазона.</param>
-	<param name="highFreq">Верхняя частота поддиапазона.</param>
-</member><member name="T:ExactAudio.FFTExplorer">
-	<summary>
- Анализатор результатов работы FFT
- </summary>
-</member><member name="M:ExactAudio.ImageUtils.ExtendWidth(Bwl.Imaging.RGBMatrix,System.Int32)">
-	<summary>
- Расширение матрицы на указанное значение
- </summary>
-</member><member name="M:ExactAudio.ImageUtils.FullClone(System.Double[][])">
-	<summary>
- Полное клонирование массива массивов
- </summary>
-</member><member name="T:ExactAudio.ImageUtils">
-	<summary>
- Графические утилиты
- </summary>
-</member><member name="P:ExactAudio.ProgrammedSineWaveProvider32.Program">
-	<summary>'Программа', управляющая генератором.</summary>
-</member><member name="T:ExactAudio.ProgrammedSineWaveProvider32">
-	<summary>
- Поставщик семплов для аудиовывода генератора
- </summary>
-</member><member name="T:ExactAudio.SineTaskBlock">
-	<summary>
+</member>
+<member name="T:ExactAudio.SineTaskBlock">
+ <summary>
  Блок программы для генератора синуса
  </summary>
-</member><member name="T:ExactAudio.DTMFGenerator">
-	<summary>
- Генератор DTMF
+</member>
+<member name="T:ExactAudio.ProgrammedSineWaveProvider32">
+ <summary>
+ Поставщик семплов для аудиовывода генератора
+ </summary>
+</member>
+<member name="P:ExactAudio.ProgrammedSineWaveProvider32.Program">
+ <summary>'Программа', управляющая генератором.</summary>
+</member>
+<member name="T:ExactAudio.ImageUtils">
+ <summary>
+ Графические утилиты
+ </summary>
+</member>
+<member name="M:ExactAudio.ImageUtils.ExtendWidth(Bwl.Imaging.RGBMatrix,System.Int32)">
+ <summary>
+ Расширение матрицы на указанное значение
+ </summary>
+</member>
+<member name="M:ExactAudio.ImageUtils.FullClone(System.Double[][])">
+ <summary>
+ Полное клонирование массива массивов
+ </summary>
+</member>
+<member name="T:ExactAudio.FFTExplorer">
+ <summary>
+ Анализатор результатов работы FFT
+ </summary>
+</member>
+<member name="M:ExactAudio.FFTExplorer.Explore(System.Single[],System.Int32,System.Boolean)">
+ <summary>
+ Прямое преобразование Фурье с выделением набора параметров (магнитуды, относительные фазы...)
+ </summary>
+ <param name="pcmSamples">Входные PCM-семплы.</param>
+ <param name="pcmSamplesCount">Количество семплов под обработку.</param>
+ <param name="magnitudesOnly">Вычислять только магнитуды?</param>
+</member>
+<member name="M:ExactAudio.FFTExplorer.SubBand(DrAF.DSP.ExactPlotter.CFFT_ExploreResult,System.Double,System.Double,System.Boolean)">
+ <summary>
+ Выделение поддиапазона гармоник
+ </summary>
+ <param name="cfft"></param>
+ <param name="lowFreq">Нижняя частота поддиапазона.</param>
+ <param name="highFreq">Верхняя частота поддиапазона.</param>
+</member>
+<member name="T:ExactAudio.WaveInSource">
+ <summary>
+ Аудиоисточник
+ </summary>
+</member>
+<member name="T:ExactAudio.Normalizer">
+ <summary>
+ Нормализатор набора данных double
+ </summary>
+</member>
+<member name="T:ExactAudio.PaletteProcessor">
+ <summary>
+ "Раскрашиватель" монохромных изображений
+ </summary>
+</member>
+<member name="T:ExactAudio.SineGenerator">
+ <summary>
+ Стерео-генератор синусоидального сигнала
+ </summary>
+</member>
+<member name="T:ExactAudio.AudioUtils">
+ <summary>
+ Аудиоутилиты
+ </summary>
+</member>
+<member name="M:ExactAudio.AudioUtils.GetWaveInNames">
+ <summary>
+ Получение списка входных аудиоустройств
+ </summary>    
+</member>
+<member name="M:ExactAudio.AudioUtils.GetWaveOutNames">
+ <summary>
+ Получение списка выходных аудиоустройств
  </summary>
 </member>
 </members>

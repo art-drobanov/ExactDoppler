@@ -13,6 +13,7 @@ Public Class DTMFGenerator
 
     Private _baseSymbolTime As Double = 160.0 '160.0
     Private _baseSpaceTime As Double = 40.0 '40.0
+    Private _speed As Double = 1.0 '1.0
     Private _generator As SineGenerator
     Private _encodeMatrix As New Dictionary(Of Char, FreqPair)
 
@@ -20,17 +21,32 @@ Public Class DTMFGenerator
 
     Public ReadOnly Property SymbolTime As Double
         Get
-            Return _baseSymbolTime / Speed
+            SyncLock _syncRoot
+                Return _baseSymbolTime / Speed
+            End SyncLock
         End Get
     End Property
 
     Public ReadOnly Property SpaceTime As Double
         Get
-            Return _baseSpaceTime / Speed
+            SyncLock _syncRoot
+                Return _baseSpaceTime / Speed
+            End SyncLock
         End Get
     End Property
 
-    Public Property Speed As Double = 1.0 '1.0
+    Public Property Speed As Double
+        Get
+            SyncLock _syncRoot
+                Return _speed
+            End SyncLock
+        End Get
+        Set(value As Double)
+            SyncLock _syncRoot
+                _speed = value
+            End SyncLock
+        End Set
+    End Property
 
     Public Property Volume As Single
         Get
@@ -70,16 +86,18 @@ Public Class DTMFGenerator
     End Sub
 
     Public Sub Play(sequence As String)
-        Dim program As New Queue(Of SineTaskBlock)()
-        For Each s In sequence.ToUpper()
-            If _encodeMatrix.ContainsKey(s) Then
-                Dim freqPair = _encodeMatrix(s)
-                program.Enqueue(New SineTaskBlock({freqPair.LowFreq, freqPair.HighFreq}, {1.0, 1.0}, ((Me.SymbolTime / 1000.0) * _generator.SampleRate))) 'symbol
-                program.Enqueue(New SineTaskBlock({0, 0}, {0, 0}, ((Me.SpaceTime / 1000.0) * _generator.SampleRate))) 'space
-            Else
-                program.Enqueue(New SineTaskBlock({0, 0}, {0, 0}, ((Me.SymbolTime / 1000.0) * _generator.SampleRate))) 'space symbol
-            End If
-        Next
-        _generator.Play(program)
+        SyncLock _syncRoot
+            Dim program As New Queue(Of SineTaskBlock)()
+            For Each s In sequence.ToUpper()
+                If _encodeMatrix.ContainsKey(s) Then
+                    Dim freqPair = _encodeMatrix(s)
+                    program.Enqueue(New SineTaskBlock({freqPair.LowFreq, freqPair.HighFreq}, {1.0, 1.0}, ((Me.SymbolTime / 1000.0) * _generator.SampleRate))) 'symbol
+                    program.Enqueue(New SineTaskBlock({0, 0}, {0, 0}, ((Me.SpaceTime / 1000.0) * _generator.SampleRate))) 'space
+                Else
+                    program.Enqueue(New SineTaskBlock({0, 0}, {0, 0}, ((Me.SymbolTime / 1000.0) * _generator.SampleRate))) 'space symbol
+                End If
+            Next
+            _generator.Play(program)
+        End SyncLock
     End Sub
 End Class

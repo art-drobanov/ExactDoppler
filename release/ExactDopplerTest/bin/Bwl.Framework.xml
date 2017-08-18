@@ -246,5 +246,18 @@ Bwl.Framework
  <returns></returns>
  <remarks></remarks>
 </member>
+<member name="M:Bwl.Framework.SettingsStorageBufferedRoot.#ctor">
+ <summary>
+ Создать хранилище настроек с виртуальным интерфейсом загрузки\сохранения и корневой категорией Root.
+ </summary>
+ <remarks></remarks>
+</member>
+<member name="M:Bwl.Framework.SettingsStorageBufferedRoot.#ctor(System.String,System.String)">
+ <summary>
+ Создать новое хранилище настроек, являющееся корневым.
+ </summary>
+ <param name="iniFileName">Имя ini-файла с настройками.</param>
+ <remarks></remarks>
+</member>
 </members>
 </doc>

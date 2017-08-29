@@ -22,6 +22,11 @@ Bwl.Imaging
   обращений к ресурсу с помощью этого класса ресурса со строгой типизацией.
 </summary>
 </member>
+<member name="P:Bwl.Imaging.BitmapInfo.Bmp">
+<remarks>
+ При обращении к Bmp обязательно использовать BmpLock()/BmpUnlock()
+</remarks>
+</member>
 <member name="M:Bwl.Imaging.HSV.HueDistance(System.Double,System.Double)">
  <summary>
  Вычисление кратчайшего расстояния между двумя тонами

@@ -53,6 +53,7 @@ Partial Class MainForm
         Me._waterfallGroupBox = New System.Windows.Forms.GroupBox()
         Me._rawImageCheckBox = New System.Windows.Forms.CheckBox()
         Me._waterfallDisplayBitmapControl = New Bwl.Imaging.DisplayBitmapControl()
+        Me._topFreqOnlyCheckBox = New System.Windows.Forms.CheckBox()
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me._topFrequencyGroupBox.SuspendLayout()
         CType(Me._volumeTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -96,6 +97,7 @@ Partial Class MainForm
         '
         '_topFrequencyGroupBox
         '
+        Me._topFrequencyGroupBox.Controls.Add(Me._topFreqOnlyCheckBox)
         Me._topFrequencyGroupBox.Controls.Add(Me.Label1)
         Me._topFrequencyGroupBox.Controls.Add(Me._freq2Label)
         Me._topFrequencyGroupBox.Controls.Add(Me._freq1Label)
@@ -364,11 +366,24 @@ Partial Class MainForm
         '_waterfallDisplayBitmapControl
         '
         Me._waterfallDisplayBitmapControl.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me._waterfallDisplayBitmapControl.Bitmap = CType(resources.GetObject("_waterfallDisplayBitmapControl.Bitmap"), System.Drawing.Bitmap)
         Me._waterfallDisplayBitmapControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me._waterfallDisplayBitmapControl.Location = New System.Drawing.Point(6, 19)
         Me._waterfallDisplayBitmapControl.Name = "_waterfallDisplayBitmapControl"
         Me._waterfallDisplayBitmapControl.Size = New System.Drawing.Size(536, 243)
         Me._waterfallDisplayBitmapControl.TabIndex = 29
+        '
+        '_topFreqOnlyCheckBox
+        '
+        Me._topFreqOnlyCheckBox.AutoSize = True
+        Me._topFreqOnlyCheckBox.Checked = True
+        Me._topFreqOnlyCheckBox.CheckState = System.Windows.Forms.CheckState.Checked
+        Me._topFreqOnlyCheckBox.Location = New System.Drawing.Point(121, 0)
+        Me._topFreqOnlyCheckBox.Name = "_topFreqOnlyCheckBox"
+        Me._topFreqOnlyCheckBox.Size = New System.Drawing.Size(93, 17)
+        Me._topFreqOnlyCheckBox.TabIndex = 8
+        Me._topFreqOnlyCheckBox.Text = "Top Freq Only"
+        Me._topFreqOnlyCheckBox.UseVisualStyleBackColor = True
         '
         'MainForm
         '
@@ -436,4 +451,5 @@ Partial Class MainForm
     Friend WithEvents Label1 As Label
     Friend WithEvents _rawImageCheckBox As CheckBox
     Friend WithEvents _alarmCheckBox As CheckBox
+    Friend WithEvents _topFreqOnlyCheckBox As CheckBox
 End Class

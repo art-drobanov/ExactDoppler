@@ -169,8 +169,11 @@ Public Class MainForm
         If freq1 < 1000 Then
             Throw New Exception("freq1 < 1000")
         End If
-        _exactDoppler.SwitchOnGen({freq1, freq2})
-        '_exactDoppler.SwitchOnGen({freq2})
+        If Not _topFreqOnlyCheckBox.Checked Then
+            _exactDoppler.SwitchOnGen({freq1, freq2})
+        Else
+            _exactDoppler.SwitchOnGen({freq2})
+        End If
         _outputGroupBox.Text = String.Format("Output [ ON AIR! ] at device with zero-based index '{0}'", _exactDoppler.OutputDeviceIdx)
         _switchOnButton.BackColor = Me.BackColor
     End Sub

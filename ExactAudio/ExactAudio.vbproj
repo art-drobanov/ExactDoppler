@@ -51,13 +51,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\refs\Bwl.Imaging.dll</HintPath>
     </Reference>
-    <Reference Include="DebugHelper">
-      <HintPath>..\refs\DebugHelper.dll</HintPath>
-    </Reference>
-    <Reference Include="ExactFFT, Version=8.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\refs\ExactFFT.dll</HintPath>
-    </Reference>
     <Reference Include="NAudio">
       <HintPath>..\refs\NAudio.dll</HintPath>
     </Reference>
@@ -126,6 +119,12 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ExactFFT\ExactFFT\ExactFFT.csproj">
+      <Project>{2b615506-98b4-41c0-abac-baf0b5bc5b7d}</Project>
+      <Name>ExactFFT</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

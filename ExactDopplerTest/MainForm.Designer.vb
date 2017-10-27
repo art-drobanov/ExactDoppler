@@ -27,6 +27,7 @@ Partial Class MainForm
         Me._sineGenSwitchOffButton = New System.Windows.Forms.Button()
         Me._sineFreqTrackBar = New System.Windows.Forms.TrackBar()
         Me._topFrequencyGroupBox = New System.Windows.Forms.GroupBox()
+        Me._topFreqOnlyCheckBox = New System.Windows.Forms.CheckBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me._freq2Label = New System.Windows.Forms.Label()
         Me._freq1Label = New System.Windows.Forms.Label()
@@ -53,7 +54,6 @@ Partial Class MainForm
         Me._waterfallGroupBox = New System.Windows.Forms.GroupBox()
         Me._rawImageCheckBox = New System.Windows.Forms.CheckBox()
         Me._waterfallDisplayBitmapControl = New Bwl.Imaging.DisplayBitmapControl()
-        Me._topFreqOnlyCheckBox = New System.Windows.Forms.CheckBox()
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me._topFrequencyGroupBox.SuspendLayout()
         CType(Me._volumeTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -108,6 +108,18 @@ Partial Class MainForm
         Me._topFrequencyGroupBox.TabIndex = 3
         Me._topFrequencyGroupBox.TabStop = False
         Me._topFrequencyGroupBox.Text = "Frequencies"
+        '
+        '_topFreqOnlyCheckBox
+        '
+        Me._topFreqOnlyCheckBox.AutoSize = True
+        Me._topFreqOnlyCheckBox.Checked = True
+        Me._topFreqOnlyCheckBox.CheckState = System.Windows.Forms.CheckState.Checked
+        Me._topFreqOnlyCheckBox.Location = New System.Drawing.Point(121, 0)
+        Me._topFreqOnlyCheckBox.Name = "_topFreqOnlyCheckBox"
+        Me._topFreqOnlyCheckBox.Size = New System.Drawing.Size(93, 17)
+        Me._topFreqOnlyCheckBox.TabIndex = 8
+        Me._topFreqOnlyCheckBox.Text = "Top Freq Only"
+        Me._topFreqOnlyCheckBox.UseVisualStyleBackColor = True
         '
         'Label1
         '
@@ -372,18 +384,6 @@ Partial Class MainForm
         Me._waterfallDisplayBitmapControl.Name = "_waterfallDisplayBitmapControl"
         Me._waterfallDisplayBitmapControl.Size = New System.Drawing.Size(536, 243)
         Me._waterfallDisplayBitmapControl.TabIndex = 29
-        '
-        '_topFreqOnlyCheckBox
-        '
-        Me._topFreqOnlyCheckBox.AutoSize = True
-        Me._topFreqOnlyCheckBox.Checked = True
-        Me._topFreqOnlyCheckBox.CheckState = System.Windows.Forms.CheckState.Checked
-        Me._topFreqOnlyCheckBox.Location = New System.Drawing.Point(121, 0)
-        Me._topFreqOnlyCheckBox.Name = "_topFreqOnlyCheckBox"
-        Me._topFreqOnlyCheckBox.Size = New System.Drawing.Size(93, 17)
-        Me._topFreqOnlyCheckBox.TabIndex = 8
-        Me._topFreqOnlyCheckBox.Text = "Top Freq Only"
-        Me._topFreqOnlyCheckBox.UseVisualStyleBackColor = True
         '
         'MainForm
         '

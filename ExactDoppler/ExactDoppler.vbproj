@@ -53,9 +53,6 @@
     <Reference Include="Bwl.Imaging">
       <HintPath>..\refs\Bwl.Imaging.dll</HintPath>
     </Reference>
-    <Reference Include="ExactFFT">
-      <HintPath>..\refs\ExactFFT.dll</HintPath>
-    </Reference>
     <Reference Include="NAudio">
       <HintPath>..\refs\NAudio.dll</HintPath>
     </Reference>
@@ -131,6 +128,10 @@
     <ProjectReference Include="..\ExactAudio\ExactAudio.vbproj">
       <Project>{8a4fab22-48ca-4b84-b69c-d67844f9d393}</Project>
       <Name>ExactAudio</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ExactFFT\ExactFFT\ExactFFT.csproj">
+      <Project>{2b615506-98b4-41c0-abac-baf0b5bc5b7d}</Project>
+      <Name>ExactFFT</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

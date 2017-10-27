@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports System.Threading
 Imports NAudio.Wave
 Imports Bwl.Imaging
 
@@ -15,6 +16,7 @@ Public Class AlarmManager
     Private _alarmWaterfall As DopplerWaterfall
     Private _alarmRecordWaterfallRaw As DopplerWaterfall
     Private _alarmRecordWaterfall As DopplerWaterfall
+    Private _alarmStartTime As DateTime
     Private WithEvents _exactDoppler As ExactDoppler
 
     Private _syncRoot As New Object()
@@ -93,6 +95,20 @@ Public Class AlarmManager
         End Set
     End Property
 
+    ''' <summary>Время начала записи тревоги.</summary>
+    Public ReadOnly Property AlarmStartTime As DateTime
+        Get
+            Return _alarmStartTime
+        End Get
+    End Property
+
+    ''' <summary>В настоящее время отслеживается тревога?.</summary>
+    Public ReadOnly Property AlarmDetected As Boolean
+        Get
+            Return _alarmStartTime <> DateTime.MinValue
+        End Get
+    End Property
+
     ''' <summary>
     ''' Событие "PCM-семплы обработаны"
     ''' </summary>
@@ -105,7 +121,8 @@ Public Class AlarmManager
     ''' <param name="rawDopplerImage">"Сырое" доплеровское изображение.</param>
     ''' <param name="dopplerImage">Доплеровское изображение.</param>
     ''' <param name="lowpassAudio">Аудиопоток без ультразвука.</param>
-    Public Event Alarm(rawDopplerImage As RGBMatrix, dopplerImage As RGBMatrix, lowpassAudio As Single())
+    ''' <param name="alarmStartTime">Время начала события.</param>
+    Public Event Alarm(rawDopplerImage As RGBMatrix, dopplerImage As RGBMatrix, lowpassAudio As Single(), alarmStartTime As DateTime)
 
     ''' <summary>
     ''' Событие "Тревога зафиксирована."
@@ -113,7 +130,8 @@ Public Class AlarmManager
     ''' <param name="rawDopplerImage">"Сырое" доплеровское изображение.</param>
     ''' <param name="dopplerImage">Доплеровское изображение.</param>
     ''' <param name="lowpassAudio">Аудиопоток без ультразвука.</param>
-    Public Event AlarmRecorded(rawDopplerImage As RGBMatrix, dopplerImage As RGBMatrix, lowpassAudio As Single())
+    ''' <param name="alarmStartTime">Время начала события.</param>
+    Public Event AlarmRecorded(rawDopplerImage As RGBMatrix, dopplerImage As RGBMatrix, lowpassAudio As Single(), alarmStartTime As DateTime)
 
     Public Sub New(exactDoppler As ExactDoppler)
         '44 блока - это горизонт накопления предупреждений в 30 секунд.
@@ -220,11 +238,9 @@ Public Class AlarmManager
 
         'Если в данный момент не осуществляется запись события...
         If _alarmRecordWaterfallRaw.MaxBlocksCount <> _alarmRecordWaterfallBlocksCount AndAlso _alarmRecordWaterfall.MaxBlocksCount <> _alarmRecordWaterfallBlocksCount Then
-            'Максимальный уровень предупреждения связан с энергией доплеровских сдвигов или отсутствием несущей (нет несущей - 100% предупреждения!)
-            Dim warningScore = {motionExplorerResult.DopplerLogItem.LowDoppler,
-                                motionExplorerResult.DopplerLogItem.HighDoppler,
-                                100.0 - motionExplorerResult.CarrierLevel.Average()}.Max() / 100.0
-            _warningMemory.Enqueue(warningScore)
+            If motionExplorerResult.IsWarning Then
+                _warningMemory.Enqueue(1) 'Фиксируем одну "сработку"
+            End If
             Dim warningElemsToRemove = _warningMemory.Count - _warningMemorySize
             For i = 1 To warningElemsToRemove
                 _warningMemory.Dequeue()
@@ -236,7 +252,11 @@ Public Class AlarmManager
                 _alarmRecordWaterfall = New DopplerWaterfall With {.MaxBlocksCount = _alarmRecordWaterfallBlocksCount} 'Тревога - активируем полную емкость записи!
                 _alarmRecordWaterfallRaw.DroppedBlocksCount = 0 'Сбрасываем индикатор пропусков строк
                 _alarmRecordWaterfall.DroppedBlocksCount = 0 'Сбрасываем индикатор пропусков строк
-                RaiseEvent Alarm(_alarmWaterfallRaw.ToRGBMatrix(), _alarmWaterfall.ToRGBMatrix(), _alarmWaterfallRaw.ToPcm()) 'Alarm вызывается один раз - при активации события! Далее осуществляет запись.
+                _alarmStartTime = Now
+                Dim thr1 = New Thread(Sub()
+                                          RaiseEvent Alarm(_alarmWaterfallRaw.ToRGBMatrix(), _alarmWaterfall.ToRGBMatrix(), _alarmWaterfallRaw.ToPcm(), _alarmStartTime) 'Alarm вызывается один раз - при активации события! Далее осуществляет запись.
+                                      End Sub) With {.IsBackground = True}
+                thr1.Start()
             End If
         Else
             'Ведется запись события!
@@ -249,7 +269,11 @@ Public Class AlarmManager
                 _alarmRecordWaterfall.MaxBlocksCount = Math.Ceiling(_alarmRecordWaterfallBlocksCount / 2.0) 'В ожидании события храним только 1/2 емкости
                 _alarmRecordWaterfallRaw.DroppedBlocksCount = 0 'Сбрасываем индикатор пропусков строк
                 _alarmRecordWaterfall.DroppedBlocksCount = 0 'Сбрасываем индикатор пропусков строк
-                RaiseEvent AlarmRecorded(_alarmRecordWaterfallRaw.ToRGBMatrix(), _alarmRecordWaterfall.ToRGBMatrix(), _alarmRecordWaterfallRaw.ToPcm()) 'Тревога записана!
+                Dim thr2 = New Thread(Sub()
+                                          RaiseEvent AlarmRecorded(_alarmRecordWaterfallRaw.ToRGBMatrix(), _alarmRecordWaterfall.ToRGBMatrix(), _alarmRecordWaterfallRaw.ToPcm(), _alarmStartTime) 'Тревога записана!
+                                      End Sub) With {.IsBackground = True}
+                thr2.Start()
+                _alarmStartTime = DateTime.MinValue
             End If
         End If
 

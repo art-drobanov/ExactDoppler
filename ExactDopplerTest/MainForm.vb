@@ -20,8 +20,8 @@ Public Class MainForm
         If _exactDoppler.OutputDeviceIdx >= 0 Then
             _outputAudioDevicesListBox.SelectedIndex = _exactDoppler.OutputDeviceIdx
             _outputAudioDevicesRefreshButton.Text = _outputAudioDevicesListBox.Items(_exactDoppler.OutputDeviceIdx) + " / Refresh"
-            _inputGroupBox.Text = String.Format("Input [ OFF ] at device with zero-based index '{0}'", _exactDoppler.InputDeviceIdx)
-            _outputGroupBox.Text = String.Format("Output [ OFF ] at device with zero-based index '{0}'", _exactDoppler.OutputDeviceIdx)
+            _inputGroupBox.Text = String.Format("Input [ OFF ] at device with zero-based idx '{0}'", _exactDoppler.InputDeviceIdx)
+            _outputGroupBox.Text = String.Format("Output [ OFF ] at device with zero-based idx '{0}'", _exactDoppler.OutputDeviceIdx)
         Else
             _outputAudioDevicesRefreshButton.Text = "Refresh"
         End If
@@ -60,27 +60,33 @@ Public Class MainForm
                       _blocksLabel.Text = _exactDoppler.PcmBlocksCounter.ToString()
                       Dim dopplerLogItem = motionExplorerResult.DopplerLogItem.ToString()
                       _dopplerLogTextBox.Lines = {dopplerLogItem}
-                  End Sub)
-    End Sub
 
-    Private Sub Alarm(rawDopplerImage As RGBMatrix, dopplerImage As RGBMatrix, lowpassAudio As Single()) Handles _alarmManager.Alarm
-        Me.Invoke(Sub()
-                      If _alarmCheckBox.Checked Then
+                      'Alarm
+                      If _alarmManager.AlarmDetected Then
                           _alarmCheckBox.BackColor = Color.Red
-                          _alarmManager.Save("Alarm", rawDopplerImage, dopplerImage, lowpassAudio)
                       Else
                           _alarmCheckBox.BackColor = Color.DeepSkyBlue
                       End If
                   End Sub)
     End Sub
 
-    Private Sub AlarmRecorded(rawDopplerImage As RGBMatrix, dopplerImage As RGBMatrix, lowpassAudio As Single()) Handles _alarmManager.AlarmRecorded
-        Me.Invoke(Sub()
-                      _alarmCheckBox.BackColor = Color.DeepSkyBlue
-                      If _alarmCheckBox.Checked Then
-                          _alarmManager.Save("AlarmRecord", rawDopplerImage, dopplerImage, lowpassAudio)
-                      End If
-                  End Sub)
+    Private Sub Alarm(rawDopplerImage As RGBMatrix, dopplerImage As RGBMatrix, lowpassAudio As Single(), alarmStartTime As DateTime) Handles _alarmManager.Alarm
+        Me.BeginInvoke(Sub()
+                           If _alarmCheckBox.Checked Then
+                               _alarmManager.Save("Alarm", rawDopplerImage, dopplerImage, lowpassAudio)
+                           Else
+                               _alarmCheckBox.BackColor = Color.DeepSkyBlue
+                           End If
+                       End Sub)
+    End Sub
+
+    Private Sub AlarmRecorded(rawDopplerImage As RGBMatrix, dopplerImage As RGBMatrix, lowpassAudio As Single(), alarmStartTime As DateTime) Handles _alarmManager.AlarmRecorded
+        Me.BeginInvoke(Sub()
+                           _alarmCheckBox.BackColor = Color.DeepSkyBlue
+                           If _alarmCheckBox.Checked Then
+                               _alarmManager.Save("AlarmRecorded", rawDopplerImage, dopplerImage, lowpassAudio)
+                           End If
+                       End Sub)
     End Sub
 
     Private Sub _captureOffButton_Click(sender As Object, e As EventArgs) Handles _captureOffButton.Click
@@ -115,7 +121,7 @@ Public Class MainForm
         _waterfallShort.Clear()
 
         'GUI
-        _inputGroupBox.Text = String.Format("Input [ OFF ] at device with zero-based index '{0}'", _exactDoppler.InputDeviceIdx)
+        _inputGroupBox.Text = String.Format("Input [ OFF ] at device with zero-based idx '{0}'", _exactDoppler.InputDeviceIdx)
         _captureOnButton.BackColor = Color.MediumSpringGreen
 
         _inputAudioDevicesListBox.Enabled = True
@@ -155,13 +161,26 @@ Public Class MainForm
         If freq1 < 1000 Then
             Return
         End If
-        _exactDoppler.Config = New ExactDopplerConfig(0, 0, 1.0, {freq1, freq2}, blindZone, 10)
-        '_exactDoppler.Config = New ExactDopplerConfig(0, 0, 1.0, {freq2}, blindZone, 10)
+        If Not _topFreqOnlyCheckBox.Checked Then
+            _exactDoppler.Config = New ExactDopplerConfig(0, 0, 1.0, {freq1, freq2}, blindZone, 10)
+        Else
+            _exactDoppler.Config = New ExactDopplerConfig(0, 0, 1.0, {freq2}, blindZone, 10)
+        End If
         _freq1Label.Text = String.Format("{0} Hz", freq1)
         _freq2Label.Text = String.Format("{0} Hz", freq2)
     End Sub
 
     Private Sub _sineGenButton_Click(sender As Object, e As EventArgs) Handles _switchOnButton.Click
+        If MessageBox.Show("High power ultrasound may damage the tweeter, " +
+                           "and also may damage your hearing. " +
+                           "By pressing 'Yes' i confirm, that: " +
+                           "I'm sure that the chosen output is not connected to the headphones. " +
+                           "I'm sure that the chosen output is not connected to the expensive speaker system. " +
+                           "The audio output device transmits the signal to the built-in laptop speakers " +
+                           "or to the cheap USB-speakers equipped with one speaker per channel.",
+                           "WARNING", MessageBoxButtons.YesNo, MessageBoxIcon.Information) = DialogResult.No Then
+            Return
+        End If
         _outputAudioDevicesListBox.Enabled = False
         _exactDoppler.Volume = _volumeTrackBar.Value / 100.0F
         Dim freq2 = Convert.ToInt32(_freq2Label.Text.Replace("Hz", String.Empty))
@@ -174,13 +193,13 @@ Public Class MainForm
         Else
             _exactDoppler.SwitchOnGen({freq2})
         End If
-        _outputGroupBox.Text = String.Format("Output [ ON AIR! ] at device with zero-based index '{0}'", _exactDoppler.OutputDeviceIdx)
+        _outputGroupBox.Text = String.Format("Output [ ON AIR! ] at device with zero-based idx '{0}'", _exactDoppler.OutputDeviceIdx)
         _switchOnButton.BackColor = Me.BackColor
     End Sub
 
     Private Sub _sineGenSwitchOffButton_Click(sender As Object, e As EventArgs) Handles _sineGenSwitchOffButton.Click
         _exactDoppler.SwitchOffGen()
-        _outputGroupBox.Text = String.Format("Output [ OFF ] at device with zero-based index '{0}'", _exactDoppler.OutputDeviceIdx)
+        _outputGroupBox.Text = String.Format("Output [ OFF ] at device with zero-based idx '{0}'", _exactDoppler.OutputDeviceIdx)
         _switchOnButton.BackColor = Color.MediumSpringGreen
         _outputAudioDevicesListBox.Enabled = True
     End Sub
@@ -191,7 +210,7 @@ Public Class MainForm
         _alarmCheckBox.BackColor = Color.DeepSkyBlue
         _alarmManager.Reset()
         _exactDoppler.Start()
-        _inputGroupBox.Text = String.Format("Input [ ON ] at device with zero-based index '{0}'", _exactDoppler.InputDeviceIdx)
+        _inputGroupBox.Text = String.Format("Input [ ON ] at device with zero-based idx '{0}'", _exactDoppler.InputDeviceIdx)
         _captureOnButton.BackColor = Me.BackColor
     End Sub
 
@@ -228,7 +247,7 @@ Public Class MainForm
         If _exactDoppler.OutputDeviceIdx >= 0 Then
             _outputAudioDevicesListBox.SelectedIndex = _exactDoppler.OutputDeviceIdx
             _outputAudioDevicesRefreshButton.Text = _outputAudioDevicesListBox.Items(_exactDoppler.OutputDeviceIdx) + " / Refresh"
-            _outputGroupBox.Text = String.Format("Output [ OFF ] at device with zero-based index '{0}'", _exactDoppler.OutputDeviceIdx)
+            _outputGroupBox.Text = String.Format("Output [ OFF ] at device with zero-based idx '{0}'", _exactDoppler.OutputDeviceIdx)
         Else
             _outputAudioDevicesRefreshButton.Text = "Refresh"
         End If
@@ -239,7 +258,7 @@ Public Class MainForm
         _exactDoppler.InputDeviceIdx = _inputAudioDevicesListBox.SelectedIndex
         If _exactDoppler.InputDeviceIdx >= 0 Then
             _inputAudioDevicesRefreshButton.Text = _inputAudioDevicesListBox.Items(_exactDoppler.InputDeviceIdx) + " / Refresh"
-            _inputGroupBox.Text = String.Format("Input [ OFF ] at device with zero-based index '{0}'", _exactDoppler.InputDeviceIdx)
+            _inputGroupBox.Text = String.Format("Input [ OFF ] at device with zero-based idx '{0}'", _exactDoppler.InputDeviceIdx)
         Else
             _inputAudioDevicesRefreshButton.Text = "Refresh"
         End If

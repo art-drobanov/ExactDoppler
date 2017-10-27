@@ -63,13 +63,6 @@
     <Reference Include="Bwl.Imaging.WinForms">
       <HintPath>..\refs\Bwl.Imaging.WinForms.dll</HintPath>
     </Reference>
-    <Reference Include="DebugHelper">
-      <HintPath>..\refs\DebugHelper.dll</HintPath>
-    </Reference>
-    <Reference Include="ExactFFT, Version=8.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\refs\ExactFFT.dll</HintPath>
-    </Reference>
     <Reference Include="NAudio, Version=1.7.3.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\refs\NAudio.dll</HintPath>

@@ -40,6 +40,12 @@ ExactDoppler
 <member name="P:ExactAudio.AlarmManager.DataDir">
  <summary>Путь к папке с данными.</summary>
 </member>
+<member name="P:ExactAudio.AlarmManager.AlarmStartTime">
+ <summary>Время начала записи тревоги.</summary>
+</member>
+<member name="P:ExactAudio.AlarmManager.AlarmDetected">
+ <summary>В настоящее время отслеживается тревога?.</summary>
+</member>
 <member name="E:ExactAudio.AlarmManager.PcmSamplesProcessed">
  <summary>
  Событие "PCM-семплы обработаны"
@@ -53,6 +59,7 @@ ExactDoppler
  <param name="rawDopplerImage">"Сырое" доплеровское изображение.</param>
  <param name="dopplerImage">Доплеровское изображение.</param>
  <param name="lowpassAudio">Аудиопоток без ультразвука.</param>
+ <param name="alarmStartTime">Время начала события.</param>
 </member>
 <member name="E:ExactAudio.AlarmManager.AlarmRecorded">
  <summary>
@@ -61,6 +68,7 @@ ExactDoppler
  <param name="rawDopplerImage">"Сырое" доплеровское изображение.</param>
  <param name="dopplerImage">Доплеровское изображение.</param>
  <param name="lowpassAudio">Аудиопоток без ультразвука.</param>
+ <param name="alarmStartTime">Время начала события.</param>
 </member>
 <member name="M:ExactAudio.AlarmManager.Reset">
  <summary>

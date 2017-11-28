@@ -23,7 +23,7 @@ Public Class ExactDoppler
     Private _config As ExactDopplerConfig
 
     'Объекты
-    Private _capture As WaveInSource
+    Private _capture As WaveSource
     Private _sineGenerator As SineGenerator
     Private _fftExplorer As FFTExplorer
     Private _lowpassFilter As BiQuadFilter
@@ -94,9 +94,27 @@ Public Class ExactDoppler
             SyncLock _syncRoot
                 If value >= 0 AndAlso value < Me.InputAudioDevices.Count Then
                     _inputDeviceIdx = value
-                    _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallBlockDuration) With {.SampleProcessor = AddressOf SampleProcessor}
+                    _capture = New WaveInSource(_inputDeviceIdx, _inputDeviceIdx.ToString(), _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallBlockDuration) With {.SampleProcessor = AddressOf SampleProcessor}
                 Else
                     _inputDeviceIdx = -1
+                End If
+            End SyncLock
+        End Set
+    End Property
+
+    ''' <summary>Имя аудиофайла.</summary>
+    Public Property InputWavFile As String
+        Get
+            SyncLock _syncRoot
+                Return If(_capture IsNot Nothing, _capture.Name, String.Empty)
+            End SyncLock
+        End Get
+        Set(value As String)
+            _inputDeviceIdx = -1
+            SyncLock _syncRoot
+                value = value.Trim()
+                If Not String.IsNullOrEmpty(value) Then
+                    _capture = New WaveFileSource(value, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallBlockDuration) With {.SampleProcessor = AddressOf SampleProcessor}
                 End If
             End SyncLock
         End Set
@@ -175,7 +193,7 @@ Public Class ExactDoppler
             _config = config
         End If
         _sineGenerator = New SineGenerator(_outputDeviceIdx, _sampleRate)
-        _capture = New WaveInSource(_inputDeviceIdx, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallBlockDuration)
+        _capture = New WaveInSource(_inputDeviceIdx, _inputDeviceIdx.ToString(), _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallBlockDuration)
         _fftExplorer = New FFTExplorer(_windowSize, _windowStep, _sampleRate, _nBitsPalette, False)
         _lowpassFilter = BiQuadFilter.LowPassFilter(_sampleRate, 14000, 1)
         MotionExplorersInit()

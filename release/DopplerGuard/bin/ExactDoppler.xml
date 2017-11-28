@@ -134,6 +134,9 @@ ExactDoppler
 <member name="P:ExactAudio.ExactDoppler.InputDeviceIdx">
  <summary>Индекс устройства захвата аудио.</summary>
 </member>
+<member name="P:ExactAudio.ExactDoppler.InputWavFile">
+ <summary>Имя аудиофайла.</summary>
+</member>
 <member name="P:ExactAudio.ExactDoppler.OutputDeviceIdx">
  <summary>Индекс устройства вывода аудио.</summary>
 </member>

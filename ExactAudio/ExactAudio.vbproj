@@ -75,12 +75,14 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\Source\WaveFileSource.vb" />
+    <Compile Include="Audio\Source\WaveSource.vb" />
     <Compile Include="Audio\Utils\DTMFGenerator.vb" />
     <Compile Include="Audio\SineGenerator\SineTaskBlock.vb" />
     <Compile Include="Audio\SineGenerator\ProgrammedSineWaveProvider32.vb" />
     <Compile Include="Imaging\ImageUtils.vb" />
     <Compile Include="FFT\FFTExplorer.vb" />
-    <Compile Include="Audio\WaveInSource.vb" />
+    <Compile Include="Audio\Source\WaveInSource.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

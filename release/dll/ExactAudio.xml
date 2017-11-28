@@ -22,6 +22,16 @@ ExactAudio
   resource lookups using this strongly typed resource class.
 </summary>
 </member>
+<member name="T:ExactAudio.WaveFileSource">
+ <summary>
+ Аудиоисточник на основе Wav-файла
+ </summary>
+</member>
+<member name="T:ExactAudio.WaveSource">
+ <summary>
+ Базовый аудиоисточник
+ </summary>
+</member>
 <member name="T:ExactAudio.DTMFGenerator">
  <summary>
  Генератор DTMF
@@ -78,7 +88,7 @@ ExactAudio
 </member>
 <member name="T:ExactAudio.WaveInSource">
  <summary>
- Аудиоисточник
+ Аудиоисточник на основе аудиокарты
  </summary>
 </member>
 <member name="T:ExactAudio.Normalizer">

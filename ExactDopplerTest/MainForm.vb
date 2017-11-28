@@ -7,6 +7,7 @@ Public Class MainForm
     Private WithEvents _alarmManager As New AlarmManager(_exactDoppler)
     Private _waterfallShort As New DopplerWaterfall With {.MaxBlocksCount = 12}
     Private _waterfallFull As New DopplerWaterfall
+    Private _wavFileMarker = "[Wav File / PCM]"
 
     Public Sub New()
         InitializeComponent()
@@ -240,6 +241,7 @@ Public Class MainForm
         For Each deviceName In _exactDoppler.InputAudioDevices
             _inputAudioDevicesListBox.Items.Add(deviceName)
         Next
+        _inputAudioDevicesListBox.Items.Add(_wavFileMarker)
     End Sub
 
     Private Sub _outputAudioDevicesListBox_SelectedIndexChanged(sender As Object, e As EventArgs) Handles _outputAudioDevicesListBox.SelectedIndexChanged
@@ -255,12 +257,29 @@ Public Class MainForm
 
     Private Sub _inputAudioDevicesListBox_SelectedIndexChanged(sender As Object, e As EventArgs) Handles _inputAudioDevicesListBox.SelectedIndexChanged
         _captureOffButton_Click(sender, e)
-        _exactDoppler.InputDeviceIdx = _inputAudioDevicesListBox.SelectedIndex
-        If _exactDoppler.InputDeviceIdx >= 0 Then
-            _inputAudioDevicesRefreshButton.Text = _inputAudioDevicesListBox.Items(_exactDoppler.InputDeviceIdx) + " / Refresh"
-            _inputGroupBox.Text = String.Format("Input [ OFF ] at device with zero-based idx '{0}'", _exactDoppler.InputDeviceIdx)
+        If CType(_inputAudioDevicesListBox.SelectedItem, String).Contains(_wavFileMarker) Then
+            Dim ofd = New OpenFileDialog
+            With ofd
+                .RestoreDirectory = True
+                .AddExtension = True
+                .DefaultExt = ".wav"
+                .Filter = "Wave files (*.wav)|*.wav"
+            End With
+            If ofd.ShowDialog() = DialogResult.OK Then
+                Try
+                    _exactDoppler.InputWavFile = ofd.FileName
+                Catch ex As Exception
+                    MessageBox.Show(ex.Message)
+                End Try
+            End If
         Else
-            _inputAudioDevicesRefreshButton.Text = "Refresh"
+            _exactDoppler.InputDeviceIdx = _inputAudioDevicesListBox.SelectedIndex
+            If _exactDoppler.InputDeviceIdx >= 0 Then
+                _inputAudioDevicesRefreshButton.Text = _inputAudioDevicesListBox.Items(_exactDoppler.InputDeviceIdx) + " / Refresh"
+                _inputGroupBox.Text = String.Format("Input [ OFF ] at device with zero-based idx '{0}'", _exactDoppler.InputDeviceIdx)
+            Else
+                _inputAudioDevicesRefreshButton.Text = "Refresh"
+            End If
         End If
     End Sub
 

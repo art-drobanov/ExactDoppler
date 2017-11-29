@@ -70,10 +70,10 @@ Public Class WaveFileSource
                     Thread.Sleep(TimeSpan.FromSeconds(timeToSleepInS))
                 End If
                 If (_read + _bufferSize) >= _waveFile.Length Then
-                    Rewind()
+                    [Stop]()
                 End If
             Else
-                Rewind()
+                [Stop]()
             End If
         End While
     End Sub

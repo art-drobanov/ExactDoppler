@@ -8,19 +8,19 @@ Public Delegate Sub SampleProcessorDelegate(samples As Single(), samplesCount As
 Public MustInherit Class WaveSource
     Protected _started As Boolean
     Protected _waveFormat As WaveFormat
-    Protected _minSamplesCountInBlock As Integer
+    Protected _minSampleCountInBlock As Integer
 
     Public SampleProcessor As SampleProcessorDelegate
 
     Public MustOverride ReadOnly Property Name As String
 
-    Public Sub New(sampleRate As Integer, bitDepth As Integer, stereo As Boolean, minSamplesCountInBlock As Integer)
+    Public Sub New(sampleRate As Integer, bitDepth As Integer, stereo As Boolean, minSampleCountInBlock As Integer)
         _started = False
         _waveFormat = New WaveFormat(sampleRate, bitDepth, If(stereo, 2, 1))
         If _waveFormat.BitsPerSample <> 16 AndAlso _waveFormat.BitsPerSample <> 24 Then
             Throw New Exception(String.Format("{0}: Wrong bit depth!", TypeName(Me)))
         End If
-        _minSamplesCountInBlock = minSamplesCountInBlock
+        _minSampleCountInBlock = minSampleCountInBlock
     End Sub
 
     Public MustOverride Sub Start()

@@ -149,6 +149,12 @@ ExactDoppler
 <member name="P:ExactAudio.ExactDoppler.Config">
  <summary>Конфигурация доплеровского анализатора.</summary>
 </member>
+<member name="P:ExactAudio.ExactDoppler.SpeedX">
+ <summary>Текущая скорость воспроизведения.</summary>
+</member>
+<member name="P:ExactAudio.ExactDoppler.FastMode">
+ <summary>Используется быстрый режим?</summary>
+</member>
 <member name="E:ExactAudio.ExactDoppler.PcmSamplesProcessed">
  <summary>
  Событие "PCM-семплы обработаны"

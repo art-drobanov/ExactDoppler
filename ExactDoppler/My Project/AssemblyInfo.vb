@@ -12,7 +12,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("ExactDoppler Library")>
 <Assembly: AssemblyCompany("DrAF (Artem Drobanov)")> 
 <Assembly: AssemblyProduct("ExactDoppler")>
-<Assembly: AssemblyCopyright("Copyright © DrAF, 2016 - 2017")>
+<Assembly: AssemblyCopyright("Copyright © DrAF, 2008 - 2017")>
 <Assembly: AssemblyTrademark("ExactDoppler")>
 
 <Assembly: ComVisible(False)>
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("0.2.9.0")>
-<Assembly: AssemblyFileVersion("0.2.9.0")>
+<Assembly: AssemblyVersion("0.2.10.0")>
+<Assembly: AssemblyFileVersion("0.2.10.0")>

@@ -61,6 +61,7 @@ Public Class MainForm
                       _blocksLabel.Text = _exactDoppler.PcmBlocksCounter.ToString()
                       Dim dopplerLogItem = motionExplorerResult.DopplerLogItem.ToString()
                       _dopplerLogTextBox.Lines = {dopplerLogItem}
+                      _speedXLabel.Text = _exactDoppler.SpeedX.ToString("F1")
 
                       'Alarm
                       If _alarmManager.AlarmDetected Then
@@ -310,5 +311,9 @@ Public Class MainForm
             Dim dtmf = New DTMFGenerator(outputAudioDeviceSelectedIndex, 48000) With {.Volume = _volumeTrackBar.Value / 100.0F}
             dtmf.Play("151 262 888 111")
         End If
+    End Sub
+
+    Private Sub _fastModeCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles _fastModeCheckBox.CheckedChanged
+        _exactDoppler.FastMode = _fastModeCheckBox.Checked
     End Sub
 End Class

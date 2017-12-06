@@ -174,6 +174,33 @@ Public Class ExactDoppler
         End Set
     End Property
 
+    ''' <summary>Текущая скорость воспроизведения.</summary>
+    Public ReadOnly Property SpeedX As Double
+        Get
+            If GetType(WaveFileSource).IsAssignableFrom(_capture.GetType) Then
+                Return CType(_capture, WaveFileSource).SpeedX
+            Else
+                Return 1
+            End If
+        End Get
+    End Property
+
+    ''' <summary>Используется быстрый режим?</summary>
+    Public Property FastMode As Boolean
+        Get
+            If GetType(WaveFileSource).IsAssignableFrom(_capture.GetType) Then
+                Return CType(_capture, WaveFileSource).FastMode
+            Else
+                Return False
+            End If
+        End Get
+        Set(value As Boolean)
+            If GetType(WaveFileSource).IsAssignableFrom(_capture.GetType) Then
+                CType(_capture, WaveFileSource).FastMode = value
+            End If
+        End Set
+    End Property
+
     ''' <summary>
     ''' Событие "PCM-семплы обработаны"
     ''' </summary>

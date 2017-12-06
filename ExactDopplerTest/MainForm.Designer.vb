@@ -52,8 +52,11 @@ Partial Class MainForm
         Me._dopplerLogGroupBox = New System.Windows.Forms.GroupBox()
         Me._dopplerLogTextBox = New System.Windows.Forms.TextBox()
         Me._waterfallGroupBox = New System.Windows.Forms.GroupBox()
+        Me._fastModeCheckBox = New System.Windows.Forms.CheckBox()
         Me._rawImageCheckBox = New System.Windows.Forms.CheckBox()
         Me._waterfallDisplayBitmapControl = New Bwl.Imaging.DisplayBitmapControl()
+        Me._speedXLabel_ = New System.Windows.Forms.Label()
+        Me._speedXLabel = New System.Windows.Forms.Label()
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me._topFrequencyGroupBox.SuspendLayout()
         CType(Me._volumeTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -91,7 +94,7 @@ Partial Class MainForm
         Me._sineFreqTrackBar.Maximum = 48
         Me._sineFreqTrackBar.Name = "_sineFreqTrackBar"
         Me._sineFreqTrackBar.Size = New System.Drawing.Size(202, 45)
-        Me._sineFreqTrackBar.TabIndex = 5
+        Me._sineFreqTrackBar.TabIndex = 4
         Me._sineFreqTrackBar.TickStyle = System.Windows.Forms.TickStyle.TopLeft
         Me._sineFreqTrackBar.Value = 42
         '
@@ -117,7 +120,7 @@ Partial Class MainForm
         Me._topFreqOnlyCheckBox.Location = New System.Drawing.Point(121, 0)
         Me._topFreqOnlyCheckBox.Name = "_topFreqOnlyCheckBox"
         Me._topFreqOnlyCheckBox.Size = New System.Drawing.Size(93, 17)
-        Me._topFreqOnlyCheckBox.TabIndex = 8
+        Me._topFreqOnlyCheckBox.TabIndex = 3
         Me._topFreqOnlyCheckBox.Text = "Top Freq Only"
         Me._topFreqOnlyCheckBox.UseVisualStyleBackColor = True
         '
@@ -155,7 +158,7 @@ Partial Class MainForm
         Me._volumeTrackBar.Name = "_volumeTrackBar"
         Me._volumeTrackBar.Orientation = System.Windows.Forms.Orientation.Vertical
         Me._volumeTrackBar.Size = New System.Drawing.Size(45, 158)
-        Me._volumeTrackBar.TabIndex = 9
+        Me._volumeTrackBar.TabIndex = 5
         Me._volumeTrackBar.TickStyle = System.Windows.Forms.TickStyle.None
         Me._volumeTrackBar.Value = 90
         '
@@ -203,6 +206,8 @@ Partial Class MainForm
         '
         '_inputGroupBox
         '
+        Me._inputGroupBox.Controls.Add(Me._speedXLabel)
+        Me._inputGroupBox.Controls.Add(Me._speedXLabel_)
         Me._inputGroupBox.Controls.Add(Me._alarmCheckBox)
         Me._inputGroupBox.Controls.Add(Me._scrButton)
         Me._inputGroupBox.Controls.Add(Me._centralBlindZoneGroupBox)
@@ -215,7 +220,7 @@ Partial Class MainForm
         Me._inputGroupBox.Location = New System.Drawing.Point(292, 12)
         Me._inputGroupBox.Name = "_inputGroupBox"
         Me._inputGroupBox.Size = New System.Drawing.Size(268, 365)
-        Me._inputGroupBox.TabIndex = 10
+        Me._inputGroupBox.TabIndex = 9
         Me._inputGroupBox.TabStop = False
         Me._inputGroupBox.Text = "Input [ OFF ]"
         '
@@ -226,7 +231,7 @@ Partial Class MainForm
         Me._alarmCheckBox.Location = New System.Drawing.Point(113, 298)
         Me._alarmCheckBox.Name = "_alarmCheckBox"
         Me._alarmCheckBox.Size = New System.Drawing.Size(94, 17)
-        Me._alarmCheckBox.TabIndex = 31
+        Me._alarmCheckBox.TabIndex = 14
         Me._alarmCheckBox.Text = "ALARM TEST"
         Me._alarmCheckBox.UseVisualStyleBackColor = False
         '
@@ -236,7 +241,7 @@ Partial Class MainForm
         Me._scrButton.Location = New System.Drawing.Point(214, 289)
         Me._scrButton.Name = "_scrButton"
         Me._scrButton.Size = New System.Drawing.Size(47, 32)
-        Me._scrButton.TabIndex = 20
+        Me._scrButton.TabIndex = 15
         Me._scrButton.Text = "Scr"
         Me._scrButton.UseVisualStyleBackColor = False
         '
@@ -247,7 +252,7 @@ Partial Class MainForm
         Me._centralBlindZoneGroupBox.Location = New System.Drawing.Point(9, 201)
         Me._centralBlindZoneGroupBox.Name = "_centralBlindZoneGroupBox"
         Me._centralBlindZoneGroupBox.Size = New System.Drawing.Size(252, 82)
-        Me._centralBlindZoneGroupBox.TabIndex = 13
+        Me._centralBlindZoneGroupBox.TabIndex = 12
         Me._centralBlindZoneGroupBox.TabStop = False
         Me._centralBlindZoneGroupBox.Text = "Central ""Blind Zone"""
         '
@@ -267,7 +272,7 @@ Partial Class MainForm
         Me._blindZoneTrackBar.Minimum = 1
         Me._blindZoneTrackBar.Name = "_blindZoneTrackBar"
         Me._blindZoneTrackBar.Size = New System.Drawing.Size(240, 45)
-        Me._blindZoneTrackBar.TabIndex = 15
+        Me._blindZoneTrackBar.TabIndex = 13
         Me._blindZoneTrackBar.TickStyle = System.Windows.Forms.TickStyle.TopLeft
         Me._blindZoneTrackBar.Value = 60
         '
@@ -276,7 +281,7 @@ Partial Class MainForm
         Me._inputAudioDevicesRefreshButton.Location = New System.Drawing.Point(6, 172)
         Me._inputAudioDevicesRefreshButton.Name = "_inputAudioDevicesRefreshButton"
         Me._inputAudioDevicesRefreshButton.Size = New System.Drawing.Size(256, 23)
-        Me._inputAudioDevicesRefreshButton.TabIndex = 12
+        Me._inputAudioDevicesRefreshButton.TabIndex = 11
         Me._inputAudioDevicesRefreshButton.UseVisualStyleBackColor = True
         '
         '_inputAudioDevicesListBox
@@ -285,12 +290,12 @@ Partial Class MainForm
         Me._inputAudioDevicesListBox.Location = New System.Drawing.Point(6, 19)
         Me._inputAudioDevicesListBox.Name = "_inputAudioDevicesListBox"
         Me._inputAudioDevicesListBox.Size = New System.Drawing.Size(256, 147)
-        Me._inputAudioDevicesListBox.TabIndex = 11
+        Me._inputAudioDevicesListBox.TabIndex = 10
         '
         '_blocksLabel_
         '
         Me._blocksLabel_.AutoSize = True
-        Me._blocksLabel_.Location = New System.Drawing.Point(6, 299)
+        Me._blocksLabel_.Location = New System.Drawing.Point(10, 289)
         Me._blocksLabel_.Name = "_blocksLabel_"
         Me._blocksLabel_.Size = New System.Drawing.Size(42, 13)
         Me._blocksLabel_.TabIndex = 16
@@ -302,14 +307,14 @@ Partial Class MainForm
         Me._captureOffButton.Location = New System.Drawing.Point(214, 327)
         Me._captureOffButton.Name = "_captureOffButton"
         Me._captureOffButton.Size = New System.Drawing.Size(47, 32)
-        Me._captureOffButton.TabIndex = 19
+        Me._captureOffButton.TabIndex = 17
         Me._captureOffButton.Text = "Off"
         Me._captureOffButton.UseVisualStyleBackColor = False
         '
         '_blocksLabel
         '
         Me._blocksLabel.AutoSize = True
-        Me._blocksLabel.Location = New System.Drawing.Point(54, 299)
+        Me._blocksLabel.Location = New System.Drawing.Point(58, 289)
         Me._blocksLabel.Name = "_blocksLabel"
         Me._blocksLabel.Size = New System.Drawing.Size(13, 13)
         Me._blocksLabel.TabIndex = 17
@@ -321,7 +326,7 @@ Partial Class MainForm
         Me._captureOnButton.Location = New System.Drawing.Point(9, 327)
         Me._captureOnButton.Name = "_captureOnButton"
         Me._captureOnButton.Size = New System.Drawing.Size(199, 32)
-        Me._captureOnButton.TabIndex = 18
+        Me._captureOnButton.TabIndex = 16
         Me._captureOnButton.Text = "Capture On"
         Me._captureOnButton.UseVisualStyleBackColor = False
         '
@@ -341,7 +346,7 @@ Partial Class MainForm
         Me._dopplerLogGroupBox.Location = New System.Drawing.Point(12, 657)
         Me._dopplerLogGroupBox.Name = "_dopplerLogGroupBox"
         Me._dopplerLogGroupBox.Size = New System.Drawing.Size(548, 59)
-        Me._dopplerLogGroupBox.TabIndex = 30
+        Me._dopplerLogGroupBox.TabIndex = 22
         Me._dopplerLogGroupBox.TabStop = False
         Me._dopplerLogGroupBox.Text = "DopplerLog"
         '
@@ -352,18 +357,29 @@ Partial Class MainForm
         Me._dopplerLogTextBox.Multiline = True
         Me._dopplerLogTextBox.Name = "_dopplerLogTextBox"
         Me._dopplerLogTextBox.Size = New System.Drawing.Size(536, 32)
-        Me._dopplerLogTextBox.TabIndex = 31
+        Me._dopplerLogTextBox.TabIndex = 23
         '
         '_waterfallGroupBox
         '
+        Me._waterfallGroupBox.Controls.Add(Me._fastModeCheckBox)
         Me._waterfallGroupBox.Controls.Add(Me._rawImageCheckBox)
         Me._waterfallGroupBox.Controls.Add(Me._waterfallDisplayBitmapControl)
         Me._waterfallGroupBox.Location = New System.Drawing.Point(12, 383)
         Me._waterfallGroupBox.Name = "_waterfallGroupBox"
         Me._waterfallGroupBox.Size = New System.Drawing.Size(548, 268)
-        Me._waterfallGroupBox.TabIndex = 27
+        Me._waterfallGroupBox.TabIndex = 18
         Me._waterfallGroupBox.TabStop = False
         Me._waterfallGroupBox.Text = "Waterfall"
+        '
+        '_fastModeCheckBox
+        '
+        Me._fastModeCheckBox.AutoSize = True
+        Me._fastModeCheckBox.Location = New System.Drawing.Point(280, -1)
+        Me._fastModeCheckBox.Name = "_fastModeCheckBox"
+        Me._fastModeCheckBox.Size = New System.Drawing.Size(76, 17)
+        Me._fastModeCheckBox.TabIndex = 20
+        Me._fastModeCheckBox.Text = "Fast Mode"
+        Me._fastModeCheckBox.UseVisualStyleBackColor = True
         '
         '_rawImageCheckBox
         '
@@ -371,7 +387,7 @@ Partial Class MainForm
         Me._rawImageCheckBox.Location = New System.Drawing.Point(59, -1)
         Me._rawImageCheckBox.Name = "_rawImageCheckBox"
         Me._rawImageCheckBox.Size = New System.Drawing.Size(80, 17)
-        Me._rawImageCheckBox.TabIndex = 28
+        Me._rawImageCheckBox.TabIndex = 19
         Me._rawImageCheckBox.Text = "Raw Image"
         Me._rawImageCheckBox.UseVisualStyleBackColor = True
         '
@@ -383,7 +399,25 @@ Partial Class MainForm
         Me._waterfallDisplayBitmapControl.Location = New System.Drawing.Point(6, 19)
         Me._waterfallDisplayBitmapControl.Name = "_waterfallDisplayBitmapControl"
         Me._waterfallDisplayBitmapControl.Size = New System.Drawing.Size(536, 243)
-        Me._waterfallDisplayBitmapControl.TabIndex = 29
+        Me._waterfallDisplayBitmapControl.TabIndex = 21
+        '
+        '_speedXLabel_
+        '
+        Me._speedXLabel_.AutoSize = True
+        Me._speedXLabel_.Location = New System.Drawing.Point(10, 308)
+        Me._speedXLabel_.Name = "_speedXLabel_"
+        Me._speedXLabel_.Size = New System.Drawing.Size(48, 13)
+        Me._speedXLabel_.TabIndex = 15
+        Me._speedXLabel_.Text = "SpeedX:"
+        '
+        '_speedXLabel
+        '
+        Me._speedXLabel.AutoSize = True
+        Me._speedXLabel.Location = New System.Drawing.Point(58, 308)
+        Me._speedXLabel.Name = "_speedXLabel"
+        Me._speedXLabel.Size = New System.Drawing.Size(13, 13)
+        Me._speedXLabel.TabIndex = 18
+        Me._speedXLabel.Text = "1"
         '
         'MainForm
         '
@@ -452,4 +486,7 @@ Partial Class MainForm
     Friend WithEvents _rawImageCheckBox As CheckBox
     Friend WithEvents _alarmCheckBox As CheckBox
     Friend WithEvents _topFreqOnlyCheckBox As CheckBox
+    Friend WithEvents _fastModeCheckBox As CheckBox
+    Friend WithEvents _speedXLabel_ As Label
+    Friend WithEvents _speedXLabel As Label
 End Class

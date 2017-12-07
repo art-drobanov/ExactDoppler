@@ -5,6 +5,19 @@ Imports DrAF.DSP
 ''' Анализатор доплеровских всплесков
 ''' </summary>
 Public Class MotionExplorer
+    Public Class Result
+        Public Property Timestamp As DateTime
+        Public Property CarrierLevel As New LinkedList(Of Single)
+        Public Property LowDoppler As New LinkedList(Of Single)
+        Public Property HighDoppler As New LinkedList(Of Single)
+        Public Property DopplerLogItem As DopplerLogItem
+        Public Property Duration As Double
+        Public Property DopplerImageRaw As RGBMatrix
+        Public Property DopplerImage As RGBMatrix
+        Public Property LowpassAudio As Single()
+        Public Property IsWarning As Boolean
+    End Class
+
     Private Const _blankerLevel = 32 '32
     Private Const _sideFormDivider = 20 '20
     Private Const _gainHarmRadius = 2 '2
@@ -38,8 +51,8 @@ Public Class MotionExplorer
     ''' <param name="mag">Магнитуды (фрагмент "водопада").</param>
     ''' <param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
     ''' <returns>"Результат анализа движения".</returns>
-    Public Function Process(mag As Double()(), blindZone As Integer) As MotionExplorerResult
-        Dim result As New MotionExplorerResult With {.Duration = mag.Length * _fftExplorer.SonogramRowDuration}
+    Public Function Process(mag As Double()(), blindZone As Integer) As MotionExplorer.Result
+        Dim result As New MotionExplorer.Result With {.Duration = mag.Length * _fftExplorer.SonogramRowDuration}
 
         'DbScale
         Dim squelchInDb = ExactAudioMath.Db(AutoGainAndGetSquelch(mag, _brightness), _fftExplorer.ZeroDbLevel)
@@ -48,7 +61,7 @@ Public Class MotionExplorer
         ExactAudioMath.DbScale(magRaw, _fftExplorer.ZeroDbLevel, 20)
 
         'Raw Image
-        result.RawDopplerImage = _paletteProcessor.Process(magRaw, -120) 'Необработанное изображение (включая несущую)
+        result.DopplerImageRaw = _paletteProcessor.Process(magRaw, -120) 'Необработанное изображение (включая несущую)
 
         'Doppler Filtering
         ExactAudioMath.DbSquelch(mag, squelchInDb)
@@ -67,7 +80,7 @@ Public Class MotionExplorer
     ''' <param name="mag">Магнитудная сонограмма ("водопад").</param>
     ''' <param name="zeroDbLevel">"Нулевой" уровень логарифмической шкалы.</param>
     ''' <param name="blindZone">"Слепая зона" для подавления несущей частоты.</param>
-    Private Sub WaterfallDetector(result As MotionExplorerResult, mag As Double()(), zeroDbLevel As Double, blindZone As Integer)
+    Private Sub WaterfallDetector(result As MotionExplorer.Result, mag As Double()(), zeroDbLevel As Double, blindZone As Integer)
         Dim dopplerWindowWidth = CInt(Math.Round((mag(0).Length - blindZone) / 2.0)) 'Ширина доплеровского окна
         Dim lowDopplerLowHarm = 0 'Нижняя гармоника нижнего доплеровского окна
         Dim lowDopplerHighHarm = dopplerWindowWidth - 1 'Верхняя гармоника нижнего доплеровского окна

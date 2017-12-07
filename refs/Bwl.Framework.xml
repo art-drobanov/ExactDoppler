@@ -252,12 +252,13 @@ Bwl.Framework
  </summary>
  <remarks></remarks>
 </member>
-<member name="M:Bwl.Framework.SettingsStorageBufferedRoot.#ctor(System.String,System.String)">
+<member name="M:Bwl.Framework.SettingsStorageBufferedRoot.#ctor(System.String,System.String,System.Boolean)">
  <summary>
  Создать новое хранилище настроек, являющееся корневым.
  </summary>
  <param name="iniFileName">Имя ini-файла с настройками.</param>
- <remarks></remarks>
+ <param name="rootName">Имя.</param>
+ <param name="logAllEvents">Логировать все события, связанные ini-файлом?</param>
 </member>
 </members>
 </doc>

@@ -10,31 +10,25 @@ Public Class DopplerWaterfall
 
     Private _waterfallRowBlocks As New Queue(Of RGBMatrix)
     Private _waterfallPcmBlocks As New Queue(Of Single())
-    Private _maxBlocksCount As Integer = 1500
-    Private _droppedBlocksCount As Long = 0
-    Private _width As Integer = -1
+    Private _maxBlockCount As Integer = 88 '~1 минута
+    Private _scrolledBlocksCount As Long = 0
+    Private _autoScroll As Boolean
+    Private _width As Integer
 
     Private _syncRoot As New Object()
 
-    Public Sub New()
-    End Sub
-
-    Public Sub New(width As Integer)
-        _width = width
-    End Sub
-
-    Public Property MaxBlocksCount As Integer
+    Public Property MaxBlockCount As Integer
         Get
             SyncLock _syncRoot
-                Return _maxBlocksCount
+                Return _maxBlockCount
             End SyncLock
         End Get
         Set(value As Integer)
-            _maxBlocksCount = value
+            _maxBlockCount = value
         End Set
     End Property
 
-    Public ReadOnly Property BlocksCount As Integer
+    Public ReadOnly Property BlockCount As Integer
         Get
             SyncLock _syncRoot
                 Return _waterfallRowBlocks.Count
@@ -42,28 +36,37 @@ Public Class DopplerWaterfall
         End Get
     End Property
 
-    Public Property DroppedBlocksCount As Long
+    Public Property ScrolledBlockCount As Long
         Get
             SyncLock _syncRoot
-                Return _droppedBlocksCount
+                Return _scrolledBlocksCount
             End SyncLock
         End Get
         Set(value As Long)
             SyncLock _syncRoot
-                _droppedBlocksCount = value
+                _scrolledBlocksCount = value
             End SyncLock
         End Set
     End Property
+
+    Public Sub New(autoScroll As Boolean)
+        Me.New(autoScroll, -1)
+    End Sub
+
+    Public Sub New(autoScroll As Boolean, width As Integer)
+        _autoScroll = autoScroll
+        _width = width
+    End Sub
 
     Public Sub Clear()
         SyncLock _syncRoot
             _waterfallRowBlocks.Clear()
             _waterfallPcmBlocks.Clear()
-            _droppedBlocksCount = 0
+            _scrolledBlocksCount = 0
         End SyncLock
     End Sub
 
-    Public Sub Add(waterfallRowBlock As RGBMatrix, Optional waterfallPcmBlock As Single() = Nothing)
+    Public Function Add(waterfallRowBlock As RGBMatrix, Optional waterfallPcmBlock As Single() = Nothing) As Boolean
         SyncLock _syncRoot
             If _width = -1 Then
                 _width = _defaultWidth
@@ -83,15 +86,24 @@ Public Class DopplerWaterfall
                 End If
             End If
 
-            'Удаление блоков, выходящих за допустимые границы
-            Dim blocksToRemove = _waterfallRowBlocks.Count - MaxBlocksCount
-            For i = 1 To blocksToRemove
-                _waterfallRowBlocks.Dequeue()
-                _waterfallPcmBlocks.Dequeue()
-                _droppedBlocksCount += 1
-            Next
+            'Количество блоков на удаление (автоподдержание размера)
+            Dim blocksToRemove = _waterfallRowBlocks.Count - MaxBlockCount
+
+            If _autoScroll Then
+                'Удаление блоков, выходящих за допустимые границы
+                If blocksToRemove > 0 Then
+                    For i = 1 To blocksToRemove
+                        _waterfallRowBlocks.Dequeue()
+                        _waterfallPcmBlocks.Dequeue()
+                        _scrolledBlocksCount += 1
+                    Next
+                End If
+                Return True 'Автоподдержание размера, всё нормально
+            Else
+                Return blocksToRemove < 0 'Резервы на добавление есть (следующая итерация не вызовет переполнение)?
+            End If
         End SyncLock
-    End Sub
+    End Function
 
     Public Function ToRGBMatrix(Optional scale As Single = 1.0) As RGBMatrix
         SyncLock _syncRoot

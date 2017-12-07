@@ -16,14 +16,14 @@ Public Class WaveInSource
         End Get
     End Property
 
-    Public Sub New(deviceNumber As Integer, deviceName As String, sampleRate As Integer, bitDepth As Integer, stereo As Boolean, minSamplesCountInBlock As Integer)
-        MyBase.New(sampleRate, bitDepth, stereo, minSamplesCountInBlock)
+    Public Sub New(deviceNumber As Integer, deviceName As String, sampleRate As Integer, bitDepth As Integer, stereo As Boolean, minSampleCountInBlock As Integer)
+        MyBase.New(sampleRate, bitDepth, stereo, minSampleCountInBlock)
         _deviceNumber = deviceNumber
         _deviceName = deviceName
         _waveIn = New WaveInEvent With {
                                            .DeviceNumber = deviceNumber,
                                            .WaveFormat = _waveFormat,
-                                           .BufferMilliseconds = Math.Ceiling((minSamplesCountInBlock / CDbl(sampleRate)) * 1000),
+                                           .BufferMilliseconds = Math.Ceiling((minSampleCountInBlock / CDbl(sampleRate)) * 1000),
                                            .NumberOfBuffers = 3
                                        }
     End Sub
@@ -47,6 +47,6 @@ Public Class WaveInSource
     End Sub
 
     Private Sub WaveDataAvailable(sender As Object, e As WaveInEventArgs) Handles _waveIn.DataAvailable
-        MyBase.WaveDataAvailableBase(e)
+        MyBase.WaveDataAvailableBase(e, Now)
     End Sub
 End Class

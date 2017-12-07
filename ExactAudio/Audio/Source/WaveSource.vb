@@ -26,8 +26,7 @@ Public MustInherit Class WaveSource
     Public MustOverride Sub Start()
     Public MustOverride Sub [Stop]()
 
-    Protected Sub WaveDataAvailableBase(e As WaveInEventArgs)
-        Dim timestamp = DateTime.Now
+    Protected Sub WaveDataAvailableBase(e As WaveInEventArgs, timestamp As DateTime)
         Dim samples As Single() = Nothing
         Dim maxValue As Single = Math.Pow(2, _waveFormat.BitsPerSample - 1)
         Select Case _waveFormat.BitsPerSample

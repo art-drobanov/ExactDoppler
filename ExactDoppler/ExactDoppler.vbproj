@@ -80,12 +80,11 @@
     <Compile Include="Alarm\AlarmManager.vb" />
     <Compile Include="Cfg\ExactDopplerConfig.vb" />
     <Compile Include="Cfg\ExactDopplerConfigFromStorage.vb" />
-    <Compile Include="ExactDoppler.vb" />
+    <Compile Include="Core\ExactDoppler.vb" />
     <Compile Include="Log\DopplerLog.vb" />
     <Compile Include="Log\DopplerLogItem.vb" />
     <Compile Include="Math\ExactAudioMath.vb" />
     <Compile Include="Motion\MotionExplorer.vb" />
-    <Compile Include="Motion\MotionExplorerResult.vb" />
     <Compile Include="Motion\RowDopplerFilter.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -102,8 +101,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="SharedConsts.vb" />
+    <Compile Include="Core\SharedConsts.vb" />
     <Compile Include="Waterfall\DopplerWaterfall.vb" />
+    <Compile Include="ExactDopplerProcessor.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

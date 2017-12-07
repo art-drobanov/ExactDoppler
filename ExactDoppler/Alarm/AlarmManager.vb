@@ -2,8 +2,23 @@
 Imports System.Threading
 Imports NAudio.Wave
 Imports Bwl.Imaging
+Imports System.Drawing
 
 Public Class AlarmManager
+    Public Class Result
+        Public ReadOnly Property DopplerImageRaw As Bitmap
+        Public ReadOnly Property DopplerImage As Bitmap
+        Public ReadOnly Property LowpassAudio As Single()
+        Public ReadOnly Property AlarmStartTime As DateTime
+
+        Public Sub New(dopplerImageRaw As Bitmap, dopplerImage As Bitmap, lowpassAudio As Single(), alarmStartTime As DateTime)
+            _DopplerImageRaw = dopplerImageRaw
+            _DopplerImage = dopplerImage
+            _LowpassAudio = lowpassAudio
+            _AlarmStartTime = alarmStartTime
+        End Sub
+    End Class
+
     Private _warningMemorySize As Integer
     Private _warningsInMemoryToAlarm As Integer
     Private _warningMemory As New Queue(Of Single)
@@ -113,25 +128,19 @@ Public Class AlarmManager
     ''' Событие "PCM-семплы обработаны"
     ''' </summary>
     ''' <param name="motionExplorerResult">"Результат анализа движения".</param>
-    Public Event PcmSamplesProcessed(motionExplorerResult As MotionExplorerResult)
+    Public Event PcmSamplesProcessed(motionExplorerResult As MotionExplorer.Result)
 
     ''' <summary>
     ''' Событие "Тревога!"
     ''' </summary>
-    ''' <param name="rawDopplerImage">"Сырое" доплеровское изображение.</param>
-    ''' <param name="dopplerImage">Доплеровское изображение.</param>
-    ''' <param name="lowpassAudio">Аудиопоток без ультразвука.</param>
-    ''' <param name="alarmStartTime">Время начала события.</param>
-    Public Event Alarm(rawDopplerImage As RGBMatrix, dopplerImage As RGBMatrix, lowpassAudio As Single(), alarmStartTime As DateTime)
+    ''' <param name="alarm">Тревожные данные.</param>
+    Public Event Alarm(alarm As Result)
 
     ''' <summary>
     ''' Событие "Тревога зафиксирована."
     ''' </summary>
-    ''' <param name="rawDopplerImage">"Сырое" доплеровское изображение.</param>
-    ''' <param name="dopplerImage">Доплеровское изображение.</param>
-    ''' <param name="lowpassAudio">Аудиопоток без ультразвука.</param>
-    ''' <param name="alarmStartTime">Время начала события.</param>
-    Public Event AlarmRecorded(rawDopplerImage As RGBMatrix, dopplerImage As RGBMatrix, lowpassAudio As Single(), alarmStartTime As DateTime)
+    ''' <param name="alarm">Тревожные данные.</param>
+    Public Event AlarmRecorded(alarm As Result)
 
     Public Sub New(exactDoppler As ExactDoppler)
         '44 блока - это горизонт накопления предупреждений в 30 секунд.
@@ -152,10 +161,10 @@ Public Class AlarmManager
         _pcmBlocksToSkip = pcmBlocksToSkip
         _pcmBlocksToSkipRemain = _pcmBlocksToSkip
 
-        _alarmWaterfallRaw = New DopplerWaterfall With {.MaxBlocksCount = _alarmWaterfallBlocksCount} 'Для первичного обнаружения тревоги - сразу полная емкость "водопада"
-        _alarmWaterfall = New DopplerWaterfall With {.MaxBlocksCount = _alarmWaterfallBlocksCount} 'Для первичного обнаружения тревоги - сразу полная емкость "водопада"
-        _alarmRecordWaterfallRaw = New DopplerWaterfall With {.MaxBlocksCount = Math.Ceiling(_alarmRecordWaterfallBlocksCount / 2.0)} 'В ожидании события храним только 1/2 емкости
-        _alarmRecordWaterfall = New DopplerWaterfall With {.MaxBlocksCount = Math.Ceiling(_alarmRecordWaterfallBlocksCount / 2.0)} 'В ожидании события храним только 1/2 емкости
+        _alarmWaterfallRaw = New DopplerWaterfall(True) With {.MaxBlockCount = _alarmWaterfallBlocksCount} 'Для первичного обнаружения тревоги - сразу полная емкость "водопада"
+        _alarmWaterfall = New DopplerWaterfall(True) With {.MaxBlockCount = _alarmWaterfallBlocksCount} 'Для первичного обнаружения тревоги - сразу полная емкость "водопада"
+        _alarmRecordWaterfallRaw = New DopplerWaterfall(True) With {.MaxBlockCount = Math.Ceiling(_alarmRecordWaterfallBlocksCount / 2.0)} 'В ожидании события храним только 1/2 емкости
+        _alarmRecordWaterfall = New DopplerWaterfall(True) With {.MaxBlockCount = Math.Ceiling(_alarmRecordWaterfallBlocksCount / 2.0)} 'В ожидании события храним только 1/2 емкости
 
         _dataDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory(), "..", "data")
     End Sub
@@ -167,8 +176,8 @@ Public Class AlarmManager
         SyncLock _syncRoot
             _pcmBlocksToSkipRemain = _pcmBlocksToSkip
             _warningMemory.Clear()
-            _alarmRecordWaterfallRaw = New DopplerWaterfall With {.MaxBlocksCount = Math.Ceiling(_alarmRecordWaterfallBlocksCount / 2.0)} 'В ожидании события храним только 1/2 емкости
-            _alarmRecordWaterfall = New DopplerWaterfall With {.MaxBlocksCount = Math.Ceiling(_alarmRecordWaterfallBlocksCount / 2.0)} 'В ожидании события храним только 1/2 емкости
+            _alarmRecordWaterfallRaw = New DopplerWaterfall(True) With {.MaxBlockCount = Math.Ceiling(_alarmRecordWaterfallBlocksCount / 2.0)} 'В ожидании события храним только 1/2 емкости
+            _alarmRecordWaterfall = New DopplerWaterfall(True) With {.MaxBlockCount = Math.Ceiling(_alarmRecordWaterfallBlocksCount / 2.0)} 'В ожидании события храним только 1/2 емкости
         End SyncLock
     End Sub
 
@@ -176,13 +185,9 @@ Public Class AlarmManager
     ''' Сохранение пары изображений в папке
     ''' </summary>
     ''' <param name="prefix">Префикс папки для сохранения (например, 'Alarm' или 'AlarmRecord').</param>
-    ''' <param name="rawDopplerImage">"Сырое" доплеровское изображение.</param>
-    ''' <param name="dopplerImage">Доплеровское изображение.</param>
-    ''' <param name="lowpassAudio">Аудиопоток без ультразвука.</param>
-    Public Sub Save(prefix As String, rawDopplerImage As RGBMatrix, dopplerImage As RGBMatrix, lowpassAudio As Single())
-        If rawDopplerImage IsNot Nothing AndAlso dopplerImage IsNot Nothing Then
-            Dim rawDopplerImageBmp = rawDopplerImage.ToBitmap()
-            Dim dopplerImageBmp = dopplerImage.ToBitmap()
+    ''' <param name="alarm">Тревожные данные.</param>
+    Public Sub WriteAlarmData(prefix As String, alarm As Result)
+        If alarm.DopplerImageRaw IsNot Nothing AndAlso alarm.DopplerImage IsNot Nothing Then
             Dim snapshotFilename = DateTime.Now.ToString("yyyy-MM-dd__HH.mm.ss.ffff") 'Base FileName
             CheckDataDir()
             Dim alarmDir = Path.Combine(_dataDir, String.Format("{0}__{1}", prefix, snapshotFilename))
@@ -193,11 +198,11 @@ Public Class AlarmManager
                 End Try
             End If
             Directory.CreateDirectory(alarmDir)
-            rawDopplerImageBmp.Save(Path.Combine(alarmDir, "rawDopplerImg__" + snapshotFilename + ".png"))
-            dopplerImageBmp.Save(Path.Combine(alarmDir, "dopplerImg__" + snapshotFilename + ".png"))
+            alarm.DopplerImageRaw.Save(Path.Combine(alarmDir, "dopplerImgRaw__" + snapshotFilename + ".png"))
+            alarm.DopplerImage.Save(Path.Combine(alarmDir, "dopplerImg__" + snapshotFilename + ".png"))
             Dim wavWriter = New WaveFileWriter(Path.Combine(alarmDir, "lowpassAudio__" + snapshotFilename + ".wav"), New WaveFormat(_exactDoppler.SampleRate, 1))
             With wavWriter
-                .WriteSamples(lowpassAudio, 0, lowpassAudio.Length)
+                .WriteSamples(alarm.LowpassAudio, 0, alarm.LowpassAudio.Length)
                 .Flush()
                 .Close()
             End With
@@ -222,7 +227,7 @@ Public Class AlarmManager
     ''' Обработчик события - "PCM-семплы обработаны"
     ''' </summary>
     ''' <param name="motionExplorerResult">Результат аназиза PCM-семплов.</param>
-    Private Sub SamplesProcessedHandler(motionExplorerResult As MotionExplorerResult) Handles _exactDoppler.PcmSamplesProcessed
+    Private Sub SamplesProcessedHandler(motionExplorerResult As MotionExplorer.Result) Handles _exactDoppler.PcmSamplesProcessed
         'Пропуск PCM-блоков
         If _pcmBlocksToSkipRemain >= 1 Then
             _pcmBlocksToSkipRemain -= 1
@@ -231,13 +236,13 @@ Public Class AlarmManager
         End If
 
         'Добавляем блоки во все водопады...
-        _alarmWaterfallRaw.Add(motionExplorerResult.RawDopplerImage, motionExplorerResult.LowpassAudio)
+        _alarmWaterfallRaw.Add(motionExplorerResult.DopplerImageRaw, motionExplorerResult.LowpassAudio)
         _alarmWaterfall.Add(motionExplorerResult.DopplerImage)
-        _alarmRecordWaterfallRaw.Add(motionExplorerResult.RawDopplerImage, motionExplorerResult.LowpassAudio)
+        _alarmRecordWaterfallRaw.Add(motionExplorerResult.DopplerImageRaw, motionExplorerResult.LowpassAudio)
         _alarmRecordWaterfall.Add(motionExplorerResult.DopplerImage)
 
         'Если в данный момент не осуществляется запись события...
-        If _alarmRecordWaterfallRaw.MaxBlocksCount <> _alarmRecordWaterfallBlocksCount AndAlso _alarmRecordWaterfall.MaxBlocksCount <> _alarmRecordWaterfallBlocksCount Then
+        If _alarmRecordWaterfallRaw.MaxBlockCount <> _alarmRecordWaterfallBlocksCount AndAlso _alarmRecordWaterfall.MaxBlockCount <> _alarmRecordWaterfallBlocksCount Then
             If motionExplorerResult.IsWarning Then
                 _warningMemory.Enqueue(1) 'Фиксируем одну "сработку"
             End If
@@ -248,13 +253,16 @@ Public Class AlarmManager
             Dim warningsInMemory = _warningMemory.Sum() 'Количество предупреждений в памяти
             If warningsInMemory >= _warningsInMemoryToAlarm Then
                 _warningMemory.Clear() 'Память предупреждений больше не нужна, очищаем!
-                _alarmRecordWaterfallRaw = New DopplerWaterfall With {.MaxBlocksCount = _alarmRecordWaterfallBlocksCount} 'Тревога - активируем полную емкость записи!
-                _alarmRecordWaterfall = New DopplerWaterfall With {.MaxBlocksCount = _alarmRecordWaterfallBlocksCount} 'Тревога - активируем полную емкость записи!
-                _alarmRecordWaterfallRaw.DroppedBlocksCount = 0 'Сбрасываем индикатор пропусков строк
-                _alarmRecordWaterfall.DroppedBlocksCount = 0 'Сбрасываем индикатор пропусков строк
+                _alarmRecordWaterfallRaw = New DopplerWaterfall(True) With {.MaxBlockCount = _alarmRecordWaterfallBlocksCount} 'Тревога - активируем полную емкость записи!
+                _alarmRecordWaterfall = New DopplerWaterfall(True) With {.MaxBlockCount = _alarmRecordWaterfallBlocksCount} 'Тревога - активируем полную емкость записи!
+                _alarmRecordWaterfallRaw.ScrolledBlockCount = 0 'Сбрасываем индикатор пропусков строк
+                _alarmRecordWaterfall.ScrolledBlockCount = 0 'Сбрасываем индикатор пропусков строк
                 _alarmStartTime = Now
                 Dim thr1 = New Thread(Sub()
-                                          RaiseEvent Alarm(_alarmWaterfallRaw.ToRGBMatrix(), _alarmWaterfall.ToRGBMatrix(), _alarmWaterfallRaw.ToPcm(), _alarmStartTime) 'Alarm вызывается один раз - при активации события! Далее осуществляет запись.
+                                          RaiseEvent Alarm(New Result(_alarmWaterfallRaw.ToBitmap(),
+                                                                      _alarmWaterfall.ToBitmap(),
+                                                                      _alarmWaterfallRaw.ToPcm(),
+                                                                      _alarmStartTime)) 'Alarm вызывается один раз - при активации события! Далее осуществляет запись.
                                       End Sub) With {.IsBackground = True}
                 thr1.Start()
             End If
@@ -264,13 +272,16 @@ Public Class AlarmManager
             'Когда начинается запись события, "половинная" емкость водопадов для записи становится полной. Кроме того, сбрасывается счетчик выпадений.
             'Это обеспечивает расположение события в середине записи (при благоприятных условиях).
             'В любом случае, запись ведется до возникновения первого выпадения.
-            If _alarmRecordWaterfallRaw.DroppedBlocksCount <> 0 AndAlso _alarmRecordWaterfall.DroppedBlocksCount <> 0 Then
-                _alarmRecordWaterfallRaw.MaxBlocksCount = Math.Ceiling(_alarmRecordWaterfallBlocksCount / 2.0) 'В ожидании события храним только 1/2 емкости
-                _alarmRecordWaterfall.MaxBlocksCount = Math.Ceiling(_alarmRecordWaterfallBlocksCount / 2.0) 'В ожидании события храним только 1/2 емкости
-                _alarmRecordWaterfallRaw.DroppedBlocksCount = 0 'Сбрасываем индикатор пропусков строк
-                _alarmRecordWaterfall.DroppedBlocksCount = 0 'Сбрасываем индикатор пропусков строк
+            If _alarmRecordWaterfallRaw.ScrolledBlockCount <> 0 AndAlso _alarmRecordWaterfall.ScrolledBlockCount <> 0 Then
+                _alarmRecordWaterfallRaw.MaxBlockCount = Math.Ceiling(_alarmRecordWaterfallBlocksCount / 2.0) 'В ожидании события храним только 1/2 емкости
+                _alarmRecordWaterfall.MaxBlockCount = Math.Ceiling(_alarmRecordWaterfallBlocksCount / 2.0) 'В ожидании события храним только 1/2 емкости
+                _alarmRecordWaterfallRaw.ScrolledBlockCount = 0 'Сбрасываем индикатор пропусков строк
+                _alarmRecordWaterfall.ScrolledBlockCount = 0 'Сбрасываем индикатор пропусков строк
                 Dim thr2 = New Thread(Sub()
-                                          RaiseEvent AlarmRecorded(_alarmRecordWaterfallRaw.ToRGBMatrix(), _alarmRecordWaterfall.ToRGBMatrix(), _alarmRecordWaterfallRaw.ToPcm(), _alarmStartTime) 'Тревога записана!
+                                          RaiseEvent AlarmRecorded(New Result(_alarmWaterfallRaw.ToBitmap(),
+                                                                              _alarmWaterfall.ToBitmap(),
+                                                                              _alarmWaterfallRaw.ToPcm(),
+                                                                              _alarmStartTime)) 'Тревога записана!
                                       End Sub) With {.IsBackground = True}
                 thr2.Start()
                 _alarmStartTime = DateTime.MinValue

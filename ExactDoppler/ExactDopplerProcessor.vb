@@ -13,10 +13,12 @@ Public Class ExactDopplerProcessor
     End Class
 
     Private _waterfallShortRaw As DopplerWaterfall
-    Private _waterfallShort As DopplerWaterfall
-
     Private _waterfallFullRaw As DopplerWaterfall
+
+    Private _waterfallShort As DopplerWaterfall
     Private _waterfallFull As DopplerWaterfall
+
+    Private _useWaterfallRaw As Boolean
 
     Private WithEvents _exactDoppler As ExactDoppler
     Private WithEvents _alarmManager As AlarmManager
@@ -55,15 +57,25 @@ Public Class ExactDopplerProcessor
     Public Event AlarmRecorded(alarm As AlarmManager.Result)
 
     Public Sub New()
-        Me.New(New Size(0, 0))
+        Me.New(New Size(0, 0), True)
     End Sub
 
-    Public Sub New(waterfallShortSize As Size)
+    Public Sub New(useWaterfallRaw As Boolean)
+        Me.New(New Size(0, 0), useWaterfallRaw)
+    End Sub
+
+    Public Sub New(waterfallShortSize As Size, useWaterfallRaw As Boolean)
         Me.WaterfallShortSize = waterfallShortSize
-        _waterfallShortRaw = New DopplerWaterfall(True) With {.MaxBlockCount = 12}
+        _useWaterfallRaw = useWaterfallRaw
+
+        If _useWaterfallRaw Then
+            _waterfallShortRaw = New DopplerWaterfall(True) With {.MaxBlockCount = 12}
+            _waterfallFullRaw = New DopplerWaterfall(False)
+        End If
+
         _waterfallShort = New DopplerWaterfall(True) With {.MaxBlockCount = 12}
-        _waterfallFullRaw = New DopplerWaterfall(False)
         _waterfallFull = New DopplerWaterfall(False)
+
         _exactDoppler = New ExactDoppler()
         _alarmManager = New AlarmManager(_exactDoppler)
     End Sub
@@ -82,11 +94,13 @@ Public Class ExactDopplerProcessor
         End If
 
         'WaterFall
-        Dim waterfallFullRaw = _waterfallFullRaw.ToBitmap()
-        If waterfallFullRaw IsNot Nothing Then
-            waterfallFullRaw.Save(Path.Combine(_alarmManager.DataDir, "dopplerImgRaw__" + snapshotFilename + ".png"))
+        If _useWaterfallRaw Then
+            Dim waterfallFullRaw = _waterfallFullRaw.ToBitmap()
+            If waterfallFullRaw IsNot Nothing Then
+                waterfallFullRaw.Save(Path.Combine(_alarmManager.DataDir, "dopplerImgRaw__" + snapshotFilename + ".png"))
+            End If
+            _waterfallFullRaw.Clear()
         End If
-        _waterfallFullRaw.Clear()
 
         Dim waterfallFull = _waterfallFull.ToBitmap()
         If waterfallFull IsNot Nothing Then
@@ -103,21 +117,22 @@ Public Class ExactDopplerProcessor
         SyncLock _waterfallSyncRoot
             Dim res = New ExactDopplerProcessor.Result()
 
-            'Блок водопада
-            Dim waterfallBlockRaw = motionExplorerResult.DopplerImageRaw
+            Dim waterfallFullRawClearRequest As Boolean = False
+            Dim waterfallFullClearRequest As Boolean = False
+
+            If _useWaterfallRaw Then
+                Dim waterfallBlockRaw = motionExplorerResult.DopplerImageRaw
+                _waterfallShortRaw.Add(waterfallBlockRaw)
+                waterfallFullRawClearRequest = Not _waterfallFullRaw.Add(waterfallBlockRaw)
+            End If
+
             Dim waterfallBlock = motionExplorerResult.DopplerImage
-
-            'В короткий водопад добавляем блок как обычно...
-            _waterfallShortRaw.Add(waterfallBlockRaw)
             _waterfallShort.Add(waterfallBlock)
-
-            'В большой водопад добавляем с проверкой на корректность последующего добавления
-            Dim waterfallFullRawClearRequest = Not _waterfallFullRaw.Add(waterfallBlockRaw)
-            Dim waterfallFullClearRequest = Not _waterfallFull.Add(waterfallBlock)
+            waterfallFullClearRequest = Not _waterfallFull.Add(waterfallBlock)
 
             'Результат обработки
             With res
-                .WaterfallShortRaw = WaterfallShortToBitmap(_waterfallShortRaw)
+                .WaterfallShortRaw = If(_useWaterfallRaw, WaterfallShortToBitmap(_waterfallShortRaw), Nothing)
                 .WaterfallShort = WaterfallShortToBitmap(_waterfallShort)
                 .PcmBlocksCounter = __exactDoppler.PcmBlocksCounter.ToString()
                 .DopplerLogItem = motionExplorerResult.DopplerLogItem.ToString()
@@ -129,7 +144,9 @@ Public Class ExactDopplerProcessor
             'Data
             If waterfallFullRawClearRequest OrElse waterfallFullClearRequest Then
                 RaiseEvent WaterfallsAreFull(_waterfallFullRaw, _waterfallFull)
-                _waterfallFullRaw.Clear()
+                If _useWaterfallRaw Then
+                    _waterfallFullRaw.Clear()
+                End If
                 _waterfallFull.Clear()
             End If
         End SyncLock

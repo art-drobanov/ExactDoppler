@@ -5,7 +5,7 @@ Imports Bwl.Imaging
 Public Class MainForm
     Private _wavFileMarker = "[Wav File / PCM]"
 
-    Private WithEvents _exactDopplerProcessor As ExactDopplerProcessor = New ExactDopplerProcessor()
+    Private WithEvents _exactDopplerProcessor As ExactDopplerProcessor = New ExactDopplerProcessor(False)
 
     Public Sub New()
         InitializeComponent()
@@ -231,6 +231,10 @@ Public Class MainForm
 
     Private Sub _inputAudioDevicesListBox_SelectedIndexChanged(sender As Object, e As EventArgs) Handles _inputAudioDevicesListBox.SelectedIndexChanged
         _captureOffButton_Click(sender, e)
+        If _inputAudioDevicesListBox.SelectedItem Is Nothing Then
+            _inputAudioDevicesRefreshButton.Text = "Refresh"
+            Return
+        End If
         If CType(_inputAudioDevicesListBox.SelectedItem, String).Contains(_wavFileMarker) Then
             Dim ofd = New OpenFileDialog
             With ofd
@@ -242,6 +246,7 @@ Public Class MainForm
             If ofd.ShowDialog() = DialogResult.OK Then
                 Try
                     _exactDopplerProcessor.ExactDoppler.InputWavFile = ofd.FileName
+                    _inputAudioDevicesRefreshButton.Text = Path.GetFileName(ofd.FileName)
                 Catch ex As Exception
                     MessageBox.Show(ex.Message)
                 End Try

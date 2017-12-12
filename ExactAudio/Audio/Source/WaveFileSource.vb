@@ -117,7 +117,17 @@ Public Class WaveFileSource
                 Dim samplesOverprocessed = (_bytesRead / (_sampleSize * _waveFormat.Channels)) - totalSamplesForOneX
                 Dim timeToSleepInS = samplesOverprocessed / _waveFormat.SampleRate
                 If timeToSleepInS > 0 Then
-                    Thread.Sleep(TimeSpan.FromSeconds(timeToSleepInS))
+                    Dim timeToWakeUp = Now.AddSeconds(timeToSleepInS)
+                    While Now < timeToWakeUp
+                        Dim timeToSleepNowMs = (timeToWakeUp - Now).TotalMilliseconds
+                        If timeToSleepNowMs > 0 Then
+                            timeToSleepNowMs = If(timeToSleepNowMs > 1000, 1000, timeToSleepNowMs)
+                            Thread.Sleep(timeToSleepNowMs)
+                        End If
+                        If FastMode Then
+                            Exit While
+                        End If
+                    End While
                 End If
             End If
         End While

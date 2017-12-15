@@ -23,7 +23,7 @@ Public Class ExactDoppler
     Private _config As ExactDopplerConfig
 
     'Объекты
-    Private _capture As WaveSource
+    Private WithEvents _waveSource As IWaveSource
     Private _sineGenerator As SineGenerator
     Private _fftExplorer As FFTExplorer
     Private _lowpassFilter As BiQuadFilter
@@ -94,7 +94,7 @@ Public Class ExactDoppler
             SyncLock _syncRoot
                 If value >= 0 AndAlso value < Me.InputAudioDevices.Count Then
                     _inputDeviceIdx = value
-                    _capture = New WaveInSource(_inputDeviceIdx, _inputDeviceIdx.ToString(), _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallBlockDuration) With {.SampleProcessor = AddressOf SampleProcessor}
+                    _waveSource = New WaveInSource(_inputDeviceIdx, _inputDeviceIdx.ToString(), _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallBlockDuration) With {.SampleProcessor = AddressOf SampleProcessor}
                 Else
                     _inputDeviceIdx = -1
                 End If
@@ -106,7 +106,7 @@ Public Class ExactDoppler
     Public Property InputWavFile As String
         Get
             SyncLock _syncRoot
-                Return If(_capture IsNot Nothing, _capture.Name, String.Empty)
+                Return If(_waveSource IsNot Nothing, _waveSource.Name, String.Empty)
             End SyncLock
         End Get
         Set(value As String)
@@ -114,7 +114,7 @@ Public Class ExactDoppler
             SyncLock _syncRoot
                 value = value.Trim()
                 If Not String.IsNullOrEmpty(value) Then
-                    _capture = New WaveFileSource(value, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallBlockDuration) With {.SampleProcessor = AddressOf SampleProcessor}
+                    _waveSource = New WaveFileSource(value, _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallBlockDuration) With {.SampleProcessor = AddressOf SampleProcessor}
                 End If
             End SyncLock
         End Set
@@ -177,8 +177,8 @@ Public Class ExactDoppler
     ''' <summary>Текущая скорость воспроизведения.</summary>
     Public ReadOnly Property SpeedX As Double
         Get
-            If GetType(WaveFileSource).IsAssignableFrom(_capture.GetType) Then
-                Return CType(_capture, WaveFileSource).RealPlaybackSpeedX
+            If GetType(WaveFileSource).IsAssignableFrom(_waveSource.GetType) Then
+                Return CType(_waveSource, WaveFileSource).RealPlaybackSpeedX
             Else
                 Return 1
             End If
@@ -193,8 +193,8 @@ Public Class ExactDoppler
         End Get
         Set(value As Boolean)
             _captureFastMode = value
-            If GetType(WaveFileSource).IsAssignableFrom(_capture.GetType) Then
-                CType(_capture, WaveFileSource).FastMode = value
+            If GetType(WaveFileSource).IsAssignableFrom(_waveSource.GetType) Then
+                CType(_waveSource, WaveFileSource).FastMode = value
             End If
         End Set
     End Property
@@ -204,6 +204,11 @@ Public Class ExactDoppler
     ''' </summary>
     ''' <param name="motionExplorerResult">"Результат анализа движения".</param>
     Public Event PcmSamplesProcessed(motionExplorerResult As MotionExplorer.Result)
+
+    ''' <summary>
+    ''' Событие "Источник PCM-семплов остановлен"
+    ''' </summary>
+    Public Event WaveSourceStopped()
 
     Public Sub New()
         Me.New(New ExactDopplerConfig())
@@ -218,7 +223,7 @@ Public Class ExactDoppler
             _config = config
         End If
         _sineGenerator = New SineGenerator(_outputDeviceIdx, _sampleRate)
-        _capture = New WaveInSource(_inputDeviceIdx, _inputDeviceIdx.ToString(), _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallBlockDuration)
+        _waveSource = New WaveInSource(_inputDeviceIdx, _inputDeviceIdx.ToString(), _sampleRate, _nBitsCapture, False, _sampleRate * _waterfallBlockDuration)
         _fftExplorer = New FFTExplorer(_windowSize, _windowStep, _sampleRate, _nBitsPalette, False)
         _lowpassFilter = BiQuadFilter.LowPassFilter(_sampleRate, 14000, 1)
         MotionExplorersInit()
@@ -368,10 +373,10 @@ Public Class ExactDoppler
     Public Sub Start()
         SyncLock _syncRoot
             _pcmBlocksCounter = 0
-            With _capture
-                .SampleProcessor = AddressOf SampleProcessor
-                If GetType(WaveFileSource).IsAssignableFrom(_capture.GetType) Then
-                    CType(_capture, WaveFileSource).FastMode = _captureFastMode
+            With _waveSource
+                .SetSampleProcessor(AddressOf SampleProcessor)
+                If GetType(WaveFileSource).IsAssignableFrom(_waveSource.GetType) Then
+                    CType(_waveSource, WaveFileSource).FastMode = _captureFastMode
                 End If
                 .Start()
             End With
@@ -383,7 +388,7 @@ Public Class ExactDoppler
     ''' </summary>
     Public Sub [Stop]()
         SyncLock _syncRoot
-            _capture.Stop()
+            _waveSource.Stop()
         End SyncLock
     End Sub
 
@@ -546,4 +551,8 @@ Public Class ExactDoppler
 
         Return result
     End Function
+
+    Private Sub WaveSourceStoppedHandler() Handles _waveSource.Stopped
+        RaiseEvent WaveSourceStopped()
+    End Sub
 End Class

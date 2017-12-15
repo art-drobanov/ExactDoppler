@@ -5,7 +5,7 @@ Imports Bwl.Imaging
 Public Class MainForm
     Private _wavFileMarker = "[Wav File / PCM]"
 
-    Private WithEvents _exactDopplerProcessor As ExactDopplerProcessor = New ExactDopplerProcessor(False)
+    Private WithEvents _exactDopplerProcessor As ExactDopplerProcessor = New ExactDopplerProcessor()
 
     Public Sub New()
         InitializeComponent()
@@ -16,7 +16,7 @@ Public Class MainForm
         _inputAudioDevicesRefreshButton_Click(Nothing, Nothing)
         Application.DoEvents()
 
-        _exactDopplerProcessor.WaterfallShortSize = _waterfallDisplayBitmapControl.Size
+        _exactDopplerProcessor.WaterfallDisplaySize = _waterfallDisplayBitmapControl.Size
         If _exactDopplerProcessor.ExactDoppler.OutputDeviceIdx >= 0 Then
             _outputAudioDevicesListBox.SelectedIndex = _exactDopplerProcessor.ExactDoppler.OutputDeviceIdx
             _outputAudioDevicesRefreshButton.Text = _outputAudioDevicesListBox.Items(_exactDopplerProcessor.ExactDoppler.OutputDeviceIdx) + " / Refresh"
@@ -36,7 +36,7 @@ Public Class MainForm
     Private Sub PcmSamplesProcessed(res As ExactDopplerProcessor.Result) Handles _exactDopplerProcessor.PcmSamplesProcessed
         Me.Invoke(Sub()
                       'WaterfallShort
-                      Dim bmp = If(_rawImageCheckBox.Checked, res.WaterfallShortRaw, res.WaterfallShort)
+                      Dim bmp = If(_rawImageCheckBox.Checked, res.WaterfallDisplayRaw, res.WaterfallDisplay)
                       If bmp IsNot Nothing Then
                           With _waterfallDisplayBitmapControl
                               .DisplayBitmap.DrawBitmap(bmp)
@@ -85,12 +85,7 @@ Public Class MainForm
     Private Sub _captureOffButton_Click(sender As Object, e As EventArgs) Handles _captureOffButton.Click
         _alarmCheckBox.BackColor = Color.DeepSkyBlue
 
-        With _exactDopplerProcessor
-            .ExactDoppler.Stop()
-            .AlarmManager.CheckDataDir()
-            .WriteDopplerDataAndClear()
-            .WaterfallShort.Clear()
-        End With
+        _exactDopplerProcessor.Stop()
 
         'GUI
         _inputGroupBox.Text = String.Format("Input [ OFF ] at device with zero-based idx '{0}'", _exactDopplerProcessor.ExactDoppler.InputDeviceIdx)
@@ -99,12 +94,18 @@ Public Class MainForm
         _inputAudioDevicesListBox.Enabled = True
     End Sub
 
+    Private Sub WaveSourceStopped() Handles _exactDopplerProcessor.WaveSourceStopped
+        Me.Invoke(Sub()
+                      _captureOffButton_Click(Nothing, Nothing)
+                  End Sub)
+    End Sub
+
     Private Sub _scrButton_Click(sender As Object, e As EventArgs) Handles _scrButton.Click
         Dim snapshotFilename = DateTime.Now.ToString("yyyy-MM-dd__HH.mm.ss.ffff")
-        'WaterFall
 
+        'WaterFall
         With _exactDopplerProcessor
-            Dim waterfall1 = .WaterfallShort.ToBitmap()
+            Dim waterfall1 = .WaterfallDisplay.ToBitmap()
             If waterfall1 IsNot Nothing Then
                 _exactDopplerProcessor.AlarmManager.CheckDataDir()
                 waterfall1.Save(Path.Combine(.AlarmManager.DataDir, "dopplerScr__" + snapshotFilename + ".png"))
@@ -181,10 +182,12 @@ Public Class MainForm
 
     Private Sub _captureOnButton_Click(sender As Object, e As EventArgs) Handles _captureOnButton.Click
         _inputAudioDevicesListBox.Enabled = False
-        _exactDopplerProcessor.WaterfallShort.Clear()
+        _exactDopplerProcessor.WaterfallDisplay.Clear()
         _alarmCheckBox.BackColor = Color.DeepSkyBlue
-        _exactDopplerProcessor.AlarmManager.Reset()
-        _exactDopplerProcessor.ExactDoppler.Start()
+        With _exactDopplerProcessor
+            .AlarmManager.Reset()
+            .ExactDoppler.Start()
+        End With
         _inputGroupBox.Text = String.Format("Input [ ON ] at device with zero-based idx '{0}'", _exactDopplerProcessor.ExactDoppler.InputDeviceIdx)
         _captureOnButton.BackColor = Me.BackColor
     End Sub

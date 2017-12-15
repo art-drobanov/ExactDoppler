@@ -10,9 +10,9 @@ Public MustInherit Class WaveSource
     Protected _waveFormat As WaveFormat
     Protected _minSampleCountInBlock As Integer
 
-    Public SampleProcessor As SampleProcessorDelegate
-
     Public MustOverride ReadOnly Property Name As String
+
+    Public SampleProcessor As SampleProcessorDelegate
 
     Public Sub New(sampleRate As Integer, bitDepth As Integer, stereo As Boolean, minSampleCountInBlock As Integer)
         _started = False
@@ -25,6 +25,10 @@ Public MustInherit Class WaveSource
 
     Public MustOverride Sub Start()
     Public MustOverride Sub [Stop]()
+
+    Protected Sub SetSampleProcessor(sampleProcessor As SampleProcessorDelegate)
+        Me.SampleProcessor = sampleProcessor
+    End Sub
 
     Protected Sub WaveDataAvailableBase(e As WaveInEventArgs, timestamp As DateTime)
         Dim samples As Single() = Nothing

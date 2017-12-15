@@ -75,6 +75,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\Source\IWaveSource.vb" />
     <Compile Include="Audio\Source\WaveFileSource.vb" />
     <Compile Include="Audio\Source\WaveSource.vb" />
     <Compile Include="Audio\Utils\DTMFGenerator.vb" />

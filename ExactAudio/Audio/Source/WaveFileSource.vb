@@ -7,6 +7,7 @@ Imports NAudio.Wave
 ''' </summary>
 Public Class WaveFileSource
     Inherits WaveSource
+    Implements IWaveSource
 
     Private _fileName As String
     Private _sampleSize As Integer
@@ -40,7 +41,7 @@ Public Class WaveFileSource
         End Get
     End Property
 
-    Public Overrides ReadOnly Property Name As String
+    Public Overrides ReadOnly Property Name As String Implements IWaveSource.Name
         Get
             Return _fileName
         End Get
@@ -48,6 +49,8 @@ Public Class WaveFileSource
 
     Public Property PlaybackSpeedX As Single = 1
     Public Property FastMode As Boolean
+
+    Public Event Stopped() Implements IWaveSource.Stopped
 
     Public Sub New(fileName As String, sampleRate As Integer, bitDepth As Integer, stereo As Boolean, minSampleCountInBlock As Integer)
         MyBase.New(sampleRate, bitDepth, stereo, minSampleCountInBlock)
@@ -68,7 +71,11 @@ Public Class WaveFileSource
         _wavBegin = New FileInfo(_fileName).LastWriteTime.AddSeconds(-1 * LengthS)
     End Sub
 
-    Public Overrides Sub Start()
+    Public Shadows Sub SetSampleProcessor(sampleProcessor As SampleProcessorDelegate) Implements IWaveSource.SetSampleProcessor
+        MyBase.SetSampleProcessor(sampleProcessor)
+    End Sub
+
+    Public Overrides Sub Start() Implements IWaveSource.Start
         SyncLock _syncRoot
             If Not _started Then
                 Rewind()
@@ -81,7 +88,7 @@ Public Class WaveFileSource
         End SyncLock
     End Sub
 
-    Public Overrides Sub [Stop]()
+    Public Overrides Sub [Stop]() Implements IWaveSource.Stop
         SyncLock _syncRoot
             _started = False
             If _thr IsNot Nothing Then
@@ -93,7 +100,10 @@ Public Class WaveFileSource
     Private Sub CaptureThread()
         _startTime = Now
         While True
-            If Not _started Then Return
+            If Not _started Then
+                RaiseEvent Stopped()
+                Return
+            End If
 
             Dim pcmBytes = New Byte(_bufferSize - 1) {}
             Dim bytesRead = _waveFile.Read(pcmBytes, 0, _bufferSize)
@@ -108,7 +118,10 @@ Public Class WaveFileSource
 
             While PlaybackSpeedX <= 0
                 Thread.Sleep(1)
-                If Not _started Then Return
+                If Not _started Then
+                    RaiseEvent Stopped()
+                    Return
+                End If
             End While
 
             If Not FastMode Then

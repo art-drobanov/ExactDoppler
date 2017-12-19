@@ -67,8 +67,6 @@ Public Class MainForm
         Me.BeginInvoke(Sub()
                            If _alarmCheckBox.Checked Then
                                _exactDopplerProcessor.AlarmManager.WriteAlarmData("Alarm", alarm)
-                           Else
-                               _alarmCheckBox.BackColor = Color.DeepSkyBlue
                            End If
                        End Sub)
     End Sub

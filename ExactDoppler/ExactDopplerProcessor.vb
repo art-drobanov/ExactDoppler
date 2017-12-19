@@ -24,22 +24,27 @@ Public Class ExactDopplerProcessor
     Private WithEvents _exactDoppler As ExactDoppler
     Private WithEvents _alarmManager As AlarmManager
 
-    Private _waterfallSyncRoot As New Object
+    Private _timestamp As DateTime
+
+    Private _syncRoot As New Object
 
     Public Property WaterfallDisplaySize As Size
 
+    ''' <summary>"Сырой" дисплей доплеровских всплесков.</summary>
     Public ReadOnly Property WaterfallDisplayRaw As DopplerWaterfall
         Get
             Return _waterfallDisplayRaw
         End Get
     End Property
 
+    ''' <summary>Основной дисплей доплеровских всплесков.</summary>
     Public ReadOnly Property WaterfallDisplay As DopplerWaterfall
         Get
             Return _waterfallDisplay
         End Get
     End Property
 
+    ''' <summary>Высота дисплея доплеровских всплесков (в блоках).</summary>
     Public Property WaterfallDisplayBlocksHeight As Integer
         Get
             Return _waterfallDisplay.MaxBlockCount
@@ -54,16 +59,28 @@ Public Class ExactDopplerProcessor
         End Set
     End Property
 
+    ''' <summary>Детектор доплеровских всплесков.</summary>
     Public ReadOnly Property ExactDoppler As ExactDoppler
         Get
             Return _exactDoppler
         End Get
     End Property
 
+    ''' <summary>Менеджер тревог.</summary>
     Public ReadOnly Property AlarmManager As AlarmManager
         Get
             Return _alarmManager
         End Get
+    End Property
+
+    ''' <summary>Путь к папке с данными.</summary>
+    Public Property DataDir As String
+        Get
+            Return _alarmManager.DataDir
+        End Get
+        Set(value As String)
+            _alarmManager.DataDir = value
+        End Set
     End Property
 
     Public Event PcmSamplesProcessed(res As ExactDopplerProcessor.Result)
@@ -113,33 +130,35 @@ Public Class ExactDopplerProcessor
     End Sub
 
     Public Sub WriteDopplerDataAndClear()
-        Dim snapshotFilename = DateTime.Now.ToString("yyyy-MM-dd__HH.mm.ss.ffff") 'Base FileName
-        _alarmManager.CheckDataDir()
+        SyncLock _syncRoot
+            Dim snapshotFilename = _timestamp.ToString("yyyy-MM-dd__HH.mm.ss.ffff") 'Base FileName
+            _alarmManager.CheckDataDir()
 
-        'DopplerLog
-        If _exactDoppler.DopplerLog.Items.Any() Then
-            'Log
-            Dim logFilename = "dopplerLog__" + snapshotFilename + ".txt"
-            With _exactDoppler.DopplerLog
-                .Write(Path.Combine(_alarmManager.DataDir, logFilename))
-                .Clear()
-            End With
-        End If
-
-        'WaterFall
-        If _useWaterfallRaw Then
-            Dim waterfallFullRaw = _waterfallFullRaw.ToBitmap()
-            If waterfallFullRaw IsNot Nothing Then
-                waterfallFullRaw.Save(Path.Combine(_alarmManager.DataDir, "dopplerImgRaw__" + snapshotFilename + ".png"))
+            'DopplerLog
+            If _exactDoppler.DopplerLog.Items.Any() Then
+                'Log
+                Dim logFilename = "dopplerLog__" + snapshotFilename + ".txt"
+                With _exactDoppler.DopplerLog
+                    .Write(Path.Combine(_alarmManager.DataDir, logFilename))
+                    .Clear()
+                End With
             End If
-        End If
 
-        Dim waterfallFull = _waterfallFull.ToBitmap()
-        If waterfallFull IsNot Nothing Then
-            waterfallFull.Save(Path.Combine(_alarmManager.DataDir, "dopplerImg__" + snapshotFilename + ".png"))
-        End If
+            'WaterFall
+            If _useWaterfallRaw Then
+                Dim waterfallFullRaw = _waterfallFullRaw.ToBitmap()
+                If waterfallFullRaw IsNot Nothing Then
+                    waterfallFullRaw.Save(Path.Combine(_alarmManager.DataDir, "dopplerImgRaw__" + snapshotFilename + ".png"))
+                End If
+            End If
 
-        WaterfallsClear()
+            Dim waterfallFull = _waterfallFull.ToBitmap()
+            If waterfallFull IsNot Nothing Then
+                waterfallFull.Save(Path.Combine(_alarmManager.DataDir, "dopplerImg__" + snapshotFilename + ".png"))
+            End If
+
+            WaterfallsClear()
+        End SyncLock
     End Sub
 
     Private Sub AlarmManagerAlarm(alarm As AlarmManager.Result) Handles _alarmManager.Alarm
@@ -147,8 +166,10 @@ Public Class ExactDopplerProcessor
     End Sub
 
     Private Sub SamplesProcessedHandler(motionExplorerResult As MotionExplorer.Result) Handles _alarmManager.PcmSamplesProcessed
-        SyncLock _waterfallSyncRoot
-            Dim res = New ExactDopplerProcessor.Result()
+        Dim res = New ExactDopplerProcessor.Result()
+
+        SyncLock _syncRoot
+            _timestamp = motionExplorerResult.Timestamp
 
             Dim waterfallFullRawClearRequest As Boolean = False
             Dim waterfallFullClearRequest As Boolean = False
@@ -170,10 +191,9 @@ Public Class ExactDopplerProcessor
                 .PcmBlocksCounter = _exactDoppler.PcmBlocksCounter.ToString()
                 .DopplerLogItem = motionExplorerResult.DopplerLogItem.ToString()
                 .SpeedX = _exactDoppler.SpeedX
-                .AlarmDetected = __alarmManager.AlarmDetected
+                .AlarmDetected = _alarmManager.AlarmDetected
                 .IsWarning = motionExplorerResult.IsWarning
             End With
-            RaiseEvent PcmSamplesProcessed(res)
 
             'Data
             If waterfallFullRawClearRequest OrElse waterfallFullClearRequest Then
@@ -184,6 +204,8 @@ Public Class ExactDopplerProcessor
                 _waterfallFull.Clear()
             End If
         End SyncLock
+
+        RaiseEvent PcmSamplesProcessed(res)
     End Sub
 
     Private Function WaterfallShortToBitmap(waterfallShort As DopplerWaterfall) As Bitmap
@@ -199,7 +221,7 @@ Public Class ExactDopplerProcessor
     End Function
 
     Private Sub WaterfallsClear()
-        SyncLock _waterfallSyncRoot
+        SyncLock _syncRoot
             If _useWaterfallRaw Then
                 _waterfallDisplayRaw.Clear()
                 _waterfallFullRaw.Clear()

@@ -37,6 +37,8 @@ Partial Class MainForm
         Me._outputAudioDevicesRefreshButton = New System.Windows.Forms.Button()
         Me._outputAudioDevicesListBox = New System.Windows.Forms.ListBox()
         Me._inputGroupBox = New System.Windows.Forms.GroupBox()
+        Me._speedXLabel = New System.Windows.Forms.Label()
+        Me._speedXLabel_ = New System.Windows.Forms.Label()
         Me._alarmCheckBox = New System.Windows.Forms.CheckBox()
         Me._scrButton = New System.Windows.Forms.Button()
         Me._centralBlindZoneGroupBox = New System.Windows.Forms.GroupBox()
@@ -55,8 +57,6 @@ Partial Class MainForm
         Me._fastModeCheckBox = New System.Windows.Forms.CheckBox()
         Me._rawImageCheckBox = New System.Windows.Forms.CheckBox()
         Me._waterfallDisplayBitmapControl = New Bwl.Imaging.DisplayBitmapControl()
-        Me._speedXLabel_ = New System.Windows.Forms.Label()
-        Me._speedXLabel = New System.Windows.Forms.Label()
         CType(Me._sineFreqTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me._topFrequencyGroupBox.SuspendLayout()
         CType(Me._volumeTrackBar, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -117,7 +117,7 @@ Partial Class MainForm
         Me._topFreqOnlyCheckBox.AutoSize = True
         Me._topFreqOnlyCheckBox.Checked = True
         Me._topFreqOnlyCheckBox.CheckState = System.Windows.Forms.CheckState.Checked
-        Me._topFreqOnlyCheckBox.Location = New System.Drawing.Point(121, 0)
+        Me._topFreqOnlyCheckBox.Location = New System.Drawing.Point(116, 0)
         Me._topFreqOnlyCheckBox.Name = "_topFreqOnlyCheckBox"
         Me._topFreqOnlyCheckBox.Size = New System.Drawing.Size(93, 17)
         Me._topFreqOnlyCheckBox.TabIndex = 3
@@ -223,6 +223,24 @@ Partial Class MainForm
         Me._inputGroupBox.TabIndex = 9
         Me._inputGroupBox.TabStop = False
         Me._inputGroupBox.Text = "Input [ OFF ]"
+        '
+        '_speedXLabel
+        '
+        Me._speedXLabel.AutoSize = True
+        Me._speedXLabel.Location = New System.Drawing.Point(58, 308)
+        Me._speedXLabel.Name = "_speedXLabel"
+        Me._speedXLabel.Size = New System.Drawing.Size(13, 13)
+        Me._speedXLabel.TabIndex = 18
+        Me._speedXLabel.Text = "1"
+        '
+        '_speedXLabel_
+        '
+        Me._speedXLabel_.AutoSize = True
+        Me._speedXLabel_.Location = New System.Drawing.Point(10, 308)
+        Me._speedXLabel_.Name = "_speedXLabel_"
+        Me._speedXLabel_.Size = New System.Drawing.Size(48, 13)
+        Me._speedXLabel_.TabIndex = 15
+        Me._speedXLabel_.Text = "SpeedX:"
         '
         '_alarmCheckBox
         '
@@ -400,24 +418,6 @@ Partial Class MainForm
         Me._waterfallDisplayBitmapControl.Name = "_waterfallDisplayBitmapControl"
         Me._waterfallDisplayBitmapControl.Size = New System.Drawing.Size(536, 243)
         Me._waterfallDisplayBitmapControl.TabIndex = 21
-        '
-        '_speedXLabel_
-        '
-        Me._speedXLabel_.AutoSize = True
-        Me._speedXLabel_.Location = New System.Drawing.Point(10, 308)
-        Me._speedXLabel_.Name = "_speedXLabel_"
-        Me._speedXLabel_.Size = New System.Drawing.Size(48, 13)
-        Me._speedXLabel_.TabIndex = 15
-        Me._speedXLabel_.Text = "SpeedX:"
-        '
-        '_speedXLabel
-        '
-        Me._speedXLabel.AutoSize = True
-        Me._speedXLabel.Location = New System.Drawing.Point(58, 308)
-        Me._speedXLabel.Name = "_speedXLabel"
-        Me._speedXLabel.Size = New System.Drawing.Size(13, 13)
-        Me._speedXLabel.TabIndex = 18
-        Me._speedXLabel.Text = "1"
         '
         'MainForm
         '

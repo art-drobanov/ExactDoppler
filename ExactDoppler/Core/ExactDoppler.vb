@@ -200,6 +200,15 @@ Public Class ExactDoppler
     End Property
 
     ''' <summary>
+    ''' Событие "Источник PCM-семплов"
+    ''' </summary>
+    Public ReadOnly Property WavSource As WaveSource
+        Get
+            Return _waveSource
+        End Get
+    End Property
+
+    ''' <summary>
     ''' Событие "PCM-семплы обработаны"
     ''' </summary>
     ''' <param name="motionExplorerResult">"Результат анализа движения".</param>

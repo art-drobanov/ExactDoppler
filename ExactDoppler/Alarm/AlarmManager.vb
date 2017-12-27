@@ -37,7 +37,9 @@ Public Class AlarmManager
 
     Private _syncRoot As New Object()
 
-    ''' <summary>Размер памяти для хранения тревог.</summary>
+    ''' <summary>
+    ''' Размер памяти для хранения тревог.
+    ''' </summary>
     Public Property WarningMemorySize As Integer
         Get
             SyncLock _syncRoot
@@ -51,7 +53,9 @@ Public Class AlarmManager
         End Set
     End Property
 
-    ''' <summary>Количество предупреждений в памяти для активации тревоги.</summary>
+    ''' <summary>
+    ''' Количество предупреждений в памяти для активации тревоги.
+    ''' </summary>
     Public Property WarningsInMemoryToAlarm As Integer
         Get
             SyncLock _syncRoot
@@ -65,7 +69,9 @@ Public Class AlarmManager
         End Set
     End Property
 
-    ''' <summary>Количество секунд в отображении тревоги.</summary>
+    ''' <summary>
+    ''' Количество секунд в отображении тревоги.
+    ''' </summary>
     Public ReadOnly Property SecondsInAlarm As Double
         Get
             SyncLock _syncRoot
@@ -74,7 +80,9 @@ Public Class AlarmManager
         End Get
     End Property
 
-    ''' <summary>Количество секунд в записи тревоги.</summary>
+    ''' <summary>
+    ''' Количество секунд в записи тревоги.
+    ''' </summary>
     Public ReadOnly Property SecondsInAlarmRecord As Double
         Get
             SyncLock _syncRoot
@@ -83,7 +91,9 @@ Public Class AlarmManager
         End Get
     End Property
 
-    ''' <summary>Количество блоков PCM которые нужно пропустить после старта.</summary>
+    ''' <summary>
+    ''' Количество блоков PCM которые нужно пропустить после старта.
+    ''' </summary>
     Public Property PcmBlocksToSkip As Integer
         Get
             SyncLock _syncRoot
@@ -97,7 +107,9 @@ Public Class AlarmManager
         End Set
     End Property
 
-    ''' <summary>Путь к папке с данными.</summary>
+    ''' <summary>
+    ''' Путь к папке с данными.
+    ''' </summary>
     Public Property DataDir As String
         Get
             SyncLock _syncRoot
@@ -111,7 +123,9 @@ Public Class AlarmManager
         End Set
     End Property
 
-    ''' <summary>Время начала записи тревоги.</summary>
+    ''' <summary>
+    ''' Время начала записи тревоги.
+    ''' </summary>
     Public ReadOnly Property AlarmStartTime As DateTime
         Get
             SyncLock _syncRoot
@@ -120,7 +134,9 @@ Public Class AlarmManager
         End Get
     End Property
 
-    ''' <summary>В настоящее время отслеживается тревога?.</summary>
+    ''' <summary>
+    ''' В настоящее время отслеживается тревога?.
+    ''' </summary>
     Public ReadOnly Property AlarmDetected As Boolean
         Get
             SyncLock _syncRoot
@@ -129,7 +145,9 @@ Public Class AlarmManager
         End Get
     End Property
 
-    ''' <summary>Счетчик количества зафиксированных тревог.</summary>
+    ''' <summary>
+    ''' Счетчик количества зафиксированных тревог.
+    ''' </summary>
     Public ReadOnly Property AlarmCounter As Long
         Get
             SyncLock _syncRoot

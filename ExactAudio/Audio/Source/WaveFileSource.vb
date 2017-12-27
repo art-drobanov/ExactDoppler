@@ -9,7 +9,7 @@ Public Class WaveFileSource
     Inherits WaveSource
     Implements IWaveSource
 
-    Private _fileName As String
+    Private _fileName As String = String.Empty
     Private _sampleSize As Integer
     Private _bufferSize As Integer
     Private _wavBegin As DateTime
@@ -54,21 +54,26 @@ Public Class WaveFileSource
 
     Public Sub New(fileName As String, sampleRate As Integer, bitDepth As Integer, stereo As Boolean, minSampleCountInBlock As Integer)
         MyBase.New(sampleRate, bitDepth, stereo, minSampleCountInBlock)
-        If Not File.Exists(fileName) Then
-            Throw New Exception(String.Format("{0}: File '{1}' does not exists!", TypeName(Me), fileName))
-        End If
-        _fileName = fileName
-        Dim wavBytes = File.ReadAllBytes(_fileName)
-        _waveFile = New WaveFileReader(New MemoryStream(wavBytes)) With {.Position = 0}
-        If _waveFile.WaveFormat.SampleRate <> _waveFormat.SampleRate Then
-            Throw New Exception(String.Format("{0}: Wav sample rate differs from desired!", TypeName(Me)))
-        End If
-        If _waveFile.WaveFormat.Channels <> _waveFormat.Channels Then
-            Throw New Exception(String.Format("{0}: Wav channel count differs from desired!", TypeName(Me)))
-        End If
-        _sampleSize = _waveFormat.BitsPerSample >> 3
-        _bufferSize = _minSampleCountInBlock * _sampleSize * _waveFormat.Channels
-        _wavBegin = New FileInfo(_fileName).LastWriteTime.AddSeconds(-1 * LengthS)
+        Try
+            If Not File.Exists(fileName) Then
+                Throw New Exception(String.Format("{0}: File '{1}' does not exists!", TypeName(Me), fileName))
+            End If
+            _fileName = fileName
+            Dim wavBytes = File.ReadAllBytes(_fileName)
+            _waveFile = New WaveFileReader(New MemoryStream(wavBytes)) With {.Position = 0}
+            If _waveFile.WaveFormat.SampleRate <> _waveFormat.SampleRate Then
+                Throw New Exception(String.Format("{0}: Wav sample rate differs from desired!", TypeName(Me)))
+            End If
+            If _waveFile.WaveFormat.Channels <> _waveFormat.Channels Then
+                Throw New Exception(String.Format("{0}: Wav channel count differs from desired!", TypeName(Me)))
+            End If
+            _sampleSize = _waveFormat.BitsPerSample >> 3
+            _bufferSize = _minSampleCountInBlock * _sampleSize * _waveFormat.Channels
+            _wavBegin = New FileInfo(_fileName).LastWriteTime.AddSeconds(-1 * LengthS)
+        Catch
+            _fileName = String.Empty
+            _waveFile = Nothing
+        End Try
     End Sub
 
     Public Shadows Sub SetSampleProcessor(sampleProcessor As SampleProcessorDelegate) Implements IWaveSource.SetSampleProcessor
@@ -77,12 +82,14 @@ Public Class WaveFileSource
 
     Public Overrides Sub Start() Implements IWaveSource.Start
         SyncLock _syncRoot
-            If Not _started Then
-                Rewind()
-                _started = True
-                If _thr Is Nothing Then
-                    _thr = New Thread(AddressOf CaptureThread) With {.IsBackground = True}
-                    _thr.Start()
+            If _waveFile IsNot Nothing Then
+                If Not _started Then
+                    Rewind()
+                    _started = True
+                    If _thr Is Nothing Then
+                        _thr = New Thread(AddressOf CaptureThread) With {.IsBackground = True}
+                        _thr.Start()
+                    End If
                 End If
             End If
         End SyncLock
@@ -90,9 +97,20 @@ Public Class WaveFileSource
 
     Public Overrides Sub [Stop]() Implements IWaveSource.Stop
         SyncLock _syncRoot
-            _started = False
-            If _thr IsNot Nothing Then
-                _thr = Nothing
+            If _waveFile IsNot Nothing Then
+                _started = False
+                If _thr IsNot Nothing Then
+                    _thr = Nothing
+                End If
+            End If
+        End SyncLock
+    End Sub
+
+    Private Sub Rewind()
+        SyncLock _syncRoot
+            If _waveFile IsNot Nothing Then
+                _bytesRead = 0
+                _waveFile.Position = 0
             End If
         End SyncLock
     End Sub
@@ -144,10 +162,5 @@ Public Class WaveFileSource
                 End If
             End If
         End While
-    End Sub
-
-    Private Sub Rewind()
-        _bytesRead = 0
-        _waveFile.Position = 0
     End Sub
 End Class

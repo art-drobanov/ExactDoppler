@@ -41,12 +41,12 @@ Partial Class MainForm
         Me._wavFileGroupBox = New System.Windows.Forms.GroupBox()
         Me._captureOffButton = New System.Windows.Forms.Button()
         Me._speedXLabel = New System.Windows.Forms.Label()
-        Me._captureOnButton = New System.Windows.Forms.Button()
+        Me._processButton = New System.Windows.Forms.Button()
         Me._wavPositionTrackBar = New System.Windows.Forms.TrackBar()
         Me._speedXLabel_ = New System.Windows.Forms.Label()
         Me._dopplerLogGroupBox = New System.Windows.Forms.GroupBox()
-        Me._dopplerLogTextBox = New System.Windows.Forms.TextBox()
         Me._alarmLabel = New System.Windows.Forms.Label()
+        Me._dopplerLogTextBox = New System.Windows.Forms.TextBox()
         Me._waterfallsGroupBox.SuspendLayout()
         Me._dopplerSettingsGroupBox.SuspendLayout()
         Me._topFrequencyGroupBox.SuspendLayout()
@@ -220,7 +220,7 @@ Partial Class MainForm
         '
         Me._wavFileGroupBox.Controls.Add(Me._captureOffButton)
         Me._wavFileGroupBox.Controls.Add(Me._speedXLabel)
-        Me._wavFileGroupBox.Controls.Add(Me._captureOnButton)
+        Me._wavFileGroupBox.Controls.Add(Me._processButton)
         Me._wavFileGroupBox.Controls.Add(Me._wavPositionTrackBar)
         Me._wavFileGroupBox.Controls.Add(Me._openWavButton)
         Me._wavFileGroupBox.Controls.Add(Me._speedXLabel_)
@@ -250,15 +250,15 @@ Partial Class MainForm
         Me._speedXLabel.TabIndex = 24
         Me._speedXLabel.Text = "1"
         '
-        '_captureOnButton
+        '_processButton
         '
-        Me._captureOnButton.BackColor = System.Drawing.Color.MediumSpringGreen
-        Me._captureOnButton.Location = New System.Drawing.Point(833, 66)
-        Me._captureOnButton.Name = "_captureOnButton"
-        Me._captureOnButton.Size = New System.Drawing.Size(199, 32)
-        Me._captureOnButton.TabIndex = 30
-        Me._captureOnButton.Text = "Capture On"
-        Me._captureOnButton.UseVisualStyleBackColor = False
+        Me._processButton.BackColor = System.Drawing.Color.MediumSpringGreen
+        Me._processButton.Location = New System.Drawing.Point(833, 66)
+        Me._processButton.Name = "_processButton"
+        Me._processButton.Size = New System.Drawing.Size(199, 32)
+        Me._processButton.TabIndex = 30
+        Me._processButton.Text = "Process"
+        Me._processButton.UseVisualStyleBackColor = False
         '
         '_wavPositionTrackBar
         '
@@ -289,15 +289,6 @@ Partial Class MainForm
         Me._dopplerLogGroupBox.TabStop = False
         Me._dopplerLogGroupBox.Text = "DopplerLog"
         '
-        '_dopplerLogTextBox
-        '
-        Me._dopplerLogTextBox.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-        Me._dopplerLogTextBox.Location = New System.Drawing.Point(6, 19)
-        Me._dopplerLogTextBox.Multiline = True
-        Me._dopplerLogTextBox.Name = "_dopplerLogTextBox"
-        Me._dopplerLogTextBox.Size = New System.Drawing.Size(530, 57)
-        Me._dopplerLogTextBox.TabIndex = 23
-        '
         '_alarmLabel
         '
         Me._alarmLabel.AutoSize = True
@@ -306,6 +297,15 @@ Partial Class MainForm
         Me._alarmLabel.Size = New System.Drawing.Size(56, 13)
         Me._alarmLabel.TabIndex = 32
         Me._alarmLabel.Text = "ALARM: 0"
+        '
+        '_dopplerLogTextBox
+        '
+        Me._dopplerLogTextBox.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+        Me._dopplerLogTextBox.Location = New System.Drawing.Point(6, 19)
+        Me._dopplerLogTextBox.Multiline = True
+        Me._dopplerLogTextBox.Name = "_dopplerLogTextBox"
+        Me._dopplerLogTextBox.Size = New System.Drawing.Size(530, 57)
+        Me._dopplerLogTextBox.TabIndex = 23
         '
         'MainForm
         '
@@ -320,6 +320,7 @@ Partial Class MainForm
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MaximizeBox = False
         Me.Name = "MainForm"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "MotionExplorer"
         Me._waterfallsGroupBox.ResumeLayout(False)
         Me._waterfallsGroupBox.PerformLayout()
@@ -361,6 +362,6 @@ Partial Class MainForm
     Friend WithEvents _speedXLabel As Label
     Friend WithEvents _speedXLabel_ As Label
     Friend WithEvents _captureOffButton As Button
-    Friend WithEvents _captureOnButton As Button
+    Friend WithEvents _processButton As Button
     Friend WithEvents _alarmLabel As Label
 End Class

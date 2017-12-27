@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports System.Threading
 Imports ExactAudio
 
 Public Class MainForm
@@ -37,18 +38,23 @@ Public Class MainForm
         End If
     End Sub
 
-    Private Sub _captureOnButton_Click(sender As Object, e As EventArgs) Handles _captureOnButton.Click
+    Private Sub _captureOnButton_Click(sender As Object, e As EventArgs) Handles _processButton.Click
         _exactDopplerProcessor.WaterfallDisplay.Clear()
         With _exactDopplerProcessor
             .AlarmManager.Reset()
-            .ExactDoppler.Start()
+            If Not .ExactDoppler.Start(True) Then 'Указываем, что должен использоваться файловый режим
+                Dim thr = New Thread(Sub()
+                                         _captureOffButton_Click(sender, e)
+                                     End Sub) With {.IsBackground = True}
+                thr.Start()
+            End If
         End With
-        _captureOnButton.BackColor = Me.BackColor
+        _processButton.BackColor = Me.BackColor
     End Sub
 
     Private Sub _captureOffButton_Click(sender As Object, e As EventArgs) Handles _captureOffButton.Click
         _exactDopplerProcessor.Stop()
-        _captureOnButton.BackColor = Color.MediumSpringGreen
+        _processButton.BackColor = Color.MediumSpringGreen
     End Sub
 
     Private Sub _fastModeCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles _fastModeCheckBox.CheckedChanged

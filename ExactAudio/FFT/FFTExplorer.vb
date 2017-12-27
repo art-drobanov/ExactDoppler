@@ -46,7 +46,8 @@ Public Class FFTExplorer
     ''' <param name="pcmSamples">Входные PCM-семплы.</param>
     ''' <param name="pcmSamplesCount">Количество семплов под обработку.</param>
     ''' <param name="magnitudesOnly">Вычислять только магнитуды?</param>
-    Public Function Explore(pcmSamples As Single(), pcmSamplesCount As Integer, Optional magnitudesOnly As Boolean = False) As ExactPlotter.CFFT_ExploreResult
+    Public Function Explore(pcmSamples As Single(), pcmSamplesCount As Integer,
+                            Optional magnitudesOnly As Boolean = False) As ExactPlotter.CFFT_ExploreResult
         'Конфигурация: прямой проход FFT с нормализацией и использованием взвешивающего окна...
         Dim useTaperWindow As Boolean = True
         Dim recoverAfterTaperWindow As Boolean = False
@@ -80,7 +81,8 @@ Public Class FFTExplorer
     ''' <param name="cfft"></param>
     ''' <param name="lowFreq">Нижняя частота поддиапазона.</param>
     ''' <param name="highFreq">Верхняя частота поддиапазона.</param>
-    Public Function SubBand(cfft As ExactPlotter.CFFT_ExploreResult, lowFreq As Double, highFreq As Double, Optional magnitudesOnly As Boolean = False) As ExactPlotter.CFFT_ExploreResult
+    Public Function SubBand(cfft As ExactPlotter.CFFT_ExploreResult, lowFreq As Double, highFreq As Double,
+                            Optional magnitudesOnly As Boolean = False) As ExactPlotter.CFFT_ExploreResult
         Dim res = New ExactPlotter.CFFT_ExploreResult
 
         Dim lowHarmIdx As Integer = 0

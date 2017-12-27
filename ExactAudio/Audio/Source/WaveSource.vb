@@ -35,13 +35,13 @@ Public MustInherit Class WaveSource
         Dim maxValue As Single = Math.Pow(2, _waveFormat.BitsPerSample - 1)
         Select Case _waveFormat.BitsPerSample
             Case 16
-                samples = New Single((e.Buffer.Length \ 2) - 1) {}
+                samples = New Single((e.Buffer.Length \ 2) - 1) {} '16 bit - 2 bytes
                 Parallel.For(0, samples.Length, Sub(bufferIdx As Integer)
                                                     Dim intSample = BitConverter.ToInt16(e.Buffer, bufferIdx * 2)
                                                     samples(bufferIdx) = intSample / maxValue
                                                 End Sub)
             Case 24
-                samples = New Single((e.Buffer.Length \ 3) - 1) {}
+                samples = New Single((e.Buffer.Length \ 3) - 1) {} '24 bit - 3 bytes
                 Parallel.For(0, samples.Length, Sub(bufferIdx As Integer)
                                                     Dim intSample = BytesToInt24(e.Buffer, bufferIdx * 3)
                                                     samples(bufferIdx) = intSample / maxValue
@@ -60,7 +60,7 @@ Public MustInherit Class WaveSource
         Dim value As Integer = 0
         For i = buffer.Length - 1 To 0 Step -1
             value += (CInt(buffer(i)) << (i << 3))
-        Next i
+        Next
         If (buffer(buffer.Length - 1) And &H80) = &H80 Then
             value = value Or (&HFFFFFF << (buffer.Length << 3))
         End If

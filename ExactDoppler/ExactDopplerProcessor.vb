@@ -30,21 +30,27 @@ Public Class ExactDopplerProcessor
 
     Public Property WaterfallDisplaySize As Size
 
-    ''' <summary>"Сырой" дисплей доплеровских всплесков.</summary>
+    ''' <summary>
+    ''' "Сырой" дисплей доплеровских всплесков.
+    ''' </summary>
     Public ReadOnly Property WaterfallDisplayRaw As DopplerWaterfall
         Get
             Return _waterfallDisplayRaw
         End Get
     End Property
 
-    ''' <summary>Основной дисплей доплеровских всплесков.</summary>
+    ''' <summary>
+    ''' Основной дисплей доплеровских всплесков.
+    ''' </summary>
     Public ReadOnly Property WaterfallDisplay As DopplerWaterfall
         Get
             Return _waterfallDisplay
         End Get
     End Property
 
-    ''' <summary>Высота дисплея доплеровских всплесков (в блоках).</summary>
+    ''' <summary>
+    ''' Высота дисплея доплеровских всплесков (в блоках).
+    ''' </summary>
     Public Property WaterfallDisplayBlocksHeight As Integer
         Get
             Return _waterfallDisplay.MaxBlockCount
@@ -59,21 +65,27 @@ Public Class ExactDopplerProcessor
         End Set
     End Property
 
-    ''' <summary>Детектор доплеровских всплесков.</summary>
+    ''' <summary>
+    ''' Детектор доплеровских всплесков.
+    ''' </summary>
     Public ReadOnly Property ExactDoppler As ExactDoppler
         Get
             Return _exactDoppler
         End Get
     End Property
 
-    ''' <summary>Менеджер тревог.</summary>
+    ''' <summary>
+    ''' Менеджер тревог.
+    ''' </summary>
     Public ReadOnly Property AlarmManager As AlarmManager
         Get
             Return _alarmManager
         End Get
     End Property
 
-    ''' <summary>Путь к папке с данными.</summary>
+    ''' <summary>
+    ''' Путь к папке с данными.
+    ''' </summary>
     Public Property DataDir As String
         Get
             Return _alarmManager.DataDir

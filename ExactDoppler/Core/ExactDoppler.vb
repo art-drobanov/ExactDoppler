@@ -32,49 +32,63 @@ Public Class ExactDoppler
 
     Private _syncRoot As New Object()
 
-    ''' <summary>Список аудиоустройств вывода.</summary>
+    ''' <summary>
+    ''' Список аудиоустройств вывода.
+    ''' </summary>
     Public ReadOnly Property OutputAudioDevices As String()
         Get
             Return AudioUtils.GetWaveOutNames()
         End Get
     End Property
 
-    ''' <summary>Список аудиоустройств ввода.</summary>
+    ''' <summary>
+    ''' Список аудиоустройств ввода.
+    ''' </summary>
     Public ReadOnly Property InputAudioDevices As String()
         Get
             Return AudioUtils.GetWaveInNames()
         End Get
     End Property
 
-    ''' <summary>Частота семлирования.</summary>
+    ''' <summary>
+    ''' Частота семлирования.
+    ''' </summary>
     Public ReadOnly Property SampleRate As Integer
         Get
             Return _sampleRate
         End Get
     End Property
 
-    ''' <summary>Верхняя частота области интереса.</summary>
+    ''' <summary>
+    ''' Верхняя частота области интереса.
+    ''' </summary>
     Public ReadOnly Property TopFreq As Integer
         Get
             Return _topFreq
         End Get
     End Property
 
-    ''' <summary>Размер доплеровской области интереса.</summary>
+    ''' <summary>
+    ''' Размер доплеровской области интереса.
+    ''' </summary>
     Public ReadOnly Property DopplerSize As Integer
         Get
             Return _dopplerSize
         End Get
     End Property
 
-    ''' <summary>Длительность блока на "водопаде".</summary>
+    ''' <summary>
+    ''' Длительность блока на "водопаде".
+    ''' </summary>
     Public ReadOnly Property WaterfallBlockDuration As Double
         Get
             Return _waterfallBlockDuration
         End Get
     End Property
 
-    ''' <summary>Количество обработанных блоков PCM.</summary>
+    ''' <summary>
+    ''' Количество обработанных блоков PCM.
+    ''' </summary>
     Public ReadOnly Property PcmBlocksCounter As Long
         Get
             SyncLock _syncRoot
@@ -83,7 +97,9 @@ Public Class ExactDoppler
         End Get
     End Property
 
-    ''' <summary>Индекс устройства захвата аудио.</summary>
+    ''' <summary>
+    ''' Индекс устройства захвата аудио.
+    ''' </summary>
     Public Property InputDeviceIdx As Integer
         Get
             SyncLock _syncRoot
@@ -102,7 +118,9 @@ Public Class ExactDoppler
         End Set
     End Property
 
-    ''' <summary>Имя аудиофайла.</summary>
+    ''' <summary>
+    ''' Имя аудиофайла.
+    ''' </summary>
     Public Property InputWavFile As String
         Get
             SyncLock _syncRoot
@@ -120,7 +138,9 @@ Public Class ExactDoppler
         End Set
     End Property
 
-    ''' <summary>Индекс устройства вывода аудио.</summary>
+    ''' <summary>
+    ''' Индекс устройства вывода аудио.
+    ''' </summary>
     Public Property OutputDeviceIdx As Integer
         Get
             SyncLock _syncRoot
@@ -139,14 +159,18 @@ Public Class ExactDoppler
         End Set
     End Property
 
-    ''' <summary>Доплеровский лог.</summary>
+    ''' <summary>
+    ''' Доплеровский лог.
+    ''' </summary>
     Public ReadOnly Property DopplerLog As DopplerLog
         Get
             Return _dopplerLog
         End Get
     End Property
 
-    ''' <summary>Громкость.</summary>
+    ''' <summary>
+    ''' Громкость.
+    ''' </summary>
     Public Property Volume As Single
         Get
             SyncLock _syncRoot
@@ -160,7 +184,9 @@ Public Class ExactDoppler
         End Set
     End Property
 
-    ''' <summary>Конфигурация доплеровского анализатора.</summary>
+    ''' <summary>
+    ''' Конфигурация доплеровского анализатора.
+    ''' </summary>
     Public Property Config As ExactDopplerConfig
         Get
             SyncLock _syncRoot
@@ -174,10 +200,12 @@ Public Class ExactDoppler
         End Set
     End Property
 
-    ''' <summary>Текущая скорость воспроизведения.</summary>
+    ''' <summary>
+    ''' Текущая скорость воспроизведения.
+    ''' </summary>
     Public ReadOnly Property SpeedX As Double
         Get
-            If GetType(WaveFileSource).IsAssignableFrom(_waveSource.GetType) Then
+            If IsInFileMode Then
                 Return CType(_waveSource, WaveFileSource).RealPlaybackSpeedX
             Else
                 Return 1
@@ -185,7 +213,9 @@ Public Class ExactDoppler
         End Get
     End Property
 
-    ''' <summary>Используется быстрый режим?</summary>
+    ''' <summary>
+    ''' Используется быстрый режим?
+    ''' </summary>
     Private _captureFastMode As Boolean
     Public Property FastMode As Boolean
         Get
@@ -193,7 +223,7 @@ Public Class ExactDoppler
         End Get
         Set(value As Boolean)
             _captureFastMode = value
-            If GetType(WaveFileSource).IsAssignableFrom(_waveSource.GetType) Then
+            If IsInFileMode Then
                 CType(_waveSource, WaveFileSource).FastMode = value
             End If
         End Set
@@ -205,6 +235,15 @@ Public Class ExactDoppler
     Public ReadOnly Property WavSource As WaveSource
         Get
             Return _waveSource
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Задействован файловый источник?
+    ''' </summary>
+    Public ReadOnly Property IsInFileMode As Boolean
+        Get
+            Return GetType(WaveFileSource).IsAssignableFrom(_waveSource.GetType())
         End Get
     End Property
 
@@ -379,18 +418,22 @@ Public Class ExactDoppler
     ''' <summary>
     ''' Запуск
     ''' </summary>
-    Public Sub Start()
+    Public Function Start(Optional fileModeNeeds As Boolean = False) As Boolean
         SyncLock _syncRoot
             _pcmBlocksCounter = 0
+            If fileModeNeeds AndAlso Not IsInFileMode Then
+                Return False
+            End If
             With _waveSource
                 .SetSampleProcessor(AddressOf SampleProcessor)
-                If GetType(WaveFileSource).IsAssignableFrom(_waveSource.GetType) Then
+                If IsInFileMode Then
                     CType(_waveSource, WaveFileSource).FastMode = _captureFastMode
                 End If
                 .Start()
             End With
+            Return True
         End SyncLock
-    End Sub
+    End Function
 
     ''' <summary>
     ''' Останов

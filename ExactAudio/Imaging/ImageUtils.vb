@@ -23,7 +23,6 @@ Public Module ImageUtils
     <Extension>
     Public Function ExtendWidth(rgbMatrix As RGBMatrix, widthAddition As Integer) As RGBMatrix
         Dim result As New RGBMatrix(rgbMatrix.Width + widthAddition, rgbMatrix.Height)
-
         Dim shift = widthAddition \ 2
         Parallel.For(0, 3, Sub(channel As Integer)
                                For x = 0 To rgbMatrix.Width - 1
@@ -32,7 +31,6 @@ Public Module ImageUtils
                                    Next
                                Next
                            End Sub)
-
         Return result
     End Function
 

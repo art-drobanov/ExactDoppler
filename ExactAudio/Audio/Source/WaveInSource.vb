@@ -7,9 +7,10 @@ Public Class WaveInSource
     Inherits WaveSource
     Implements IWaveSource
 
-    Private _deviceNumber As Integer
-    Private _deviceName As String
+    Private _deviceNumber As Integer = -1
+    Private _deviceName As String = String.Empty
     Private WithEvents _waveIn As WaveInEvent
+    Private _syncRoot As New Object
 
     Public Overrides ReadOnly Property Name As String Implements IWaveSource.Name
         Get
@@ -21,14 +22,20 @@ Public Class WaveInSource
 
     Public Sub New(deviceNumber As Integer, deviceName As String, sampleRate As Integer, bitDepth As Integer, stereo As Boolean, minSampleCountInBlock As Integer)
         MyBase.New(sampleRate, bitDepth, stereo, minSampleCountInBlock)
-        _deviceNumber = deviceNumber
-        _deviceName = deviceName
-        _waveIn = New WaveInEvent With {
-                                           .DeviceNumber = deviceNumber,
-                                           .WaveFormat = _waveFormat,
-                                           .BufferMilliseconds = Math.Ceiling((minSampleCountInBlock / CDbl(sampleRate)) * 1000),
-                                           .NumberOfBuffers = 3
-                                       }
+        Try
+            _deviceNumber = deviceNumber
+            _deviceName = deviceName
+            _waveIn = New WaveInEvent With {
+                                                .DeviceNumber = _deviceNumber,
+                                                .WaveFormat = _waveFormat,
+                                                .BufferMilliseconds = Math.Ceiling((minSampleCountInBlock / CDbl(sampleRate)) * 1000),
+                                                .NumberOfBuffers = 3
+                                           }
+        Catch
+            _deviceNumber = -1
+            _deviceName = String.Empty
+            _waveIn = Nothing
+        End Try
     End Sub
 
     Public Shadows Sub SetSampleProcessor(sampleProcessor As SampleProcessorDelegate) Implements IWaveSource.SetSampleProcessor
@@ -36,20 +43,24 @@ Public Class WaveInSource
     End Sub
 
     Public Overrides Sub Start() Implements IWaveSource.Start
-        If _deviceNumber >= 0 AndAlso Not _started Then
-            SyncLock _waveIn
-                _waveIn.StartRecording()
-                _started = True
+        If _waveIn IsNot Nothing Then
+            SyncLock _syncRoot
+                If _deviceNumber >= 0 AndAlso Not _started Then
+                    _waveIn.StartRecording()
+                    _started = True
+                End If
             End SyncLock
         End If
     End Sub
 
     Public Overrides Sub [Stop]() Implements IWaveSource.Stop
-        If _started Then
-            SyncLock _waveIn
-                _waveIn.StopRecording()
-                _started = False
-                RaiseEvent Stopped()
+        If _waveIn IsNot Nothing Then
+            SyncLock _syncRoot
+                If _started Then
+                    _waveIn.StopRecording()
+                    _started = False
+                    RaiseEvent Stopped()
+                End If
             End SyncLock
         End If
     End Sub

@@ -8,7 +8,9 @@ Public Class ProgrammedSineWaveProvider32
 
     Private _sampleIdx As Integer
 
-    ''' <summary>'Программа', управляющая генератором.</summary>
+    ''' <summary>
+    ''' "Программа", управляющая генератором.
+    ''' </summary>
     Public Property Program As Queue(Of SineTaskBlock)
 
     Public Sub New()

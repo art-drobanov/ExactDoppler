@@ -55,24 +55,9 @@ Public Class SineGenerator
             _waveOut.Init(waveProvider)
             _deviceNumber = selectedDeviceNumber
         Catch
-            For i = 0 To AudioUtils.GetWaveOutNames().Length - 1
-                Dim exc = False
-                If i <> selectedDeviceNumber Then
-                    Try
-                        _waveOut = New WaveOut() With {.DeviceNumber = i}
-                        _waveOut.Init(waveProvider)
-                        selectedDeviceNumber = i
-                    Catch
-                        _waveOut = Nothing
-                        exc = True
-                    End Try
-                    If Not exc Then
-                        Exit For
-                    End If
-                End If
-            Next
+            _waveOut = Nothing
+            _deviceNumber = -1
         End Try
-        _waveOut = Nothing
     End Sub
 
     Public Sub Play(program As Queue(Of SineTaskBlock))
@@ -92,7 +77,10 @@ Public Class SineGenerator
             If _waveOut IsNot Nothing Then
                 With _waveOut
                     .Stop()
-                    .Dispose()
+                    Try
+                        .Dispose()
+                    Catch
+                    End Try
                 End With
                 _waveOut = Nothing
             End If

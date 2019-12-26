@@ -1,6 +1,5 @@
 ﻿Imports System.Drawing
 Imports System.IO
-Imports Bwl.Imaging
 
 Public Class ExactDopplerProcessor
     Public Class Result

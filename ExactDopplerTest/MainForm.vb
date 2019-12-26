@@ -89,6 +89,8 @@ Public Class MainForm
         _inputGroupBox.Text = String.Format("Input [ OFF ] at device with zero-based idx '{0}'", _exactDopplerProcessor.ExactDoppler.InputDeviceIdx)
         _captureOnButton.BackColor = Color.MediumSpringGreen
 
+        _sineGenSwitchOffButton_Click(sender, e)
+
         _inputAudioDevicesListBox.Enabled = True
     End Sub
 
